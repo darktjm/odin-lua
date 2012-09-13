@@ -1,6 +1,6 @@
-odin.ps == odin.tex :ps
+odin.pdf == odin.tex +usepdf :pdf
 %html-in == <<
-   odin.tex :texauxin.vtd
+   odin.tex +usepdf :texauxin.vtd
    odin.tex :tex.vtd
 
 odin.html == '/dev/null' \
