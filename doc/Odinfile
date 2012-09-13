@@ -1,1 +1,11 @@
-odin.ps == odin.tex :ps 
+odin.ps == odin.tex :ps
+%html-in == <<
+   odin.tex :texauxin.vtd
+   odin.tex :tex.vtd
+
+odin.html == '/dev/null' \
+   +cmd=cd (%html-in :list :cat :vir_dir)';' \
+        latex2html -split 0 -noimages -nonavigation -show_section_numbers \
+                   -math -noinfo odin.tex '>/dev/null' '2>&1' ';' \
+        cat 'odin/odin.html' ';' rm -rf odin ';' \
+   :stdout
