@@ -273,8 +273,7 @@ void Write_Node(tp_FilDsc FilDsc, tp_Nod Nod)
    }
 }
 
-tp_Nod Append_Seq(Seq1, Seq2)
-tp_Nod Seq1, Seq2;
+tp_Nod Append_Seq(tp_Nod Seq1, tp_Nod Seq2)
 {
    if (Seq1 == NIL) {
       return Seq2;
@@ -298,8 +297,7 @@ tp_Nod Seq1, Seq2;
    return Make_Nod(SEQ, NConc(Seq1, Seq2));
 }
 
-tp_Nod Union_Alternative(Alt1, Alt2)
-tp_Nod Alt1, Alt2;
+tp_Nod Union_Alternative(tp_Nod Alt1, tp_Nod Alt2)
 {
    if (Alt1 == NIL) {
       return Alt2;
@@ -323,11 +321,8 @@ tp_Nod Alt1, Alt2;
    return Make_Nod(ALTLST, NUnion(Alt1, Alt2));
 }
 
-tp_Nod NUnion(Nod1, Nod2)
-tp_Nod Nod1, Nod2;
+tp_Nod NUnion(tp_Nod Nod1, tp_Nod Nod2)
 {
-   tp_Nod Nod, NextNod;
-
    if (Nod1 == NIL) {
       return Nod2;
    }
@@ -335,8 +330,7 @@ tp_Nod Nod1, Nod2;
    return NConc(Nod1, Nod2);
 }
 
-tp_Nod NConc(Nod1, Nod2)
-tp_Nod Nod1, Nod2;
+tp_Nod NConc(tp_Nod Nod1, tp_Nod Nod2)
 {
    tp_Nod Nod;
 

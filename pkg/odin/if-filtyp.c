@@ -107,7 +107,8 @@ boolean IsDerefInput_Tool(tp_Tool Tool)
          FATALERROR("illegal ToolClass");
       }
    }
- /*NOTREACHED*/}
+   /*NOTREACHED*/
+}
 
 boolean IsReport_Tool(tp_Tool Tool)
 {

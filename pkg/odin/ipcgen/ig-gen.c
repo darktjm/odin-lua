@@ -16,7 +16,7 @@ geoff@boulder.colorado.edu
 #include "inc/GMC.h"
 #include "inc/NodTyp_.h"
 
-int Gen_InStub(tp_FilDsc FilDsc, tp_Nod Root)
+void Gen_InStub(tp_FilDsc FilDsc, tp_Nod Root)
 {
    tp_Nod StubNod, MsgNod;
    int MsgNum;
@@ -76,7 +76,7 @@ int Gen_InStub(tp_FilDsc FilDsc, tp_Nod Root)
    Writeln(FilDsc, "   }");
 }
 
-int Gen_OutStub(tp_FilDsc FilDsc, tp_Nod Root)
+void Gen_OutStub(tp_FilDsc FilDsc, tp_Nod Root)
 {
    tp_Nod StubNod, MsgNod;
    int MsgNum;
@@ -97,7 +97,7 @@ int Gen_OutStub(tp_FilDsc FilDsc, tp_Nod Root)
    }
 }
 
-int Write_InMsg(tp_FilDsc FilDsc, tp_Nod MsgNod)
+void Write_InMsg(tp_FilDsc FilDsc, tp_Nod MsgNod)
 {
    tp_Nod ArgDclsNod, ArgDclNod;
    tp_NodTyp ArgKind;
@@ -181,7 +181,7 @@ int Write_InMsg(tp_FilDsc FilDsc, tp_Nod MsgNod)
    Writeln(FilDsc, "}");
 }
 
-int Write_SplitInMsg(tp_FilDsc FilDsc, tp_Nod MsgNod)
+void Write_SplitInMsg(tp_FilDsc FilDsc, tp_Nod MsgNod)
 {
    tp_Nod ArgDclsNod, ArgDclNod, ArgTypeNod;
    tp_NodTyp ArgKind;
@@ -334,8 +334,8 @@ int Write_SplitInMsg(tp_FilDsc FilDsc, tp_Nod MsgNod)
    Writeln(FilDsc, "}");
 }
 
-int Write_OutMsg(tp_FilDsc FilDsc, tp_Nod MsgNod, int MsgNum,
-                 boolean IsServer)
+void Write_OutMsg(tp_FilDsc FilDsc, tp_Nod MsgNod, int MsgNum,
+                  boolean IsServer)
 {
    tp_Nod ArgDclsNod, ArgDclNod, ArgTypeNod;
    tp_NodTyp ArgKind;
@@ -502,7 +502,7 @@ int Write_OutMsg(tp_FilDsc FilDsc, tp_Nod MsgNod, int MsgNum,
    Writeln(FilDsc, "   }");
 }
 
-int Get_MsgNod(tp_Nod * MsgNodPtr, boolean * IsServerPtr, tp_Nod StubNod)
+void Get_MsgNod(tp_Nod * MsgNodPtr, boolean * IsServerPtr, tp_Nod StubNod)
 {
    switch (Nod_NodTyp(StubNod)) {
    case NOD_server:{
@@ -520,7 +520,7 @@ int Get_MsgNod(tp_Nod * MsgNodPtr, boolean * IsServerPtr, tp_Nod StubNod)
    *MsgNodPtr = Nod_Son(1, StubNod);
 }
 
-int Write_ServerIfDef(tp_FilDsc FilDsc, boolean IsServer)
+void Write_ServerIfDef(tp_FilDsc FilDsc, boolean IsServer)
 {
    if (IsServer) {
       Writeln(FilDsc, "#ifndef CLIENT_ONLY");
@@ -529,12 +529,12 @@ int Write_ServerIfDef(tp_FilDsc FilDsc, boolean IsServer)
    Writeln(FilDsc, "#ifndef SERVER_ONLY");
 }
 
-int Write_Args(tp_FilDsc FilDsc, tp_Nod ArgsNod)
+void Write_Args(tp_FilDsc FilDsc, tp_Nod ArgsNod)
 {
 
 }
 
-int Write_NodSym(tp_FilDsc FilDsc, tp_Nod Nod)
+void Write_NodSym(tp_FilDsc FilDsc, tp_Nod Nod)
 {
    Write(FilDsc, Sym_Str(Nod_Sym(Nod)));
 }

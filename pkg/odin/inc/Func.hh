@@ -483,6 +483,7 @@ extern boolean IsCopy_FilTyp(tp_FilTyp);
 extern boolean IsGrouping_FilTyp(tp_FilTyp);
 extern boolean IsGroupingInput_FilTyp(tp_FilTyp);
 extern boolean IsSecOrd_FilTyp(tp_FilTyp);
+extern boolean IsRecurse_FilTyp(tp_FilTyp);
 extern boolean IsExec_FilTyp(tp_FilTyp);
 extern boolean IsVoid_FilTyp(tp_FilTyp);
 extern boolean IsAtmc_FilTyp(tp_FilTyp);
@@ -579,6 +580,7 @@ extern void TopLevelCI(boolean *, tp_Str);
 extern void Get_Commands(boolean *);
 extern int main(int, char **);
 /* if-nod.c */
+extern tp_Nod New_Nod(void);
 extern void Ret_Nod(tp_Nod);
 extern tp_NodTyp Nod_NodTyp(tp_Nod);
 extern void Set_Nod_NodTyp(tp_Nod, tp_NodTyp);

@@ -38,13 +38,13 @@ int main(void)
    if (Num_Errors() > 0) return 102;
 */
 
-   FilDsc = FileName_WFilDsc("OUT.c");
+   FilDsc = FileName_WFilDsc("OUT.c", TRUE);
    Gen_OutStub(FilDsc, Root);
    Close(FilDsc);
    if (Num_Errors() > 0)
       return 103;
 
-   FilDsc = FileName_WFilDsc("IN.c");
+   FilDsc = FileName_WFilDsc("IN.c", TRUE);
    Gen_InStub(FilDsc, Root);
    Close(FilDsc);
    if (Num_Errors() > 0)

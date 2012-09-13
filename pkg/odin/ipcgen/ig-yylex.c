@@ -54,6 +54,7 @@ int Init_Lex(void)
    Set_Sym_Att(Sym, TOK_str);
    Sym = Str_Sym("int");
    Set_Sym_Att(Sym, TOK_int);
+   return 0;
 }
 
 /*private*/ boolean
@@ -180,12 +181,12 @@ YY_IsWordChr(char Chr)
 /* NOTREACHED */
 }
 
-int EndLex(void)
+void EndLex(void)
 {
    SystemError("Unexpected call to EndLex");
 }
 
-int ParseError(tp_Str Str)
+void ParseError(tp_Str Str)
 {
    SystemError("%s at <%s> at line %d.\n", Str, PrevParseStr, LineNum);
 }

@@ -97,7 +97,8 @@ static tp_Str FTClass_Str(tp_FTClass FTClass)
          FATALERROR("unknown FTClass.\n");
       }
    }
- /*NOTREACHED*/}
+   /*NOTREACHED*/
+}
 
 static void Broadcast_FTClass(tp_FilTyp FilTyp, tp_FTClass FTClass)
 {

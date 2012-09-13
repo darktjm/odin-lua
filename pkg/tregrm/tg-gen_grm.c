@@ -364,7 +364,7 @@ void Write_Act(tp_FilDsc FilDsc, int NodeType, int NumSons)
    Write(FilDsc, ");} ");
 }
 
-void Write_Lex(tp_FilDsc FilDsc, tp_Str Str)
+static void Write_Lex(tp_FilDsc FilDsc, tp_Str Str)
 {
    tp_Str StrPtr;
 

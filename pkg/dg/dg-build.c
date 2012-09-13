@@ -123,7 +123,6 @@ static tp_InpSpc Nod_InpSpc(tp_Nod InpNod, tp_Tool Tool)
 {
    tp_Nod RootNod, OprNod, ValsNod, ValNod;
    tp_InpSpc InpSpc, InpSpcElm, PrvInpSpc, ValInpSpc, PrvValInpSpc;
-   tps_Str StrBuf;
 
    if (Nod_NodTyp(InpNod) == NOD_Word || Nod_NodTyp(InpNod) == NOD_VarWord) {
       InpSpc = New_InpSpc();

@@ -57,40 +57,40 @@ typedef struct _HISTORY {
    CHAR *Lines[HIST_SIZE];
 } HISTORY;
 
-STATIC STATUS accept_line();
-STATIC STATUS beg_line();
-STATIC STATUS bk_char();
-STATIC STATUS bk_del_char();
-STATIC STATUS bk_kill_word();
-STATIC STATUS bk_word();
-STATIC STATUS c_complete();
-STATIC STATUS c_possible();
-STATIC STATUS case_down_word();
-STATIC STATUS case_up_word();
-STATIC STATUS copy_region();
-STATIC STATUS del_char();
-STATIC STATUS end_line();
-STATIC STATUS exchange();
-STATIC STATUS fd_char();
-STATIC STATUS fd_kill_word();
-STATIC STATUS fd_word();
-STATIC STATUS h_first();
-STATIC STATUS h_last();
-STATIC STATUS h_next();
-STATIC STATUS h_prev();
-STATIC STATUS h_search();
-STATIC STATUS kill_line();
-STATIC STATUS last_argument();
-STATIC STATUS meta();
-STATIC STATUS mk_set();
-STATIC STATUS move_to_char();
-STATIC STATUS quote();
-STATIC STATUS redisplay();
-STATIC STATUS ring_bell();
-STATIC STATUS toggle_meta_mode();
-STATIC STATUS transpose();
-STATIC STATUS wipe();
-STATIC STATUS yank();
+STATIC STATUS accept_line(void);
+STATIC STATUS beg_line(void);
+STATIC STATUS bk_char(void);
+STATIC STATUS bk_del_char(void);
+STATIC STATUS bk_kill_word(void);
+STATIC STATUS bk_word(void);
+STATIC STATUS c_complete(void);
+STATIC STATUS c_possible(void);
+STATIC STATUS case_down_word(void);
+STATIC STATUS case_up_word(void);
+STATIC STATUS copy_region(void);
+STATIC STATUS del_char(void);
+STATIC STATUS end_line(void);
+STATIC STATUS exchange(void);
+STATIC STATUS fd_char(void);
+STATIC STATUS fd_kill_word(void);
+STATIC STATUS fd_word(void);
+STATIC STATUS h_first(void);
+STATIC STATUS h_last(void);
+STATIC STATUS h_next(void);
+STATIC STATUS h_prev(void);
+STATIC STATUS h_search(void);
+STATIC STATUS kill_line(void);
+STATIC STATUS last_argument(void);
+STATIC STATUS meta(void);
+STATIC STATUS mk_set(void);
+STATIC STATUS move_to_char(void);
+STATIC STATUS quote(void);
+STATIC STATUS redisplay(void);
+STATIC STATUS ring_bell(void);
+STATIC STATUS toggle_meta_mode(void);
+STATIC STATUS transpose(void);
+STATIC STATUS wipe(void);
+STATIC STATUS yank(void);
 
 /*
 **  Globals.
@@ -186,7 +186,7 @@ int rl_meta_chars = 1;
 /*
 **  Declarations.
 */
-STATIC CHAR *editinput();
+STATIC CHAR *editinput(void);
 #ifdef USE_TERMCAP
 extern char *getenv();
 extern char *tgetstr();

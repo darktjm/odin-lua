@@ -48,7 +48,7 @@ void Local_Add_BuildArg(tp_FileName Arg)
    Num_BuildArgV += 1;
 }
 
-tp_Build BuildID_Build(tp_BuildID BuildID)
+static tp_Build BuildID_Build(tp_BuildID BuildID)
 {
    tp_Build Build;
 
@@ -72,7 +72,7 @@ tp_Build JobID_Build(tp_JobID JobID)
    return NIL;
 }
 
-tp_Build New_Build(void)
+static tp_Build New_Build(void)
 {
    tp_Build Build;
 
@@ -144,7 +144,7 @@ static void RBS_Read_Str(char *Str)
    Str[len] = 0;
 }
 
-void RBS_Read_VarDef(void)
+static void RBS_Read_VarDef(void)
 {
    tps_Str StrBuf;
    int status;
@@ -154,7 +154,7 @@ void RBS_Read_VarDef(void)
    FORBIDDEN(status != 0);
 }
 
-void Set_ODINRBSHOST(void)
+static void Set_ODINRBSHOST(void)
 {
    int status;
    char LocalHostName[MAXHOSTNAMELEN];
@@ -178,8 +178,7 @@ int main(int argc, char **argv)
    int i, status, MsgType, BuildID, JobID;
    boolean Abort;
    fd_set _readfds, *readfds = &_readfds;
-   int fd, pid, nfds;
-   struct timeval _Timeout, *Timeout;
+   int fd, nfds;
    tps_FileName JobDirName, LogFileName, Arg;
    tp_Build Build;
 

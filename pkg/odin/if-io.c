@@ -54,7 +54,7 @@ tp_FilDsc FileName_CFilDsc(tp_FileName FileName)
    return (tp_FilDsc) FilDscFILE;
 }
 
-tp_FilDsc
+static tp_FilDsc
 FileName_FilDsc(tp_FileName FileName, char *Mode, boolean RetryFlag)
 {
    FILE *FilDscFILE;
