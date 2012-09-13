@@ -6,6 +6,6 @@ typedef struct _tps_SrcTyp {
    boolean IsPrefix;
    tp_FilTyp FilTyp;
    tp_SrcTyp Link;
-   }				tps_SrcTyp;
+} tps_SrcTyp;
 
 #endif

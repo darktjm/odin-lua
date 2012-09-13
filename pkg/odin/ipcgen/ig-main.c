@@ -17,10 +17,9 @@ geoff@boulder.colorado.edu
 
 #include "inc/GMC.h"
 
-tp_Str		Author = "odin-build-users@lists.sourceforge.net";
+tp_Str Author = "odin-build-users@lists.sourceforge.net";
 
-
-main()
+int main(void)
 {
    tp_Nod Root;
    tp_FilDsc FilDsc;
@@ -31,24 +30,25 @@ main()
    Init_Err();
 
    Root = YY_Parse();
-   if (Num_Errors() > 0) return 101;
+   if (Num_Errors() > 0)
+      return 101;
 
 /*
    Analyze(Root);
    if (Num_Errors() > 0) return 102;
 */
 
-   FilDsc = FileName_WFilDsc("OUT.c"); 
+   FilDsc = FileName_WFilDsc("OUT.c");
    Gen_OutStub(FilDsc, Root);
    Close(FilDsc);
-   if (Num_Errors() > 0) return 103;
+   if (Num_Errors() > 0)
+      return 103;
 
-   FilDsc = FileName_WFilDsc("IN.c"); 
+   FilDsc = FileName_WFilDsc("IN.c");
    Gen_InStub(FilDsc, Root);
    Close(FilDsc);
-   if (Num_Errors() > 0) return 104;
+   if (Num_Errors() > 0)
+      return 104;
 
    return 0;
-   }/*main*/
-
-
+}

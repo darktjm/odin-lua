@@ -23,159 +23,128 @@ geoff@boulder.colorado.edu
 #include "inc/Job.h"
 #include "inc/Str.h"
 
-extern int		num_EnvVarS;
-extern tp_EnvVar	EnvVarS;
+extern int num_EnvVarS;
+extern tp_EnvVar EnvVarS;
 
-tp_Str		RBS_Cmd;
-boolean		ShortCacheNameFlag;
-boolean		LocalIPCFlag;
+tp_Str RBS_Cmd;
+boolean ShortCacheNameFlag;
+boolean LocalIPCFlag;
 
-tp_FileName	OdinDirName;
-tp_FileName	CacheDirName;
-tp_FileName	JobsDirName;
+tp_FileName OdinDirName;
+tp_FileName CacheDirName;
+tp_FileName JobsDirName;
 
-static tp_Str	*EnvVarDefS;
+static tp_Str *EnvVarDefS;
 
-
-void
-Get_SocketFileName(
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_FileName, FileName)
+void Get_SocketFileName(tp_FileName FileName)
 {
    size_t sz;
 
    sz = snprintf(FileName, MAX_FileName, "%s/SOCKET", OdinDirName);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/SOCKET\n",
-		  MAX_FileName, OdinDirName);
-      exit(1); }/*if*/;
-   }/*Get_SocketFileName*/
+      (void) fprintf(stderr,
+                     "File name too long (MAX_FileName=%d): %s/SOCKET\n",
+                     MAX_FileName, OdinDirName);
+      exit(1);
+   }
+}
 
-
-void
-Get_DGFileName(
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_FileName, FileName)
+void Get_DGFileName(tp_FileName FileName)
 {
    size_t sz;
 
    sz = snprintf(FileName, MAX_FileName, "%s/DG", OdinDirName);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/DG\n",
-		  MAX_FileName, OdinDirName);
-      exit(1); }/*if*/;
-   }/*Get_DGFileName*/
+      (void) fprintf(stderr,
+                     "File name too long (MAX_FileName=%d): %s/DG\n",
+                     MAX_FileName, OdinDirName);
+      exit(1);
+   }
+}
 
-
-void
-Get_PkgDirName(
-   GMC_ARG(tp_FileName, FileName),
-   GMC_ARG(tp_Package, Package)
-   )
-   GMC_DCL(tp_FileName, FileName)
-   GMC_DCL(tp_Package, Package)
+void Get_PkgDirName(tp_FileName FileName, tp_Package Package)
 {
    size_t sz;
 
-   sz = snprintf(FileName, MAX_FileName, "%s/PKGS/%s", OdinDirName, Package);
+   sz = snprintf(FileName, MAX_FileName, "%s/PKGS/%s", OdinDirName,
+                 Package);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/PKGS/%s\n",
-		  MAX_FileName, OdinDirName, Package);
-      exit(1); }/*if*/;
-   }/*Get_PkgDirName*/
+      (void) fprintf(stderr,
+                     "File name too long (MAX_FileName=%d): %s/PKGS/%s\n",
+                     MAX_FileName, OdinDirName, Package);
+      exit(1);
+   }
+}
 
-
-void
-Get_InfoFileName(
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_FileName, FileName)
+void Get_InfoFileName(tp_FileName FileName)
 {
    size_t sz;
 
    sz = snprintf(FileName, MAX_FileName, "%s/INFO", OdinDirName);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/INFO\n",
-		  MAX_FileName, OdinDirName);
-      exit(1); }/*if*/;
-   }/*Get_InfoFileName*/
+      (void) fprintf(stderr,
+                     "File name too long (MAX_FileName=%d): %s/INFO\n",
+                     MAX_FileName, OdinDirName);
+      exit(1);
+   }
+}
 
-
-void
-Get_DebugFileName(
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_FileName, FileName)
+void Get_DebugFileName(tp_FileName FileName)
 {
    size_t sz;
 
    sz = snprintf(FileName, MAX_FileName, "%s/DEBUG", OdinDirName);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/DEBUG\n",
-		  MAX_FileName, OdinDirName);
-      exit(1); }/*if*/;
-   }/*Get_DebugFileName*/
-
+      (void) fprintf(stderr,
+                     "File name too long (MAX_FileName=%d): %s/DEBUG\n",
+                     MAX_FileName, OdinDirName);
+      exit(1);
+   }
+}
 
 void
-Get_WorkFileName(
-   GMC_ARG(tp_FileName, WorkFileName),
-   GMC_ARG(tp_Job, Job),
-   GMC_ARG(tp_FilHdr, FilHdr)
-   )
-   GMC_DCL(tp_FileName, WorkFileName)
-   GMC_DCL(tp_Job, Job)
-   GMC_DCL(tp_FilHdr, FilHdr)
+Get_WorkFileName(tp_FileName WorkFileName, tp_Job Job, tp_FilHdr FilHdr)
 {
    size_t sz;
    tp_FilHdr OutFilHdr;
    tp_FTName FTName;
 
    OutFilHdr = Copy_FilHdr(FilHdr);
-   if (IsInstance(OutFilHdr)) OutFilHdr = FilHdr_Father(OutFilHdr);
+   if (IsInstance(OutFilHdr))
+      OutFilHdr = FilHdr_Father(OutFilHdr);
    FTName = FilTyp_ShortFTName(FilHdr_FilTyp(OutFilHdr));
-   sz = snprintf(WorkFileName, MAX_FileName, "%s/%s", Job->JobDirName, FTName);
+   sz = snprintf(WorkFileName, MAX_FileName, "%s/%s", Job->JobDirName,
+                 FTName);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/%s\n",
-		  MAX_FileName, Job->JobDirName, FTName);
-      exit(11); }/*if*/;
+      (void) fprintf(stderr,
+                     "File name too long (MAX_FileName=%d): %s/%s\n",
+                     MAX_FileName, Job->JobDirName, FTName);
+      exit(11);
+   }
    Ret_FilHdr(OutFilHdr);
-   }/*Get_WorkFileName*/
+}
 
-
-void
-JobID_LogFileName(
-   GMC_ARG(tp_FileName, LogFileName),
-   GMC_ARG(int, JobID)
-   )
-   GMC_DCL(tp_FileName, LogFileName)
-   GMC_DCL(int, JobID)
+void JobID_LogFileName(tp_FileName LogFileName, int JobID)
 {
    size_t sz;
 
-   sz = snprintf(LogFileName, MAX_FileName, "%s/LOG%d", JobsDirName, JobID);
+   sz = snprintf(LogFileName, MAX_FileName, "%s/LOG%d", JobsDirName,
+                 JobID);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/LOG/%d\n",
-		  MAX_FileName, JobsDirName, JobID);
-      exit(1); }/*if*/;
-   }/*JobID_LogFileName*/
+      (void) fprintf(stderr,
+                     "File name too long (MAX_FileName=%d): %s/LOG/%d\n",
+                     MAX_FileName, JobsDirName, JobID);
+      exit(1);
+   }
+}
 
-
-void
-Local_ShutDown(GMC_ARG_VOID)
+void Local_ShutDown(void)
 {
    CurrentClient = LocalClient;
    Exit(0);
-   }/*Local_ShutDown*/
+}
 
-
-static void
-Read_Env(
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_FileName, FileName)
+static void Read_Env(tp_FileName FileName)
 {
    tp_FilDsc FilDsc;
    tp_Str Str;
@@ -185,30 +154,34 @@ Read_Env(
    FilDsc = FileName_RFilDsc(FileName, FALSE);
    if (FilDsc == ERROR) {
       Writeln(StdOutFD, "Using bootstrap derivation graph.");
-      EnvVarDefS = (tp_Str *)malloc((unsigned)(num_EnvVarS * sizeof(tp_Str)));
+      EnvVarDefS =
+          (tp_Str *) malloc((unsigned) (num_EnvVarS * sizeof(tp_Str)));
       for (i = 0; i < num_EnvVarS; i += 1) {
-	 Str = GetEnv(EnvVarS[i].Name);
-	 if (Str == NIL) Str = EnvVarS[i].Default;
-	 (void)sprintf(StrBuf, "%s=%s", EnvVarS[i].Name, Str);
-	 EnvVarDefS[i] = Malloc_Str(StrBuf);
-	 status = putenv(EnvVarDefS[i]);
-	 FORBIDDEN(status != 0); }/*for*/;
-      return; }/*if*/;
-   count = fscanf((FILE *)FilDsc, "%d\n", &num_EnvVarS);
+         Str = GetEnv(EnvVarS[i].Name);
+         if (Str == NIL)
+            Str = EnvVarS[i].Default;
+         (void) sprintf(StrBuf, "%s=%s", EnvVarS[i].Name, Str);
+         EnvVarDefS[i] = Malloc_Str(StrBuf);
+         status = putenv(EnvVarDefS[i]);
+         FORBIDDEN(status != 0);
+      }
+      return;
+   }
+   count = fscanf((FILE *) FilDsc, "%d\n", &num_EnvVarS);
    FORBIDDEN(count != 1);
-   EnvVarDefS = (tp_Str *)malloc((unsigned)(num_EnvVarS * sizeof(tp_Str)));
+   EnvVarDefS =
+       (tp_Str *) malloc((unsigned) (num_EnvVarS * sizeof(tp_Str)));
    for (i = 0; i < num_EnvVarS; i += 1) {
-      count = fscanf((FILE *)FilDsc, "%[^\1]\1\n", StrBuf);
+      count = fscanf((FILE *) FilDsc, "%[^\1]\1\n", StrBuf);
       FORBIDDEN(count != 1);
       EnvVarDefS[i] = Malloc_Str(StrBuf);
       status = putenv(EnvVarDefS[i]);
-      FORBIDDEN(status != 0); }/*for*/;
+      FORBIDDEN(status != 0);
+   }
    Close(FilDsc);
-   }/*Read_Env*/
+}
 
-
-void
-Init_Env(GMC_ARG_VOID)
+void Init_Env(void)
 {
    tps_FileName FileName;
    boolean Abort;
@@ -218,35 +191,46 @@ Init_Env(GMC_ARG_VOID)
    FORBIDDEN(OdinDirName == NIL);
    if (!IsDirectory_FileName(OdinDirName)) {
       SystemError("Odin root <%s> does not exist.\n", OdinDirName);
-      FATALERROR("");}/*if*/;
+      FATALERROR("");
+   }
    if (OdinDirName[0] != '/') {
-      SystemError("Odin cache pathname <%s> must be absolute.\n", OdinDirName);
-      FATALERROR("");}/*if*/;
+      SystemError("Odin cache pathname <%s> must be absolute.\n",
+                  OdinDirName);
+      FATALERROR("");
+   }
    Set_ModeMask(OdinDirName);
 
    sz = snprintf(FileName, MAX_FileName, "%s/FILES", OdinDirName);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/FILES\n",
-                  MAX_FileName, OdinDirName);
-      exit(1); }/*if*/;
+      (void) fprintf(stderr,
+                     "File name too long (MAX_FileName=%d): %s/FILES\n",
+                     MAX_FileName, OdinDirName);
+      exit(1);
+   }
    CacheDirName = Malloc_Str(FileName);
    MakeDirFile(&Abort, CacheDirName);
-   if (Abort) FATALERROR("cannot create odin FILES directory");
+   if (Abort)
+      FATALERROR("cannot create odin FILES directory");
 
    sz = snprintf(FileName, MAX_FileName, "%s/JOBS", OdinDirName);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/JOBS\n",
-                  MAX_FileName, OdinDirName);
-      exit(1); }/*if*/;
+      (void) fprintf(stderr,
+                     "File name too long (MAX_FileName=%d): %s/JOBS\n",
+                     MAX_FileName, OdinDirName);
+      exit(1);
+   }
    JobsDirName = Malloc_Str(FileName);
    MakeDirFile(&Abort, JobsDirName);
-   if (Abort) FATALERROR("cannot create odin JOBS directory");
+   if (Abort)
+      FATALERROR("cannot create odin JOBS directory");
 
    sz = snprintf(FileName, MAX_FileName, "%s/ENV", OdinDirName);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/ENV\n",
-		  MAX_FileName, OdinDirName);
-      exit(1); }/*if*/;
+      (void) fprintf(stderr,
+                     "File name too long (MAX_FileName=%d): %s/ENV\n",
+                     MAX_FileName, OdinDirName);
+      exit(1);
+   }
    Read_Env(FileName);
 
    DumpCore = (GetEnv("DUMPCORE") != NIL);
@@ -254,11 +238,9 @@ Init_Env(GMC_ARG_VOID)
    FORBIDDEN(RBS_Cmd == NIL);
    ShortCacheNameFlag = (GetEnv("ODIN_SHORTNAMES") != NIL);
    LocalIPCFlag = (GetEnv("ODIN_LOCALIPC") != NIL);
-   }/*Init_Env*/
+}
 
-
-void
-Write_ENV2(GMC_ARG_VOID)
+void Write_ENV2(void)
 {
    tps_FileName FileName;
    tp_FilDsc FilDsc;
@@ -271,33 +253,37 @@ Write_ENV2(GMC_ARG_VOID)
 
    sz = snprintf(FileName, MAX_FileName, "%s/ENV2", OdinDirName);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/ENV2\n",
-		  MAX_FileName, OdinDirName);
-      exit(1); }/*if*/;
+      (void) fprintf(stderr,
+                     "File name too long (MAX_FileName=%d): %s/ENV2\n",
+                     MAX_FileName, OdinDirName);
+      exit(1);
+   }
    FilDsc = FileName_WFilDsc(FileName, FALSE);
    if (FilDsc == ERROR) {
       SystemError("Cannot open ENV2 file.\n");
-      exit(1); }/*if*/;
-   for (i=0; i<num_EnvVarS; i+=1) {
+      exit(1);
+   }
+   for (i = 0; i < num_EnvVarS; i += 1) {
       EnvVar = &EnvVarS[i];
       if (EnvVar->IsFile) {
-	 Str = GetEnv(EnvVar->Name);
-	 FORBIDDEN(Str == NIL);
-	 FilHdr = OdinExpr_FilHdr(Str);
-	 if (FilHdr == ERROR) {
-	    SystemError("Value of $%s is not a legal Odin expression.\n",
-			EnvVar->Name);
-	    exit(1); }/*if*/;
-	 FilHdr_DataFileName(StrBuf, FilHdr);
-	 Ret_FilHdr(FilHdr);
-	 (void)fprintf((FILE *)FilDsc, "%s=%s\1\n", EnvVar->Name, StrBuf);
-	 }/*if*/; }/*for*/;
+         Str = GetEnv(EnvVar->Name);
+         FORBIDDEN(Str == NIL);
+         FilHdr = OdinExpr_FilHdr(Str);
+         if (FilHdr == ERROR) {
+            SystemError("Value of $%s is not a legal Odin expression.\n",
+                        EnvVar->Name);
+            exit(1);
+         }
+         FilHdr_DataFileName(StrBuf, FilHdr);
+         Ret_FilHdr(FilHdr);
+         (void) fprintf((FILE *) FilDsc, "%s=%s\1\n", EnvVar->Name,
+                        StrBuf);
+      }
+   }
    Close(FilDsc);
-   }/*Write_ENV2*/
+}
 
-
-void
-Read_ENV2(GMC_ARG_VOID)
+void Read_ENV2(void)
 {
    tps_FileName FileName;
    tp_FilDsc FilDsc;
@@ -308,44 +294,42 @@ Read_ENV2(GMC_ARG_VOID)
 
    sz = snprintf(FileName, MAX_FileName, "%s/ENV2", OdinDirName);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/ENV2\n",
-		  MAX_FileName, OdinDirName);
-      exit(1); }/*if*/;
+      (void) fprintf(stderr,
+                     "File name too long (MAX_FileName=%d): %s/ENV2\n",
+                     MAX_FileName, OdinDirName);
+      exit(1);
+   }
    FilDsc = FileName_RFilDsc(FileName, FALSE);
    FORBIDDEN(FilDsc == ERROR);
-   for (count = fscanf((FILE *)FilDsc, "%[^\1]\1\n", StrBuf);
-	count == 1;
-	count = fscanf((FILE *)FilDsc, "%[^\1]\1\n", StrBuf)) {
+   for (count = fscanf((FILE *) FilDsc, "%[^\1]\1\n", StrBuf);
+        count == 1;
+        count = fscanf((FILE *) FilDsc, "%[^\1]\1\n", StrBuf)) {
       Str = Malloc_Str(StrBuf);
       status = putenv(Str);
-      FORBIDDEN(status != 0); }/*for*/;
+      FORBIDDEN(status != 0);
+   }
    FORBIDDEN(!EndOfFile(FilDsc));
    Close(FilDsc);
-   }/*Read_ENV2*/
+}
 
-
-boolean
-IsDef_EnvVar(
-   GMC_ARG(tp_Str, Name)
-   )
-   GMC_DCL(tp_Str, Name)
+boolean IsDef_EnvVar(tp_Str Name)
 {
    int Len, i;
 
    Len = strlen(Name);
    for (i = 0; i < num_EnvVarS; i += 1) {
       if (strncmp(Name, EnvVarDefS[i], Len) == 0
-	  && EnvVarDefS[i][Len] == '=') {
-	 return TRUE; }/*if*/; }/*for*/;
+          && EnvVarDefS[i][Len] == '=') {
+         return TRUE;
+      }
+   }
    return FALSE;
-   }/*IsDef_EnvVar*/
+}
 
+static tps_FileName _CWDirName;
+tp_FileName CWDirName = _CWDirName;
 
-static tps_FileName	_CWDirName;
-tp_FileName		CWDirName = _CWDirName;
-
-void
-Init_CWD(GMC_ARG_VOID)
+void Init_CWD(void)
 {
    tp_Str Home, PWD;
    boolean Abort;
@@ -354,26 +338,29 @@ Init_CWD(GMC_ARG_VOID)
    GetWorkingDir(&Abort, RawCWDirName);
    if (Abort) {
       SystemError("Current working directory name too long.\n");
-      Exit(1); }/*if*/;
+      Exit(1);
+   }
 
    Do_Alias(OdinDirName, FALSE);
 
    Home = GetHome("");
-   if (Home == NIL) Home = GetEnv("HOME");
-   if (Home != NIL) Do_Alias(Home, FALSE);
+   if (Home == NIL)
+      Home = GetEnv("HOME");
+   if (Home != NIL)
+      Do_Alias(Home, FALSE);
 
    PWD = GetEnv("PWD");
-   if (PWD == NIL) PWD = GetEnv("cwd");
+   if (PWD == NIL)
+      PWD = GetEnv("cwd");
    if (PWD != NIL && strncmp(PWD, RawCWDirName, strlen(PWD)) != 0) {
-      Do_Alias(PWD, FALSE); }/*if*/;
+      Do_Alias(PWD, FALSE);
+   }
 
    Get_Alias(CWDirName, RawCWDirName);
    Set_CWD(CWDirName);
-   }/*Init_CWD*/
+}
 
-
-void
-DeadServerExit(GMC_ARG_VOID)
+void DeadServerExit(void)
 {
    tps_FileName FileName;
    tp_FilDsc FilDsc;
@@ -381,25 +368,24 @@ DeadServerExit(GMC_ARG_VOID)
 
    sz = snprintf(FileName, MAX_FileName, "%s/ERR", OdinDirName);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/ERR\n",
-		  MAX_FileName, OdinDirName);
-      exit(1); }/*if*/;
+      (void) fprintf(stderr,
+                     "File name too long (MAX_FileName=%d): %s/ERR\n",
+                     MAX_FileName, OdinDirName);
+      exit(1);
+   }
    FilDsc = FileName_RFilDsc(FileName, FALSE);
-   /*select*/{
+   {
       if (FilDsc != ERROR) {
-	 FileCopy(StdErrFD, FilDsc);
-	 Close(FilDsc);
-      }else{
-	 SystemError("Odin server shut down.\n"); };}/*select*/;
+         FileCopy(StdErrFD, FilDsc);
+         Close(FilDsc);
+      } else {
+         SystemError("Odin server shut down.\n");
+      }
+   }
    Exit(1);
-   }/*DeadServerExit*/
+}
 
-
-void
-Exit(
-   GMC_ARG(int, Status)
-   )
-   GMC_DCL(int, Status)
+void Exit(int Status)
 {
    tp_Client Client;
 
@@ -408,8 +394,10 @@ Exit(
       IPC_Finish();
       CleanUp();
       FOREACH_CLIENT(Client) {
-	 if (!Is_LocalClient(Client)) {
-	    Ret_Client(Client); }/*if*/; }/*for*/;
+         if (!Is_LocalClient(Client)) {
+            Ret_Client(Client);
+         }
+      }
       Purge_Clients();
       FORBIDDEN(!Is_LocalClient(CurrentClient));
       Ret_Client(CurrentClient);
@@ -431,8 +419,7 @@ Exit(
       FORBIDDEN(PrmFHdrs_InUse());
       FORBIDDEN(FilHdrs_InUse());
       FORBIDDEN(FilInps_InUse());
-      FORBIDDEN(FilElms_InUse()); }/*if*/;
+      FORBIDDEN(FilElms_InUse());
+   }
    exit(Status);
-   }/*Exit*/
-
-
+}

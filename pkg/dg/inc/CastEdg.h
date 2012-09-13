@@ -8,6 +8,6 @@ typedef struct _tps_CastEdg {
    tp_CastEdg Next;
    int Index;
    tp_CastEdg Link;
-   }				tps_CastEdg;
+} tps_CastEdg;
 
 #endif

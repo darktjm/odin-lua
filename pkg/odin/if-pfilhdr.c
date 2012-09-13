@@ -16,36 +16,31 @@ geoff@boulder.colorado.edu
 #include "inc/GMC.h"
 #include "inc/PrmFHdr.h"
 
+int num_PrmFHdrS = 0;
 
-int			num_PrmFHdrS = 0;
-
-static int		num_PrmFHdrs = 0;
-static tp_PrmFHdr	FreePrmFHdr = NIL;
+static int num_PrmFHdrs = 0;
+static tp_PrmFHdr FreePrmFHdr = NIL;
 
 /* PrmFHdr's are absorbed when used as an argument to a function
  * that returns a PrmFHdr.
  */
 
-tp_PrmFHdr
-New_PrmFHdr(
-   GMC_ARG(tp_FilHdr, FilHdr),
-   GMC_ARG(tp_FilPrm, FilPrm)
-   )
-   GMC_DCL(tp_FilHdr, FilHdr)
-   GMC_DCL(tp_FilPrm, FilPrm)
+tp_PrmFHdr New_PrmFHdr(tp_FilHdr FilHdr, tp_FilPrm FilPrm)
 {
    tp_PrmFHdr PrmFHdr;
 
    FORBIDDEN(FilHdr == ERROR || FilPrm == ERROR);
 
-   /*select*/{
+   {
       if (FreePrmFHdr == NIL) {
-	 PrmFHdr = (tp_PrmFHdr)malloc(sizeof(tps_PrmFHdr));
-	 num_PrmFHdrS += 1;
-	 PrmFHdr->InUse = FALSE;
-      }else{
-	 PrmFHdr = FreePrmFHdr;
-	 FreePrmFHdr = FreePrmFHdr->Next; };}/*select*/;
+         PrmFHdr = (tp_PrmFHdr) malloc(sizeof(tps_PrmFHdr));
+         num_PrmFHdrS += 1;
+         PrmFHdr->InUse = FALSE;
+      } else {
+         PrmFHdr = FreePrmFHdr;
+         FreePrmFHdr = FreePrmFHdr->Next;
+      }
+   }
 
    FORBIDDEN(PrmFHdr->InUse);
    num_PrmFHdrs += 1;
@@ -54,14 +49,9 @@ New_PrmFHdr(
    PrmFHdr->FilPrm = FilPrm;
    PrmFHdr->Next = NIL;
    return PrmFHdr;
-   }/*New_PrmFHdr*/
+}
 
-
-static void
-Rls_PrmFHdr(
-   GMC_ARG(tp_PrmFHdr, PrmFHdr)
-   )
-   GMC_DCL(tp_PrmFHdr, PrmFHdr)
+static void Rls_PrmFHdr(tp_PrmFHdr PrmFHdr)
 {
    FORBIDDEN(PrmFHdr == ERROR);
    PrmFHdr->Next = FreePrmFHdr;
@@ -70,33 +60,24 @@ Rls_PrmFHdr(
    PrmFHdr->InUse = FALSE;
    num_PrmFHdrs -= 1;
    FreePrmFHdr = PrmFHdr;
-   }/*Rls_PrmFHdr*/
-
+}
 
 void
-Use_PrmFHdr(
-   GMC_ARG(tp_FilHdr*, FilHdrPtr),
-   GMC_ARG(tp_FilPrm*, FilPrmPtr),
-   GMC_ARG(tp_PrmFHdr, PrmFHdr)
-   )
-   GMC_DCL(tp_FilHdr*, FilHdrPtr)
-   GMC_DCL(tp_FilPrm*, FilPrmPtr)
-   GMC_DCL(tp_PrmFHdr, PrmFHdr)
+Use_PrmFHdr(tp_FilHdr * FilHdrPtr,
+            tp_FilPrm * FilPrmPtr, tp_PrmFHdr PrmFHdr)
 {
    if (PrmFHdr == ERROR) {
       *FilHdrPtr = ERROR;
       *FilPrmPtr = ERROR;
-      return; }/*if*/;
+      return;
+   }
    *FilHdrPtr = PrmFHdr->FilHdr;
    PrmFHdr->FilHdr = NIL;
    *FilPrmPtr = PrmFHdr->FilPrm;
    Rls_PrmFHdr(PrmFHdr);
-   }/*Use_PrmFHdr*/
+}
 
-
-boolean
-PrmFHdrs_InUse(GMC_ARG_VOID)
+boolean PrmFHdrs_InUse(void)
 {
    return (num_PrmFHdrs != 0);
-   }/*PrmFHdrs_InUse*/
-
+}

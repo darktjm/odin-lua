@@ -11,6 +11,6 @@ typedef struct _tps_InpSpc {
    tp_InpSpc Next;
    int Index;
    tp_InpSpc Link;
-   }				tps_InpSpc;
+} tps_InpSpc;
 
 #endif

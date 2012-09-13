@@ -1,7 +1,6 @@
 #ifndef TPS_POS
 #define TPS_POS
 
-
 typedef struct _tps_Pos {
    tp_PType PType;
    tp_FilTyp FilTyp;
@@ -9,6 +8,6 @@ typedef struct _tps_Pos {
    tp_Pos Base;
    tp_Pos Next;
    tp_Pos Last;
-   }				tps_Pos;
+} tps_Pos;
 
 #endif

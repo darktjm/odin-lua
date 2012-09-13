@@ -16,57 +16,51 @@ geoff@boulder.colorado.edu
 #include "inc/GMC.h"
 #include "inc/AttTyp_.h"
 
-typedef tp_Att tps_AttArr [MAX_ATP];
-typedef tp_Att * tp_AttArr;
+typedef tp_Att tps_AttArr[MAX_ATP];
+typedef tp_Att *tp_AttArr;
 
 #define MAX_AttS	4000
-tps_AttArr AttS [MAX_AttS];
+tps_AttArr AttS[MAX_AttS];
 int iAttS = 1;
 
-
-void
-Reset_Att(AttTyp)
-   tp_AttTyp AttTyp;
+void Reset_Att(tp_AttTyp AttTyp)
 {
    int i;
 
-   if (AttTyp < 1 || AttTyp > MAX_ATP) fatal_err("bad AttTyp");
-   for (i=0; i<iAttS; i++) (AttS[i][AttTyp-1]).Int = 0;
-   }/*Reset_Att*/
+   if (AttTyp < 1 || AttTyp > MAX_ATP)
+      fatal_err("bad AttTyp");
+   for (i = 0; i < iAttS; i++)
+      (AttS[i][AttTyp - 1]).Int = 0;
+}
 
-
-tp_Att
-Get_Att(AttTyp, Sym)
-   tp_AttTyp AttTyp;
-   tp_Sym Sym;
+tp_Att Get_Att(tp_AttTyp AttTyp, tp_Sym Sym)
 {
    int AttArr;
    tp_Att Null;
 
-   if (AttTyp < 1 || AttTyp > MAX_ATP) fatal_err("bad AttTyp");
+   if (AttTyp < 1 || AttTyp > MAX_ATP)
+      fatal_err("bad AttTyp");
    AttArr = Sym_Att(Sym);
    if (AttArr == 0) {
-      Null.Nod=(tp_Nod)0;
-      return Null; }/*if*/;
-   return AttS[AttArr][AttTyp-1];
-   }/*Get_Att*/
+      Null.Nod = (tp_Nod) 0;
+      return Null;
+   }
+   return AttS[AttArr][AttTyp - 1];
+}
 
-
-void
-Set_Att(AttTyp, Sym, Att)
-   tp_AttTyp AttTyp;
-   tp_Sym    Sym;
-   tp_Att   Att;
+void Set_Att(tp_AttTyp AttTyp, tp_Sym Sym, tp_Att Att)
 {
    int AttArr;
 
-   if (AttTyp < 1 || AttTyp > MAX_ATP) fatal_err("bad AttTyp");
+   if (AttTyp < 1 || AttTyp > MAX_ATP)
+      fatal_err("bad AttTyp");
    AttArr = Sym_Att(Sym);
    if (AttArr == 0) {
-      if (iAttS == MAX_AttS) fatal_err("no room for more AttS");
+      if (iAttS == MAX_AttS)
+         fatal_err("no room for more AttS");
       AttArr = iAttS;
       Set_Sym_Att(Sym, AttArr);
-      iAttS += 1; }/*if*/;
-   AttS[AttArr][AttTyp-1] = Att;
-   }/*Set_Att*/
-
+      iAttS += 1;
+   }
+   AttS[AttArr][AttTyp - 1] = Att;
+}

@@ -1,15 +1,18 @@
 /* if-bcast.c */
 extern void Broadcast(GMC_P1(tp_FilHdr) GMC_PN(tp_Status));
-extern void Broadcast_Mod(GMC_P1(tp_FilHdr) GMC_PN(tp_ModKind) GMC_PN(tp_Status));
+extern void Broadcast_Mod(GMC_P1(tp_FilHdr) GMC_PN(tp_ModKind)
+                          GMC_PN(tp_Status));
 /* if-build.c */
 extern tp_Build JobID_Build(GMC_P1(tp_JobID));
 extern void Extend_Builds(GMC_P1(int));
 extern void Set_BuildHosts(GMC_P1(boolean *) GMC_PN(tp_Str));
 extern void Write_BuildHosts(GMC_P1(tp_FilDsc));
 extern void Local_Add_BuildArg(GMC_P1(tp_FileName));
-extern void Local_Do_Build(GMC_P1(tp_JobID) GMC_PN(tp_FileName) GMC_PN(tp_FileName));
+extern void Local_Do_Build(GMC_P1(tp_JobID) GMC_PN(tp_FileName)
+                           GMC_PN(tp_FileName));
 extern void Local_Abort_Build(GMC_P1(tp_JobID));
-extern void SystemExecCmdWait(GMC_P1(boolean *) GMC_PN(const char *) GMC_PN(boolean));
+extern void SystemExecCmdWait(GMC_P1(boolean *)
+                              GMC_PN(const char *)GMC_PN(boolean));
 extern void ChildAction(GMC_P1(boolean *) GMC_PN(boolean *));
 extern void Cancel_Builds(GMC_P1(tp_Host));
 extern void Build_Done(GMC_P1(tp_Build) GMC_PN(int));
@@ -18,18 +21,23 @@ extern void Local_Do_MakeReadOnly(GMC_P1(tp_FileName));
 extern tp_DrvPth Get_DrvPth(GMC_P1(tp_FilHdr) GMC_PN(tp_FilTyp));
 extern tp_PrmTypLst DrvPth_PrmTypLst(GMC_P1(tp_DrvPth));
 extern tp_DrvPth Find_GroupingDrvPthElm(GMC_P1(tp_DrvPth));
-extern tp_FilHdr Do_DrvPth(GMC_P1(tp_FilHdr) GMC_PN(tp_FilPrm) GMC_PN(tp_FilPrm) GMC_PN(tp_DrvPth));
-extern tp_FilHdr Do_Deriv(GMC_P1(tp_FilHdr) GMC_PN(tp_FilPrm) GMC_PN(tp_FilPrm) GMC_PN(tp_FilTyp));
+extern tp_FilHdr Do_DrvPth(GMC_P1(tp_FilHdr) GMC_PN(tp_FilPrm)
+                           GMC_PN(tp_FilPrm) GMC_PN(tp_DrvPth));
+extern tp_FilHdr Do_Deriv(GMC_P1(tp_FilHdr) GMC_PN(tp_FilPrm)
+                          GMC_PN(tp_FilPrm) GMC_PN(tp_FilTyp));
 extern tp_FilHdr Do_Key(GMC_P1(tp_FilHdr) GMC_PN(tp_Key));
 extern tp_FilHdr Do_Keys(GMC_P1(tp_FilHdr) GMC_PN(tp_Key));
 extern tp_FilHdr Str_FilHdr(GMC_P1(tp_Str) GMC_PN(tp_PrmTyp));
 extern tp_FilHdr Do_VTgt(GMC_P1(tp_FilHdr) GMC_PN(tp_Key));
 extern void WriteDrvHelp(GMC_P1(tp_FilDsc) GMC_PN(tp_FilHdr));
-extern void WritePrmHelp(GMC_P1(tp_FilDsc) GMC_PN(tp_FilHdr) GMC_PN(tp_FilPrm));
-extern void WriteNameDesc(GMC_P1(tp_FilDsc) GMC_PN(tp_Str) GMC_PN(tp_Desc));
+extern void WritePrmHelp(GMC_P1(tp_FilDsc) GMC_PN(tp_FilHdr)
+                         GMC_PN(tp_FilPrm));
+extern void WriteNameDesc(GMC_P1(tp_FilDsc) GMC_PN(tp_Str)
+                          GMC_PN(tp_Desc));
 extern tp_FilHdr Get_BaseVTgtFilHdr(GMC_P1(tp_FilHdr));
 extern tp_PrmFHdr Nod_PrmFHdr(GMC_P1(tp_Nod));
-extern tp_LocElm Make_ApplyLocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr) GMC_PN(tp_FileName));
+extern tp_LocElm Make_ApplyLocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr)
+                                  GMC_PN(tp_FileName));
 extern tp_LocElm Make_MapLocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr));
 extern tp_LocElm Make_RecurseLocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr));
 extern void Local_Get_OdinFile(GMC_P1(tp_Str) GMC_PN(boolean));
@@ -49,7 +57,8 @@ extern int Client_ErrLevel(GMC_P1(tp_Client));
 extern int Client_WarnLevel(GMC_P1(tp_Client));
 extern tp_LogLevel Client_LogLevel(GMC_P1(tp_Client));
 extern tp_FilHdr Client_FilHdr(GMC_P1(tp_Client));
-extern void Set_Client_FilHdr(GMC_P1(tp_Client) GMC_PN(tp_FilHdr) GMC_PN(boolean));
+extern void Set_Client_FilHdr(GMC_P1(tp_Client) GMC_PN(tp_FilHdr)
+                              GMC_PN(boolean));
 extern boolean Client_NeedsData(GMC_P1(tp_Client));
 extern void Push_AllReqs(GMC_P1(boolean *));
 extern tp_FHLst Client_ToDo(GMC_P1(tp_Client));
@@ -88,19 +97,23 @@ extern void Local_Set_HelpLevel(GMC_P1(int));
 extern void Local_Set_MaxJobs(GMC_P1(int));
 extern void Local_Get_UseCount(GMC_P1(int *));
 /* if-cmd.c */
-extern void CommandInterpreter(GMC_P1(boolean *) GMC_PN(tp_Nod) GMC_PN(boolean));
+extern void CommandInterpreter(GMC_P1(boolean *) GMC_PN(tp_Nod)
+                               GMC_PN(boolean));
 extern boolean IsIncremental_MsgLevel(GMC_P1(int));
 extern void UtilityHelp(GMC_P1(void));
 extern void UtilityDefaultHelp(GMC_P1(void));
 extern void Print_Banner(GMC_P1(void));
 /* if-depend.c */
-extern void WriteReport(GMC_P1(tp_FilDsc) GMC_PN(tp_FilHdr) GMC_PN(tp_Status));
-extern void GetDepend(GMC_P1(tp_LocElm *) GMC_PN(tp_LocElm *) GMC_PN(tp_FilHdr) GMC_PN(tp_FilHdr));
+extern void WriteReport(GMC_P1(tp_FilDsc) GMC_PN(tp_FilHdr)
+                        GMC_PN(tp_Status));
+extern void GetDepend(GMC_P1(tp_LocElm *) GMC_PN(tp_LocElm *)
+                      GMC_PN(tp_FilHdr) GMC_PN(tp_FilHdr));
 extern void Local_Get_DPath(GMC_P1(tp_Str));
 /* if-dir.c */
 extern tp_FilDsc OpenDir(GMC_P1(tp_FileName));
 extern void CloseDir(GMC_P1(tp_FilDsc));
-extern void ReadDir(GMC_P1(tp_FileName) GMC_PN(boolean *) GMC_PN(tp_FilDsc));
+extern void ReadDir(GMC_P1(tp_FileName) GMC_PN(boolean *)
+                    GMC_PN(tp_FilDsc));
 extern void ClearDir(GMC_P1(tp_FileName));
 /* if-drvgrf.c */
 extern tp_FilTyp IFilTyp_FilTyp(GMC_P1(int));
@@ -120,7 +133,8 @@ extern tp_FilTyp DrvPth_FilTyp(GMC_P1(tp_DrvPth));
 extern tp_DrvEdg DrvPth_DrvEdg(GMC_P1(tp_DrvPth));
 extern tp_DrvPth DrvPth_Next(GMC_P1(tp_DrvPth));
 /* if-drvspc.c */
-extern void Print_FilHdr(GMC_P1(tp_FilDsc) GMC_PN(tp_Str) GMC_PN(tp_FilHdr));
+extern void Print_FilHdr(GMC_P1(tp_FilDsc) GMC_PN(tp_Str)
+                         GMC_PN(tp_FilHdr));
 extern void SPrint_FilHdr(GMC_P1(tp_Str) GMC_PN(tp_FilHdr));
 extern void VerboseSPrint_FilHdr(GMC_P1(tp_Str) GMC_PN(tp_FilHdr));
 /* if-edg.c */
@@ -137,7 +151,8 @@ extern boolean NeedsElmData(GMC_P1(tp_FilHdr) GMC_PN(tp_InpKind));
 extern boolean NeedsElmNameData(GMC_P1(tp_FilHdr) GMC_PN(tp_InpKind));
 extern int NumInputs(GMC_P1(tp_FilTyp));
 extern void GetOutTyps(GMC_P1(tp_FilTyp) GMC_PN(tp_OutTyps) GMC_PN(int *));
-extern void SetEqvEdg_Marks(GMC_P1(tp_EqvEdg) GMC_PN(boolean) GMC_PN(boolean));
+extern void SetEqvEdg_Marks(GMC_P1(tp_EqvEdg) GMC_PN(boolean)
+                            GMC_PN(boolean));
 extern void SetCastEdg_Marks(GMC_P1(tp_CastEdg) GMC_PN(boolean));
 extern void SetDrvEdg_Marks(GMC_P1(tp_DrvEdg) GMC_PN(boolean));
 /* if-env.c */
@@ -146,7 +161,8 @@ extern void Get_DGFileName(GMC_P1(tp_FileName));
 extern void Get_PkgDirName(GMC_P1(tp_FileName) GMC_PN(tp_Package));
 extern void Get_InfoFileName(GMC_P1(tp_FileName));
 extern void Get_DebugFileName(GMC_P1(tp_FileName));
-extern void Get_WorkFileName(GMC_P1(tp_FileName) GMC_PN(tp_Job) GMC_PN(tp_FilHdr));
+extern void Get_WorkFileName(GMC_P1(tp_FileName) GMC_PN(tp_Job)
+                             GMC_PN(tp_FilHdr));
 extern void JobID_LogFileName(GMC_P1(tp_FileName) GMC_PN(int));
 extern void Local_ShutDown(GMC_P1(void));
 extern void Init_Env(GMC_P1(void));
@@ -159,26 +175,30 @@ extern void Exit(GMC_P1(int));
 /* if-err.c */
 extern void Init_Err(GMC_P1(void));
 extern void Set_IPC_Err(GMC_P1(boolean));
-extern void Set_ErrFile(GMC_P1(tp_FileName) GMC_PN(boolean) GMC_PN(tp_FilDsc));
-extern void Save_ErrFile(GMC_P1(tp_FileName *) GMC_PN(boolean *) GMC_PN(tp_FilDsc *));
+extern void Set_ErrFile(GMC_P1(tp_FileName) GMC_PN(boolean)
+                        GMC_PN(tp_FilDsc));
+extern void Save_ErrFile(GMC_P1(tp_FileName *) GMC_PN(boolean *)
+                         GMC_PN(tp_FilDsc *));
 extern boolean IsErr(GMC_P1(void));
 extern void Reset_Err(GMC_P1(void));
 extern void Increment_Errors(GMC_P1(void));
 extern int Num_Errors(GMC_P1(void));
 extern void SysCallError(GMC_P1(tp_FilDsc) GMC_PN(char *));
-extern void FatalError(GMC_P1(char *) GMC_PN(char *) GMC_PN(int));
-extern void SystemError(GMC_P1(char *) GMC_PN(...));
+extern void FatalError(GMC_P1(char *)GMC_PN(char *)GMC_PN(int));
+extern void SystemError(GMC_P1(char *)GMC_PN(...));
 extern void Local_ErrMessage(GMC_P1(tp_Str));
 extern void fatal_err(GMC_P1(char *));
 /* if-exec.c */
 extern void Exec(GMC_P1(tp_FilHdr));
 extern void Local_Job_Done(GMC_P1(tp_JobID) GMC_PN(boolean));
 /* if-execint.c */
-extern void ExecInternal(GMC_P1(tp_FilHdr) GMC_PN(tp_Status) GMC_PN(tp_Date));
+extern void ExecInternal(GMC_P1(tp_FilHdr) GMC_PN(tp_Status)
+                         GMC_PN(tp_Date));
 /* if-execspc.c */
 extern tp_Tool FilHdr_Tool(GMC_P1(tp_FilHdr));
 extern void FilHdr_ExecSpc(GMC_P1(tp_ExecSpc) GMC_PN(tp_FilHdr));
-extern void Get_OutFilHdrs(GMC_P1(tp_OutFilHdrs) GMC_PN(int *) GMC_PN(tp_FilHdr));
+extern void Get_OutFilHdrs(GMC_P1(tp_OutFilHdrs)
+                           GMC_PN(int *)GMC_PN(tp_FilHdr));
 extern void Ret_ExecSpc(GMC_P1(tp_ExecSpc));
 /* if-fhacc.c */
 extern boolean IsSource_FKind(GMC_P1(tp_FKind));
@@ -234,7 +254,8 @@ extern tp_FilHdr FilHdr_Father(GMC_P1(tp_FilHdr));
 extern tp_FilHdr FilHdr_SrcFilHdr(GMC_P1(tp_FilHdr));
 extern tp_FilHdr FilHdr_DirFilHdr(GMC_P1(tp_FilHdr));
 extern tp_Str FilHdr_Key(GMC_P1(tp_Str) GMC_PN(tp_FilHdr));
-extern tp_Label FilHdr_Label(GMC_P1(tp_Str) GMC_PN(tp_FilHdr) GMC_PN(boolean));
+extern tp_Label FilHdr_Label(GMC_P1(tp_Str) GMC_PN(tp_FilHdr)
+                             GMC_PN(boolean));
 extern tp_FilHdr FilHdr_ElmFilHdr(GMC_P1(tp_FilHdr));
 /* if-fhnam.c */
 extern void FilHdr_DataFileName(GMC_P1(tp_FileName) GMC_PN(tp_FilHdr));
@@ -242,32 +263,44 @@ extern void FilHdr_ErrorFileName(GMC_P1(tp_FileName) GMC_PN(tp_FilHdr));
 extern void FilHdr_WarningFileName(GMC_P1(tp_FileName) GMC_PN(tp_FilHdr));
 extern void Local_Do_Alias(GMC_P1(tp_FileName) GMC_PN(boolean));
 extern void Local_Get_Alias(GMC_P1(tp_FileName) GMC_PN(tp_FileName));
-extern void FilHdr_HostFN(GMC_P1(tp_FileName) GMC_PN(tp_FilHdr) GMC_PN(boolean));
+extern void FilHdr_HostFN(GMC_P1(tp_FileName) GMC_PN(tp_FilHdr)
+                          GMC_PN(boolean));
 extern tp_FilHdr HostFN_FilHdr(GMC_P1(tp_FileName));
 extern tp_FilHdr CacheFileName_FilHdr(GMC_P1(tp_FileName));
 extern tp_FilHdr DataFileName_FilHdr(GMC_P1(tp_FileName));
 /* if-fhnew.c */
 extern void Make_RootHdrInf(GMC_P1(tp_HdrInf) GMC_PN(tp_LocHdr));
-extern tp_FilHdr Insert_FilHdr(GMC_P1(tp_FilHdr) GMC_PN(tp_FKind) GMC_PN(tp_FilTyp) GMC_PN(tp_FilPrm) GMC_PN(tp_Ident));
-extern tp_FilHdr Extend_FilHdr(GMC_P1(tp_FilHdr) GMC_PN(tp_FKind) GMC_PN(tp_FilTyp) GMC_PN(tp_FilPrm) GMC_PN(tp_Str));
-extern tp_FilHdr Get_Drv(GMC_P1(tp_FilHdr) GMC_PN(tp_FKind) GMC_PN(tp_FilTyp) GMC_PN(tp_FilPrm) GMC_PN(tp_Ident));
-extern tp_FilHdr Get_KeyDrv(GMC_P1(tp_FilHdr) GMC_PN(tp_FKind) GMC_PN(tp_Key));
+extern tp_FilHdr Insert_FilHdr(GMC_P1(tp_FilHdr) GMC_PN(tp_FKind)
+                               GMC_PN(tp_FilTyp) GMC_PN(tp_FilPrm)
+                               GMC_PN(tp_Ident));
+extern tp_FilHdr Extend_FilHdr(GMC_P1(tp_FilHdr) GMC_PN(tp_FKind)
+                               GMC_PN(tp_FilTyp) GMC_PN(tp_FilPrm)
+                               GMC_PN(tp_Str));
+extern tp_FilHdr Get_Drv(GMC_P1(tp_FilHdr) GMC_PN(tp_FKind)
+                         GMC_PN(tp_FilTyp) GMC_PN(tp_FilPrm)
+                         GMC_PN(tp_Ident));
+extern tp_FilHdr Get_KeyDrv(GMC_P1(tp_FilHdr) GMC_PN(tp_FKind)
+                            GMC_PN(tp_Key));
 /* if-fhsrc.c */
-extern void Deref_Pntrs(GMC_P1(tp_FilHdr *) GMC_PN(tp_FilPrm *) GMC_PN(tp_FilHdr) GMC_PN(boolean));
+extern void Deref_Pntrs(GMC_P1(tp_FilHdr *) GMC_PN(tp_FilPrm *)
+                        GMC_PN(tp_FilHdr) GMC_PN(boolean));
 extern tp_FilHdr Deref(GMC_P1(tp_FilHdr));
 extern tp_FilHdr Deref_SymLink(GMC_P1(tp_FilHdr));
 extern void Local_Test(GMC_P1(tp_FileName));
 extern void Local_Test_All(GMC_P1(void));
 extern tp_FilHdr Get_Copy_DestFilHdr(GMC_P1(tp_FilHdr));
-extern tp_LocElm Make_CopyLocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr) GMC_PN(tp_FilHdr));
-extern void Exec_CopyCmd(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr) GMC_PN(tp_FilHdr));
+extern tp_LocElm Make_CopyLocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr)
+                                 GMC_PN(tp_FilHdr));
+extern void Exec_CopyCmd(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr)
+                         GMC_PN(tp_FilHdr));
 /* if-fhstat.c */
 extern boolean Is_PRB_Status(GMC_P1(tp_Status));
 extern void Clr_ErrStatus(GMC_P1(tp_FilHdr));
 extern void Add_ErrStatus(GMC_P1(tp_FilHdr) GMC_PN(tp_Status));
 extern boolean FilHdr_HasErrStatus(GMC_P1(tp_FilHdr) GMC_PN(tp_Status));
 extern tp_Status FilHdr_MinErrStatus(GMC_P1(tp_FilHdr));
-extern void Add_StatusFile(GMC_P1(tp_FilHdr) GMC_PN(tp_Status) GMC_PN(tp_FileName));
+extern void Add_StatusFile(GMC_P1(tp_FilHdr) GMC_PN(tp_Status)
+                           GMC_PN(tp_FileName));
 extern void Set_DepStatus(GMC_P1(tp_FilHdr) GMC_PN(tp_Status));
 extern tp_Status FilHdr_DepStatus(GMC_P1(tp_FilHdr));
 extern void Set_DepModDate(GMC_P1(tp_FilHdr) GMC_PN(tp_Date));
@@ -337,7 +370,8 @@ extern void Set_OrigModDate(GMC_P1(tp_FilHdr) GMC_PN(tp_Date));
 extern tp_Date FilHdr_OrigModDate(GMC_P1(tp_FilHdr));
 /* if-file.c */
 extern void Set_ModeMask(GMC_P1(tp_FileName));
-extern void Get_FileInfo(GMC_P1(tp_SKind *) GMC_PN(int *) GMC_PN(tp_FileName));
+extern void Get_FileInfo(GMC_P1(tp_SKind *)
+                         GMC_PN(int *)GMC_PN(tp_FileName));
 extern void MakePlnFile(GMC_P1(boolean *) GMC_PN(tp_FileName));
 extern void MakeDirFile(GMC_P1(boolean *) GMC_PN(tp_FileName));
 extern void GetWorkingDir(GMC_P1(boolean *) GMC_PN(tp_Str));
@@ -345,15 +379,18 @@ extern void ChangeDir(GMC_P1(boolean *) GMC_PN(tp_FileName));
 extern boolean IsExecutable(GMC_P1(tp_FileName));
 extern void MakeExecutable(GMC_P1(tp_FileName));
 extern void MakeReadOnly(GMC_P1(boolean *) GMC_PN(tp_FileName));
-extern void SymLink(GMC_P1(boolean *) GMC_PN(tp_FileName) GMC_PN(tp_FileName));
-extern void FileName_SymLinkFileName(GMC_P1(tp_FileName) GMC_PN(tp_FileName));
+extern void SymLink(GMC_P1(boolean *) GMC_PN(tp_FileName)
+                    GMC_PN(tp_FileName));
+extern void FileName_SymLinkFileName(GMC_P1(tp_FileName)
+                                     GMC_PN(tp_FileName));
 extern boolean IsDirectory_FileName(GMC_P1(tp_FileName));
 extern boolean Exists(GMC_P1(tp_FileName));
 extern boolean Empty(GMC_P1(tp_FileName));
-extern void FileSize(GMC_P1(boolean *) GMC_PN(int *) GMC_PN(tp_FileName));
+extern void FileSize(GMC_P1(boolean *) GMC_PN(int *)GMC_PN(tp_FileName));
 extern void Remove(GMC_P1(tp_FileName));
 extern void RemoveDir(GMC_P1(tp_FileName));
-extern void Rename(GMC_P1(boolean *) GMC_PN(tp_FileName) GMC_PN(tp_FileName));
+extern void Rename(GMC_P1(boolean *) GMC_PN(tp_FileName)
+                   GMC_PN(tp_FileName));
 /* if-filelm.c */
 extern void Init_FilElms(GMC_P1(void));
 extern void Ret_FilElm(GMC_P1(tp_FilElm));
@@ -370,8 +407,10 @@ extern tp_FilPrm FilElm_FilPrm(GMC_P1(tp_FilElm));
 extern tp_LocElm FilElm_Next(GMC_P1(tp_FilElm));
 extern tp_FilElm FilElm_NextFilElm(GMC_P1(tp_FilElm));
 extern tp_LocElm FilElm_Link(GMC_P1(tp_FilElm));
-extern tp_LocElm Make_LocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilPrm) GMC_PN(tp_FilHdr));
-extern void Chain_LocElms(GMC_P1(tp_LocElm *) GMC_PN(tp_LocElm *) GMC_PN(tp_LocElm));
+extern tp_LocElm Make_LocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilPrm)
+                             GMC_PN(tp_FilHdr));
+extern void Chain_LocElms(GMC_P1(tp_LocElm *) GMC_PN(tp_LocElm *)
+                          GMC_PN(tp_LocElm));
 extern boolean IsEquiv_LocElms(GMC_P1(tp_LocElm) GMC_PN(tp_LocElm));
 /* if-filhdr.c */
 extern void Init_FilHdrs(GMC_P1(void));
@@ -400,14 +439,17 @@ extern int FilInp_IArg(GMC_P1(tp_FilInp));
 extern tp_InpKind FilInp_InpKind(GMC_P1(tp_FilInp));
 extern tp_FilInp FilInp_NextFilInp(GMC_P1(tp_FilInp));
 extern tp_LocInp FilInp_Link(GMC_P1(tp_FilInp));
-extern tp_LocInp Make_LocInp(GMC_P1(tp_FilHdr) GMC_PN(int) GMC_PN(tp_InpKind) GMC_PN(tp_FilHdr));
-extern void Chain_LocInps(GMC_P1(tp_LocInp *) GMC_PN(tp_LocInp *) GMC_PN(tp_LocInp));
+extern tp_LocInp Make_LocInp(GMC_P1(tp_FilHdr) GMC_PN(int)
+                             GMC_PN(tp_InpKind) GMC_PN(tp_FilHdr));
+extern void Chain_LocInps(GMC_P1(tp_LocInp *) GMC_PN(tp_LocInp *)
+                          GMC_PN(tp_LocInp));
 extern tp_LocInp Get_LocInp(GMC_P1(tp_FilHdr));
 /* if-filprm.c */
 extern void Init_FilPrm(GMC_P1(void));
 extern void Add_RootLocPVal(GMC_P1(tp_PrmTyp) GMC_PN(tp_LocPVal));
 extern boolean Equal_FilPrm(GMC_P1(tp_FilPrm) GMC_PN(tp_FilPrm));
-extern tp_FilPrm Append_PrmInf(GMC_P1(tp_FilPrm) GMC_PN(tp_PrmTyp) GMC_PN(tp_LocHdr) GMC_PN(tp_LocPVal));
+extern tp_FilPrm Append_PrmInf(GMC_P1(tp_FilPrm) GMC_PN(tp_PrmTyp)
+                               GMC_PN(tp_LocHdr) GMC_PN(tp_LocPVal));
 extern tp_FilPrm Append_FilPrm(GMC_P1(tp_FilPrm) GMC_PN(tp_FilPrm));
 extern tp_LocPrm FilPrm_LocPrm(GMC_P1(tp_FilPrm));
 extern tp_FilPrm LocPrm_FilPrm(GMC_P1(tp_LocPrm));
@@ -416,26 +458,36 @@ extern tp_FilPrm StripExcept_FilPrm(GMC_P1(tp_FilPrm) GMC_PN(tp_PrmTyp));
 extern tp_FilPVal FilPrm_FilPVal(GMC_P1(tp_FilPrm));
 extern tp_FilPVal Get_FilPVal(GMC_P1(tp_FilPrm) GMC_PN(tp_PrmTyp));
 extern tp_FilPrm FilPrm_DerefPrmVal(GMC_P1(tp_FilPrm));
-extern void Chain_FilPrm_DerefPrmVal(GMC_P1(tp_LocInp *) GMC_PN(tp_LocInp *) GMC_PN(tp_FilPrm) GMC_PN(tp_FilHdr));
+extern void Chain_FilPrm_DerefPrmVal(GMC_P1(tp_LocInp *)
+                                     GMC_PN(tp_LocInp *) GMC_PN(tp_FilPrm)
+                                     GMC_PN(tp_FilHdr));
 extern tp_FilHdr Get_FPVFilHdr(GMC_P1(tp_PrmTyp) GMC_PN(tp_FilPrm));
-extern void Print_FilPrm(GMC_P1(tp_FilDsc) GMC_PN(tp_Str) GMC_PN(tp_FilPrm));
+extern void Print_FilPrm(GMC_P1(tp_FilDsc) GMC_PN(tp_Str)
+                         GMC_PN(tp_FilPrm));
 extern void SetPrmTypLst_Marks(GMC_P1(tp_PrmTypLst));
 /* if-filpval.c */
 extern tp_FilPVal New_FilPVal(GMC_P1(void));
 extern boolean IsRootFilPVal(GMC_P1(tp_FilPVal));
-extern tp_FilPVal Add_PValInf(GMC_P1(tp_FilPVal) GMC_PN(tp_LocHdr) GMC_PN(tp_LocPVal));
-extern tp_FilPVal Append_PValInf(GMC_P1(tp_FilPVal) GMC_PN(tp_LocHdr) GMC_PN(tp_LocPVal));
+extern tp_FilPVal Add_PValInf(GMC_P1(tp_FilPVal) GMC_PN(tp_LocHdr)
+                              GMC_PN(tp_LocPVal));
+extern tp_FilPVal Append_PValInf(GMC_P1(tp_FilPVal) GMC_PN(tp_LocHdr)
+                                 GMC_PN(tp_LocPVal));
 extern tp_FilPVal Append_FilPVal(GMC_P1(tp_FilPVal) GMC_PN(tp_FilPVal));
 extern tp_LocPVal FilPVal_LocPVal(GMC_P1(tp_FilPVal));
 extern tp_FilPVal LocPVal_FilPVal(GMC_P1(tp_LocPVal));
-extern void Print_FilPVal(GMC_P1(tp_FilDsc) GMC_PN(tp_Str) GMC_PN(tp_PrmTyp) GMC_PN(tp_FilPVal));
+extern void Print_FilPVal(GMC_P1(tp_FilDsc) GMC_PN(tp_Str)
+                          GMC_PN(tp_PrmTyp) GMC_PN(tp_FilPVal));
 extern tp_LocHdr FilPVal_LocHdr(GMC_P1(tp_FilPVal));
 extern tp_LocPVal FilPVal_ValLocPVal(GMC_P1(tp_FilPVal));
 extern void Set_FilPVal_DataLocHdr(GMC_P1(tp_FilPVal) GMC_PN(tp_LocHdr));
 extern tp_LocHdr FilPVal_DataLocHdr(GMC_P1(tp_FilPVal));
 extern tp_FilPVal FilPVal_Father(GMC_P1(tp_FilPVal));
-extern tp_FilPVal FilPVal_DerefPrmVal(GMC_P1(tp_FilPVal) GMC_PN(tp_PrmTyp));
-extern void Chain_FilPVal_DerefPrmVal(GMC_P1(tp_LocInp *) GMC_PN(tp_LocInp *) GMC_PN(tp_FilPVal) GMC_PN(tp_FilHdr));
+extern tp_FilPVal FilPVal_DerefPrmVal(GMC_P1(tp_FilPVal)
+                                      GMC_PN(tp_PrmTyp));
+extern void Chain_FilPVal_DerefPrmVal(GMC_P1(tp_LocInp *)
+                                      GMC_PN(tp_LocInp *)
+                                      GMC_PN(tp_FilPVal)
+                                      GMC_PN(tp_FilHdr));
 /* if-filtyp.c */
 extern tp_TClass Tool_TClass(GMC_P1(tp_Tool));
 extern tp_InpEdg Tool_InpEdg(GMC_P1(tp_Tool));
@@ -447,11 +499,13 @@ extern tp_Status Get_ToolStatus(GMC_P1(tp_Tool) GMC_PN(tp_Status));
 extern tp_FilTyp Key_FilTyp(GMC_P1(tp_Key));
 extern void Key_InstanceLabel(GMC_P1(tp_Str) GMC_PN(tp_Key));
 extern tp_FilTyp FTName_FilTyp(GMC_P1(tp_FTName));
-extern void Build_Label(GMC_P1(tp_Str) GMC_PN(tp_Ident) GMC_PN(tp_FilTyp) GMC_PN(tp_LocHdr) GMC_PN(boolean));
+extern void Build_Label(GMC_P1(tp_Str) GMC_PN(tp_Ident) GMC_PN(tp_FilTyp)
+                        GMC_PN(tp_LocHdr) GMC_PN(boolean));
 extern tp_LocHdr CacheFileName_LocHdr(GMC_P1(tp_FileName));
 extern void SetFilHdr_DrvMarks(GMC_P1(tp_FilHdr));
 extern void SetFilHdr_Marks(GMC_P1(tp_FilHdr) GMC_PN(boolean));
-extern void SetFilTyp_Marks(GMC_P1(tp_FilTyp) GMC_PN(boolean) GMC_PN(boolean));
+extern void SetFilTyp_Marks(GMC_P1(tp_FilTyp) GMC_PN(boolean)
+                            GMC_PN(boolean));
 extern void SetFilTyp_Mark(GMC_P1(tp_FilTyp));
 extern void WriteSrcFilTyps(GMC_P1(tp_FilDsc) GMC_PN(boolean));
 extern void Clr_FilTypMarks(GMC_P1(void));
@@ -489,11 +543,15 @@ extern boolean IsPipe_FilTyp(GMC_P1(tp_FilTyp));
 /* if-get.c */
 extern void GetAllReqs(GMC_P1(tp_FilHdr) GMC_PN(tp_InpKind));
 /* if-help.c */
-extern void Do_Help(GMC_P1(boolean *) GMC_PN(boolean *) GMC_PN(boolean *) GMC_PN(tp_Nod));
+extern void Do_Help(GMC_P1(boolean *) GMC_PN(boolean *) GMC_PN(boolean *)
+                    GMC_PN(tp_Nod));
 extern void Local_Next_OdinFile(GMC_P1(tp_Str) GMC_PN(int));
 /* if-hook.c */
-extern void NestedHooks(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr) GMC_PN(tp_FilDsc) GMC_PN(tp_FilDsc) GMC_PN(tp_FilPrm));
-extern void ExpandHooks(GMC_P1(tp_FilDsc) GMC_PN(tp_FilDsc) GMC_PN(tp_FilHdr));
+extern void NestedHooks(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr)
+                        GMC_PN(tp_FilDsc) GMC_PN(tp_FilDsc)
+                        GMC_PN(tp_FilPrm));
+extern void ExpandHooks(GMC_P1(tp_FilDsc) GMC_PN(tp_FilDsc)
+                        GMC_PN(tp_FilHdr));
 /* if-info.c */
 extern void Hash_Item(GMC_P1(tp_Item) GMC_PN(tp_Loc));
 extern void UnHash_Item(GMC_P1(tp_Item));
@@ -543,7 +601,7 @@ extern void FileCopy(GMC_P1(tp_FilDsc) GMC_PN(tp_FilDsc));
 /* if-ipc.c */
 extern boolean IsServerPId(GMC_P1(int));
 extern void IPC_Init(GMC_P1(void));
-extern int IPC_Read(GMC_P1(int) GMC_PN(char *) GMC_PN(int));
+extern int IPC_Read(GMC_P1(int) GMC_PN(char *)GMC_PN(int));
 extern void IPC_Get_Commands(GMC_P1(boolean *) GMC_PN(char *));
 extern void IPC_Write_Int(GMC_P1(boolean *) GMC_PN(int));
 extern void IPC_Read_Int(GMC_P1(boolean *) GMC_PN(int *));
@@ -563,7 +621,9 @@ extern void Unlex(GMC_P1(tp_Str) GMC_PN(tp_Str));
 extern void Print_Unlex(GMC_P1(tp_FilDsc) GMC_PN(tp_Str));
 /* if-lvl.c */
 extern boolean IsSubType(GMC_P1(tp_FilTyp) GMC_PN(tp_FilTyp));
-extern void Do_Search(GMC_P1(tp_DrvPth *) GMC_PN(boolean *) GMC_PN(tp_FKind) GMC_PN(tp_FilTyp) GMC_PN(tp_FilTyp));
+extern void Do_Search(GMC_P1(tp_DrvPth *) GMC_PN(boolean *)
+                      GMC_PN(tp_FKind) GMC_PN(tp_FilTyp)
+                      GMC_PN(tp_FilTyp));
 /* if-main.c */
 extern void InterruptAction(GMC_P1(void));
 extern void TopLevelCI(GMC_P1(boolean *) GMC_PN(tp_Str));
@@ -591,7 +651,8 @@ extern int OC_Lex(GMC_P1(void));
 extern void OC_Unparse(GMC_P1(tp_Str) GMC_PN(tp_Nod));
 /* if-pfilhdr.c */
 extern tp_PrmFHdr New_PrmFHdr(GMC_P1(tp_FilHdr) GMC_PN(tp_FilPrm));
-extern void Use_PrmFHdr(GMC_P1(tp_FilHdr *) GMC_PN(tp_FilPrm *) GMC_PN(tp_PrmFHdr));
+extern void Use_PrmFHdr(GMC_P1(tp_FilHdr *) GMC_PN(tp_FilPrm *)
+                        GMC_PN(tp_PrmFHdr));
 extern boolean PrmFHdrs_InUse(GMC_P1(void));
 /* if-prmtyp.c */
 extern tp_PTName PrmTyp_PTName(GMC_P1(tp_PrmTyp));
@@ -614,7 +675,8 @@ extern tp_Host Lookup_Host(GMC_P1(tp_Str));
 extern tp_Host PId_Host(GMC_P1(int));
 extern void RBS_Done(GMC_P1(tp_Host));
 extern void RBS_Get_Msg(GMC_P1(tp_Host));
-extern void RBS_Do_Build(GMC_P1(tp_Host) GMC_PN(int) GMC_PN(tp_FileName) GMC_PN(tp_FileName) GMC_PN(char **));
+extern void RBS_Do_Build(GMC_P1(tp_Host) GMC_PN(int) GMC_PN(tp_FileName)
+                         GMC_PN(tp_FileName) GMC_PN(char **));
 extern void RBS_Abort_Build(GMC_P1(tp_Host) GMC_PN(int));
 extern void RBS_VarDef(GMC_P1(tp_Str));
 /* if-symbol.c */
@@ -634,52 +696,69 @@ extern void Init_Sigs(GMC_P1(boolean));
 extern void Block_Signals(GMC_P1(void));
 extern void Unblock_Signals(GMC_P1(void));
 extern void Lose_ControlTTY(GMC_P1(void));
-extern int SystemExec(GMC_P1(const char *) GMC_PN(char * const *) GMC_PN(const char *));
-extern int SystemExecCmd(GMC_P1(const char *) GMC_PN(boolean));
-extern void SystemWait(GMC_P1(int *) GMC_PN(boolean *));
+extern int
+SystemExec(GMC_P1(const char *)GMC_PN(char *const *)GMC_PN(const char *));
+extern int SystemExecCmd(GMC_P1(const char *)GMC_PN(boolean));
+extern void SystemWait(GMC_P1(int *)GMC_PN(boolean *));
 extern void SystemInterrupt(GMC_P1(int));
 extern tp_Str GetHome(GMC_P1(tp_Str));
 extern int Await_Event(GMC_P1(fd_set *) GMC_PN(boolean));
 /* if-systools.c */
 extern void WriteCat(GMC_P1(tp_FilDsc) GMC_PN(tp_FilHdr));
 extern void WriteFlat(GMC_P1(tp_FilDsc) GMC_PN(tp_FilHdr));
-extern void WriteNames(GMC_P1(tp_FilDsc) GMC_PN(tp_FilHdr) GMC_PN(tp_FilPrm));
+extern void WriteNames(GMC_P1(tp_FilDsc) GMC_PN(tp_FilHdr)
+                       GMC_PN(tp_FilPrm));
 extern void WriteLabels(GMC_P1(tp_FilDsc) GMC_PN(tp_FilHdr));
 extern tp_LocElm Make_UnionLocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr));
 extern void Clr_UnionFlags(GMC_P1(tp_FilHdr));
-extern void Exec_List(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr) GMC_PN(tp_FilPrm) GMC_PN(boolean));
+extern void Exec_List(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr) GMC_PN(tp_FilPrm)
+                      GMC_PN(boolean));
 extern void Exec_TargetsPtr(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr));
 extern void Exec_Targets(GMC_P1(tp_FilDsc) GMC_PN(tp_FileName));
-extern void WriteSrcNames(GMC_P1(tp_FilDsc) GMC_PN(tp_FileName) GMC_PN(boolean));
+extern void WriteSrcNames(GMC_P1(tp_FilDsc) GMC_PN(tp_FileName)
+                          GMC_PN(boolean));
 extern void Validate_ViewSpec(GMC_P1(tp_FilHdr));
 extern tp_FilElm FilElm_NextStrFilElm(GMC_P1(tp_FilElm));
-extern void Exec_CmptView(GMC_P1(boolean *) GMC_PN(tp_FilHdr) GMC_PN(tp_FilHdr));
+extern void Exec_CmptView(GMC_P1(boolean *) GMC_PN(tp_FilHdr)
+                          GMC_PN(tp_FilHdr));
 extern void Install_ActTgt(GMC_P1(tp_FilHdr));
 extern void Uninstall_ActTgt(GMC_P1(tp_FilHdr));
-extern void WriteTextDef(GMC_P1(tp_FilHdr) GMC_PN(tp_FilDsc) GMC_PN(tp_FileName) GMC_PN(tp_FilDsc) GMC_PN(tp_FileName));
-extern tp_LocElm Make_TargetsLocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilDsc) GMC_PN(tp_FileName) GMC_PN(tp_Date) GMC_PN(boolean));
+extern void WriteTextDef(GMC_P1(tp_FilHdr) GMC_PN(tp_FilDsc)
+                         GMC_PN(tp_FileName) GMC_PN(tp_FilDsc)
+                         GMC_PN(tp_FileName));
+extern tp_LocElm Make_TargetsLocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilDsc)
+                                    GMC_PN(tp_FileName) GMC_PN(tp_Date)
+                                    GMC_PN(boolean));
 extern void Exec_VirDir(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr));
-extern void FilPVal_LocElm(GMC_P1(tp_LocElm *) GMC_PN(tp_LocElm *) GMC_PN(tp_FilPVal) GMC_PN(tp_FilHdr));
+extern void FilPVal_LocElm(GMC_P1(tp_LocElm *) GMC_PN(tp_LocElm *)
+                           GMC_PN(tp_FilPVal) GMC_PN(tp_FilHdr));
 extern tp_LocElm Make_PntrHoLocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr));
-extern tp_LocElm Make_DerefPrmValLocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr));
+extern tp_LocElm Make_DerefPrmValLocElm(GMC_P1(tp_FilHdr)
+                                        GMC_PN(tp_FilHdr));
 extern tp_LocElm Make_RecurseLocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr));
-extern tp_LocElm Make_ExDelLocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr) GMC_PN(boolean));
+extern tp_LocElm Make_ExDelLocElm(GMC_P1(tp_FilHdr) GMC_PN(tp_FilHdr)
+                                  GMC_PN(boolean));
 /* if-update.c */
-extern void Do_Update(GMC_P1(tp_FilHdr) GMC_PN(tp_OutFilHdrs) GMC_PN(int) GMC_PN(tp_Job) GMC_PN(tp_Status) GMC_PN(tp_Date) GMC_PN(boolean));
+extern void Do_Update(GMC_P1(tp_FilHdr) GMC_PN(tp_OutFilHdrs) GMC_PN(int)
+                      GMC_PN(tp_Job) GMC_PN(tp_Status) GMC_PN(tp_Date)
+                      GMC_PN(boolean));
 extern void Validate_IsPntr(GMC_P1(tp_FilHdr));
-extern void Update_RefFile(GMC_P1(tp_FilHdr) GMC_PN(tp_Status) GMC_PN(tp_Date));
+extern void Update_RefFile(GMC_P1(tp_FilHdr) GMC_PN(tp_Status)
+                           GMC_PN(tp_Date));
 extern void Set_DrvDirConfirm(GMC_P1(tp_FilHdr) GMC_PN(tp_Status));
 extern void Set_ListStatus(GMC_P1(tp_FilHdr) GMC_PN(tp_Status));
 /* if-util.c */
 extern void Local_Redo(GMC_P1(tp_Str));
-extern void Local_OdinExpr_ID(GMC_P1(int *) GMC_PN(tp_Str));
+extern void Local_OdinExpr_ID(GMC_P1(int *)GMC_PN(tp_Str));
 extern void Local_ID_OdinExpr(GMC_P1(tp_Str) GMC_PN(int));
 extern void Local_ID_LongOdinExpr(GMC_P1(tp_Str) GMC_PN(int));
 extern void Do_Log(GMC_P1(tp_Str) GMC_PN(tp_FilHdr) GMC_PN(tp_LogLevel));
 extern tp_FilHdr OdinExpr_FilHdr(GMC_P1(const char *));
-extern void WritePrmOdinExpr(GMC_P1(tp_FilDsc) GMC_PN(tp_FilHdr) GMC_PN(tp_FilPrm));
+extern void WritePrmOdinExpr(GMC_P1(tp_FilDsc) GMC_PN(tp_FilHdr)
+                             GMC_PN(tp_FilPrm));
 extern void Local_Set_Debug(GMC_P1(tp_Str));
-extern void Local_Get_Status(GMC_P1(tp_Status *) GMC_PN(tp_Status *) GMC_PN(int));
+extern void Local_Get_Status(GMC_P1(tp_Status *) GMC_PN(tp_Status *)
+                             GMC_PN(int));
 extern void Local_Get_Elements(GMC_P1(int));
 extern void Local_Get_ElementsOf(GMC_P1(int));
 extern void Local_Get_Inputs(GMC_P1(int));
@@ -699,7 +778,8 @@ extern void ShowVar(GMC_P1(tp_Nod));
 extern void SetVar(GMC_P1(boolean *) GMC_PN(tp_Str) GMC_PN(tp_Str));
 extern void Set_HostVar(GMC_P1(boolean *) GMC_PN(tp_Str) GMC_PN(tp_Str));
 /* if-yylex.c */
-extern tp_Nod YY_Parser(GMC_P1(const char *) GMC_PN(tp_FileName) GMC_PN(int *));
+extern tp_Nod YY_Parser(GMC_P1(const char *)GMC_PN(tp_FileName)
+                        GMC_PN(int *));
 extern int YY_Lex(GMC_P1(void));
 extern void YY_Unparse(GMC_P1(tp_Str) GMC_PN(tp_Nod));
 /* client.yacc.c */
@@ -714,10 +794,12 @@ extern int yylex(GMC_P1(void));
 extern int yyparse(GMC_P1(void));
 /* stub.in.c */
 extern void IPC_Do_Msg(GMC_P1(boolean *) GMC_PN(int));
-extern void LocalEnd_Get_OdinFile(GMC_P1(tp_FileName) GMC_PN(tp_Status) GMC_PN(boolean));
+extern void LocalEnd_Get_OdinFile(GMC_P1(tp_FileName) GMC_PN(tp_Status)
+                                  GMC_PN(boolean));
 /* stub.out.c */
 extern void Add_BuildArg(GMC_P1(tp_FileName));
-extern void Do_Build(GMC_P1(tp_JobID) GMC_PN(tp_FileName) GMC_PN(tp_FileName));
+extern void Do_Build(GMC_P1(tp_JobID) GMC_PN(tp_FileName)
+                     GMC_PN(tp_FileName));
 extern void Abort_Build(GMC_P1(tp_JobID));
 extern void Do_MakeReadOnly(GMC_P1(tp_FileName));
 extern void ErrMessage(GMC_P1(char *));
@@ -734,7 +816,8 @@ extern void Get_Alias(GMC_P1(tp_FileName) GMC_PN(tp_FileName));
 extern void Job_Done(GMC_P1(tp_JobID) GMC_PN(boolean));
 extern void Test(GMC_P1(tp_FileName));
 extern void Test_All(GMC_P1(void));
-extern void Get_OdinFile(GMC_P1(tp_FileName) GMC_PN(tp_Status *) GMC_PN(boolean *) GMC_PN(tp_Str) GMC_PN(boolean));
+extern void Get_OdinFile(GMC_P1(tp_FileName) GMC_PN(tp_Status *)
+                         GMC_PN(boolean *) GMC_PN(tp_Str) GMC_PN(boolean));
 extern void Set_CWD(GMC_P1(tp_FileName));
 extern void Push_Context(GMC_P1(tp_FileName) GMC_PN(tp_FileName));
 extern void Pop_Context(GMC_P1(tp_FileName));
@@ -746,18 +829,19 @@ extern void Set_HelpLevel(GMC_P1(int));
 extern void Set_Debug(GMC_P1(tp_Str));
 extern void Set_MaxJobs(GMC_P1(int));
 extern void Redo(GMC_P1(tp_Str));
-extern void OdinExpr_ID(GMC_P1(int *) GMC_PN(tp_Str));
+extern void OdinExpr_ID(GMC_P1(int *)GMC_PN(tp_Str));
 extern void ID_OdinExpr(GMC_P1(tp_Str) GMC_PN(int));
 extern void ID_LongOdinExpr(GMC_P1(tp_Str) GMC_PN(int));
-extern void Get_Status(GMC_P1(tp_Status *) GMC_PN(tp_Status *) GMC_PN(int));
+extern void Get_Status(GMC_P1(tp_Status *) GMC_PN(tp_Status *)
+                       GMC_PN(int));
 extern void Get_Elements(GMC_P1(int));
 extern void Get_ElementsOf(GMC_P1(int));
 extern void Get_Inputs(GMC_P1(int));
 extern void Get_Outputs(GMC_P1(int));
 extern void Get_DPath(GMC_P1(tp_Str));
 /* editline/complete.c */
-extern char *rl_complete(GMC_P1(char *) GMC_PN(int *));
-extern int rl_list_possib(GMC_P1(char *) GMC_PN(char ***));
+extern char *rl_complete(GMC_P1(char *)GMC_PN(int *));
+extern int rl_list_possib(GMC_P1(char *)GMC_PN(char ***));
 /* editline/editline.c */
 extern void rl_reset_terminal(GMC_P1(char *));
 extern void rl_initialize(GMC_P1(void));
@@ -765,4 +849,4 @@ extern char *readline(GMC_P1(const char *));
 extern void add_history(GMC_P1(char *));
 /* editline/sysunix.c */
 extern void rl_ttyset(GMC_P1(int));
-extern void rl_add_slash(GMC_P1(char *) GMC_PN(char *));
+extern void rl_add_slash(GMC_P1(char *)GMC_PN(char *));

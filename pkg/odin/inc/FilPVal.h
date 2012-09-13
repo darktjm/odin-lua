@@ -10,6 +10,6 @@ typedef struct _tps_FilPVal {
    tp_FilPVal Father, Brother, Son;
 
    tps_PValInf PValInf;
-   }				tps_FilPVal;
+} tps_FilPVal;
 
 #endif

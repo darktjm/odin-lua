@@ -8,6 +8,6 @@ typedef struct _tps_EqvEdg {
    tp_EqvEdg Next;
    int Index;
    tp_EqvEdg Link;
-   }				tps_EqvEdg;
+} tps_EqvEdg;
 
 #endif

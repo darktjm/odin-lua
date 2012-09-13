@@ -27,6 +27,6 @@ typedef struct _tps_FilTyp {
    tp_FilTyp NextOrder, NextBackOrder;
    int Index;
    tp_FilTyp Link, BackLink;
-   }				tps_FilTyp;
+} tps_FilTyp;
 
 #endif

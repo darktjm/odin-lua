@@ -8,6 +8,6 @@ typedef struct _tps_PrmTypLst {
    tp_PrmTypLst Son;
    int Index;
    tp_PrmTypLst Link;
-   }				tps_PrmTypLst;
+} tps_PrmTypLst;
 
 #endif

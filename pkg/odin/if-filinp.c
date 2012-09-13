@@ -25,38 +25,28 @@ geoff@boulder.colorado.edu
 #include "inc/NodTyp_.h"
 #include "inc/Str.h"
 
+int num_FilInpS = 0;
 
-int		num_FilInpS = 0;
-
-tp_FilInp	ModFilInp = NIL;
+tp_FilInp ModFilInp = NIL;
 
 static tps_FilInp _UsedFilInp;
-static tp_FilInp		UsedFilInp = &_UsedFilInp;
+static tp_FilInp UsedFilInp = &_UsedFilInp;
 static tps_FilInp _FreeFilInp;
-static tp_FilInp		FreeFilInp = &_FreeFilInp;
+static tp_FilInp FreeFilInp = &_FreeFilInp;
 
+static tp_FilHdr Do_InpSpc(GMC_P1(tp_FilHdr) GMC_PN(tp_FilPrm)
+                           GMC_PN(tp_InpSpc) GMC_PN(tp_Tool));
 
-static tp_FilHdr Do_InpSpc(GMC_P1(tp_FilHdr) GMC_PN(tp_FilPrm) GMC_PN(tp_InpSpc) GMC_PN(tp_Tool));
-
-
-void
-Init_FilInps(GMC_ARG_VOID)
+void Init_FilInps(void)
 {
    UsedFilInp->PrevFree = UsedFilInp;
    UsedFilInp->NextFree = UsedFilInp;
 
    FreeFilInp->PrevFree = FreeFilInp;
    FreeFilInp->NextFree = FreeFilInp;
-   }/*Init_FilInps*/
+}
 
-
-static void
-Transfer_FilInp(
-   GMC_ARG(tp_FilInp, FilInp),
-   GMC_ARG(tp_FilInp, FilInpLst)
-   )
-   GMC_DCL(tp_FilInp, FilInp)
-   GMC_DCL(tp_FilInp, FilInpLst)
+static void Transfer_FilInp(tp_FilInp FilInp, tp_FilInp FilInpLst)
 {
    FilInp->PrevFree->NextFree = FilInp->NextFree;
    FilInp->NextFree->PrevFree = FilInp->PrevFree;
@@ -64,37 +54,28 @@ Transfer_FilInp(
    FilInp->NextFree = FilInpLst;
    FilInp->PrevFree->NextFree = FilInp;
    FilInp->NextFree->PrevFree = FilInp;
-   }/*Transfer_FilInp*/
+}
 
-
-static tp_FilInp
-Copy_FilInp(
-   GMC_ARG(tp_FilInp, FilInp)
-   )
-   GMC_DCL(tp_FilInp, FilInp)
+static tp_FilInp Copy_FilInp(tp_FilInp FilInp)
 {
-   if (FilInp == ERROR) return ERROR;
+   if (FilInp == ERROR)
+      return ERROR;
    if (FilInp->Cnt == 0) {
-      Transfer_FilInp(FilInp, UsedFilInp); }/*if*/;
+      Transfer_FilInp(FilInp, UsedFilInp);
+   }
    FilInp->Cnt += 1;
    return FilInp;
-   }/*Copy_FilInp*/
+}
 
-
-void
-Ret_FilInp(
-   GMC_ARG(tp_FilInp, FilInp)
-   )
-   GMC_DCL(tp_FilInp, FilInp)
+void Ret_FilInp(tp_FilInp FilInp)
 {
-   if (FilInp == ERROR) return;
+   if (FilInp == ERROR)
+      return;
    FilInp->Cnt -= 1;
    FORBIDDEN(FilInp->Cnt < 0);
-   }/*Ret_FilInp*/
+}
 
-
-void
-Free_FilInps(GMC_ARG_VOID)
+void Free_FilInps(void)
 {
    tp_FilInp FilInp, NextFilInp;
 
@@ -103,136 +84,109 @@ Free_FilInps(GMC_ARG_VOID)
       FilInp = NextFilInp;
       NextFilInp = NextFilInp->NextFree;
       if (FilInp->Cnt == 0) {
-	 Transfer_FilInp(FilInp, FreeFilInp); }/*if*/; }/*while*/;
-   }/*Free_FilInps*/
+         Transfer_FilInp(FilInp, FreeFilInp);
+      }
+   }
+}
 
-
-static void
-UnHash_FilInp(
-   GMC_ARG(tp_FilInp, FilInp)
-   )
-   GMC_DCL(tp_FilInp, FilInp)
+static void UnHash_FilInp(tp_FilInp FilInp)
 {
-   UnHash_Item((tp_Item)FilInp);
-   }/*UnHash_FilInp*/
+   UnHash_Item((tp_Item) FilInp);
+}
 
-
-static tp_FilInp
-New_FilInp(
-   GMC_ARG(tp_LocInp, LocInp)
-   )
-   GMC_DCL(tp_LocInp, LocInp)
+static tp_FilInp New_FilInp(tp_LocInp LocInp)
 {
    tp_FilInp FilInp;
    tp_InpInf InpInf;
 
    FilInp = FreeFilInp->NextFree;
-   /*select*/{
+   {
       if (FilInp == FreeFilInp) {
-	 FilInp = (tp_FilInp)malloc(sizeof(tps_FilInp));
-	 num_FilInpS += 1;
-	 InpInf = &(FilInp->InpInf);
-	 InpInf->IArg = -1;
-	 InpInf->LocHdr = NIL;
-	 InpInf->BackLink = NIL;
-	 InpInf->Link = NIL;
-	 InpInf->InpKind = NIL;
-	 InpInf->OutLocHdr = NIL;
-	 InpInf->Next = NIL;
-	 
-	 FilInp->LocInp = NIL;
-	 FilInp->Cnt = 0;
-	 FilInp->Modified = FALSE;
-	 FilInp->PrevFree = FreeFilInp->PrevFree;
-	 FilInp->NextFree = FreeFilInp;
-	 FilInp->PrevFree->NextFree = FilInp;
-	 FilInp->NextFree->PrevFree = FilInp;
-      }else if (FilInp->LocInp != NIL) {
-	 FORBIDDEN(FilInp->Cnt != 0);
-	 if (FilInp->Modified) WriteFilInps();
-	 FORBIDDEN(FilInp->Modified);
-	 UnHash_FilInp(FilInp); };}/*select*/;
-   Hash_Item((tp_Item)FilInp, (tp_Loc)LocInp);
+         FilInp = (tp_FilInp) malloc(sizeof(tps_FilInp));
+         num_FilInpS += 1;
+         InpInf = &(FilInp->InpInf);
+         InpInf->IArg = -1;
+         InpInf->LocHdr = NIL;
+         InpInf->BackLink = NIL;
+         InpInf->Link = NIL;
+         InpInf->InpKind = NIL;
+         InpInf->OutLocHdr = NIL;
+         InpInf->Next = NIL;
+
+         FilInp->LocInp = NIL;
+         FilInp->Cnt = 0;
+         FilInp->Modified = FALSE;
+         FilInp->PrevFree = FreeFilInp->PrevFree;
+         FilInp->NextFree = FreeFilInp;
+         FilInp->PrevFree->NextFree = FilInp;
+         FilInp->NextFree->PrevFree = FilInp;
+      } else if (FilInp->LocInp != NIL) {
+         FORBIDDEN(FilInp->Cnt != 0);
+         if (FilInp->Modified)
+            WriteFilInps();
+         FORBIDDEN(FilInp->Modified);
+         UnHash_FilInp(FilInp);
+      }
+   }
+   Hash_Item((tp_Item) FilInp, (tp_Loc) LocInp);
    return Copy_FilInp(FilInp);
-   }/*New_FilInp*/
+}
 
-
-static tp_FilInp
-Lookup_FilInp(
-   GMC_ARG(tp_LocInp, LocInp)
-   )
-   GMC_DCL(tp_LocInp, LocInp)
+static tp_FilInp Lookup_FilInp(tp_LocInp LocInp)
 {
-   return Copy_FilInp((tp_FilInp)Lookup_Item(LocInp));
-   }/*Lookup_FilInp*/
+   return Copy_FilInp((tp_FilInp) Lookup_Item(LocInp));
+}
 
-
-tp_FilInp
-LocInp_FilInp(
-   GMC_ARG(tp_LocInp, LocInp)
-   )
-   GMC_DCL(tp_LocInp, LocInp)
+tp_FilInp LocInp_FilInp(tp_LocInp LocInp)
 {
    tp_FilInp FilInp;
    tp_InpInf InpInf;
 
    if (LocInp == ERROR) {
-      return ERROR; }/*if*/;
+      return ERROR;
+   }
 
    FilInp = Lookup_FilInp(LocInp);
    if (FilInp != ERROR) {
-      return FilInp; }/*if*/;
+      return FilInp;
+   }
 
    FilInp = New_FilInp(LocInp);
    InpInf = &(FilInp->InpInf);
    ReadInpInf(InpInf, LocInp);
    return FilInp;
-   }/*LocInp_FilInp*/
+}
 
-
-static void
-SetFilInpModified(
-   GMC_ARG(tp_FilInp, FilInp)
-   )
-   GMC_DCL(tp_FilInp, FilInp)
+static void SetFilInpModified(tp_FilInp FilInp)
 {
-   if (FilInp->Modified) return;
+   if (FilInp->Modified)
+      return;
    FilInp->Modified = TRUE;
    FilInp->NextMod = ModFilInp;
    ModFilInp = FilInp;
-   }/*SetFilInpModified*/
+}
 
-
-static void
-WriteFilInp(
-   GMC_ARG(tp_FilInp, FilInp)
-   )
-   GMC_DCL(tp_FilInp, FilInp)
+static void WriteFilInp(tp_FilInp FilInp)
 {
    WriteInpInf(&(FilInp->InpInf), FilInp->LocInp);
-   }/*WriteFilInp*/
+}
 
-
-void
-WriteFilInps(GMC_ARG_VOID)
+void WriteFilInps(void)
 {
    while (ModFilInp != NIL) {
       FORBIDDEN(!ModFilInp->Modified);
       ModFilInp->Modified = FALSE;
       WriteFilInp(ModFilInp);
-      ModFilInp = ModFilInp->NextMod; }/*while*/;
-   }/*WriteFilInps*/
+      ModFilInp = ModFilInp->NextMod;
+   }
+}
 
-
-static tp_LocInp
-Alloc_InpInf(GMC_ARG_VOID)
+static tp_LocInp Alloc_InpInf(void)
 {
    return (tp_LocInp) Alloc(sizeof(tps_InpInf));
-   }/*Alloc_InpInf*/
+}
 
-
-boolean
-FilInps_InUse(GMC_ARG_VOID)
+boolean FilInps_InUse(void)
 {
    tp_FilInp FilInp;
 
@@ -240,65 +194,42 @@ FilInps_InUse(GMC_ARG_VOID)
    FilInp = UsedFilInp->NextFree;
    while (FilInp != UsedFilInp) {
       Write(StdOutFD, "LocInp=");
-      WriteInt(StdOutFD, (int)FilInp->LocInp);
+      WriteInt(StdOutFD, (int) FilInp->LocInp);
       Write(StdOutFD, ", Cnt=");
       WriteInt(StdOutFD, FilInp->Cnt);
       Writeln(StdOutFD, "");
-      FilInp = FilInp->NextFree; }/*while*/;
+      FilInp = FilInp->NextFree;
+   }
    return (UsedFilInp->NextFree != UsedFilInp);
-   }/*FilInps_InUse*/
+}
 
-
-tp_FilHdr
-FilInp_FilHdr(
-   GMC_ARG(tp_FilInp, FilInp)
-   )
-   GMC_DCL(tp_FilInp, FilInp)
+tp_FilHdr FilInp_FilHdr(tp_FilInp FilInp)
 {
    tp_FilHdr FilHdr;
 
    if (FilInp == ERROR) {
-      return ERROR; }/*if*/;
+      return ERROR;
+   }
    FilHdr = LocHdr_FilHdr(FilInp->InpInf.LocHdr);
    return FilHdr;
-   }/*FilInp_FilHdr*/
+}
 
-
-tp_LocHdr
-FilInp_OutLocHdr(
-   GMC_ARG(tp_FilInp, FilInp)
-   )
-   GMC_DCL(tp_FilInp, FilInp)
+tp_LocHdr FilInp_OutLocHdr(tp_FilInp FilInp)
 {
    return FilInp->InpInf.OutLocHdr;
-   }/*FilInp_OutLocHdr*/
+}
 
-
-int
-FilInp_IArg(
-   GMC_ARG(tp_FilInp, FilInp)
-   )
-   GMC_DCL(tp_FilInp, FilInp)
+int FilInp_IArg(tp_FilInp FilInp)
 {
    return FilInp->InpInf.IArg;
-   }/*FilInp_IArg*/
+}
 
-
-tp_InpKind
-FilInp_InpKind(
-   GMC_ARG(tp_FilInp, FilInp)
-   )
-   GMC_DCL(tp_FilInp, FilInp)
+tp_InpKind FilInp_InpKind(tp_FilInp FilInp)
 {
    return FilInp->InpInf.InpKind;
-   }/*FilInp_InpKind*/
+}
 
-
-tp_FilInp
-FilInp_NextFilInp(
-   GMC_ARG(tp_FilInp, FilInp)
-   )
-   GMC_DCL(tp_FilInp, FilInp)
+tp_FilInp FilInp_NextFilInp(tp_FilInp FilInp)
 {
    tp_LocInp LocInp;
 
@@ -306,49 +237,39 @@ FilInp_NextFilInp(
    LocInp = FilInp->InpInf.Next;
    Ret_FilInp(FilInp);
    return LocInp_FilInp(LocInp);
-   }/*FilInp_NextFilInp*/
+}
 
-
-tp_LocInp
-FilInp_Link(
-   GMC_ARG(tp_FilInp, FilInp)
-   )
-   GMC_DCL(tp_FilInp, FilInp)
+tp_LocInp FilInp_Link(tp_FilInp FilInp)
 {
    return FilInp->InpInf.Link;
-   }/*FilInp_Link*/
+}
 
-
-static void
-Link_LocInp(
-   GMC_ARG(tp_LocInp, LocInp),
-   GMC_ARG(tp_FilHdr, FilHdr)
-   )
-   GMC_DCL(tp_LocInp, LocInp)
-   GMC_DCL(tp_FilHdr, FilHdr)
+static void Link_LocInp(tp_LocInp LocInp, tp_FilHdr FilHdr)
 {
    tp_FilInp FilInp, RiteFilInp, LeftFilInp;
    tp_InpInf InpInf;
    tp_LocInp RiteLocInp, LeftLocInp;
 
    RiteLocInp = FilHdr_InpLink(FilHdr);
-   /*select*/{
+   {
       if (RiteLocInp == NIL) {
-	 Set_InpLink(FilHdr, LocInp);
-	 LeftLocInp = LocInp;
-	 RiteLocInp = LocInp;
-      }else{
-	 RiteFilInp = LocInp_FilInp(RiteLocInp);
-	 FORBIDDEN(RiteFilInp->InpInf.LocHdr != FilHdr_LocHdr(FilHdr));
-	 LeftLocInp = RiteFilInp->InpInf.BackLink;
-	 RiteFilInp->InpInf.BackLink = LocInp;
-	 SetFilInpModified(RiteFilInp);
-	 Ret_FilInp(RiteFilInp);
+         Set_InpLink(FilHdr, LocInp);
+         LeftLocInp = LocInp;
+         RiteLocInp = LocInp;
+      } else {
+         RiteFilInp = LocInp_FilInp(RiteLocInp);
+         FORBIDDEN(RiteFilInp->InpInf.LocHdr != FilHdr_LocHdr(FilHdr));
+         LeftLocInp = RiteFilInp->InpInf.BackLink;
+         RiteFilInp->InpInf.BackLink = LocInp;
+         SetFilInpModified(RiteFilInp);
+         Ret_FilInp(RiteFilInp);
 
-	 LeftFilInp = LocInp_FilInp(LeftLocInp);
-	 LeftFilInp->InpInf.Link = LocInp;
-	 SetFilInpModified(LeftFilInp);
-	 Ret_FilInp(LeftFilInp); };}/*select*/;
+         LeftFilInp = LocInp_FilInp(LeftLocInp);
+         LeftFilInp->InpInf.Link = LocInp;
+         SetFilInpModified(LeftFilInp);
+         Ret_FilInp(LeftFilInp);
+      }
+   }
 
    FilInp = LocInp_FilInp(LocInp);
    InpInf = &(FilInp->InpInf);
@@ -359,20 +280,11 @@ Link_LocInp(
    InpInf->Link = RiteLocInp;
    SetFilInpModified(FilInp);
    Ret_FilInp(FilInp);
-   }/*Link_LocInp*/
-
+}
 
 tp_LocInp
-Make_LocInp(
-   GMC_ARG(tp_FilHdr, FilHdr),
-   GMC_ARG(int, IArg),
-   GMC_ARG(tp_InpKind, InpKind),
-   GMC_ARG(tp_FilHdr, OutFilHdr)
-   )
-   GMC_DCL(tp_FilHdr, FilHdr)
-   GMC_DCL(int, IArg)
-   GMC_DCL(tp_InpKind, InpKind)
-   GMC_DCL(tp_FilHdr, OutFilHdr)
+Make_LocInp(tp_FilHdr FilHdr,
+            int IArg, tp_InpKind InpKind, tp_FilHdr OutFilHdr)
 {
    tp_FilInp FilInp;
    tp_InpInf InpInf;
@@ -389,9 +301,11 @@ Make_LocInp(
    InpInf->Link = NIL;
    InpInf->InpKind = InpKind;
    if (InpKind == IK_Trans && !IsRef(FilHdr)) {
-      InpInf->InpKind = IK_Simple; }/*if*/;
+      InpInf->InpKind = IK_Simple;
+   }
    if (InpKind == IK_TransName && !IsRef(FilHdr)) {
-      InpInf->InpKind = IK_Name; }/*if*/;
+      InpInf->InpKind = IK_Name;
+   }
    InpInf->OutLocHdr = FilHdr_LocHdr(OutFilHdr);
    InpInf->Next = NIL;
    SetFilInpModified(FilInp);
@@ -400,18 +314,11 @@ Make_LocInp(
    Link_LocInp(LocInp, FilHdr);
 
    return LocInp;
-   }/*Make_LocInp*/
-
+}
 
 void
-Chain_LocInps(
-   GMC_ARG(tp_LocInp*, FirstLocInpPtr),
-   GMC_ARG(tp_LocInp*, LastLocInpPtr),
-   GMC_ARG(tp_LocInp, LocInp)
-   )
-   GMC_DCL(tp_LocInp*, FirstLocInpPtr)
-   GMC_DCL(tp_LocInp*, LastLocInpPtr)
-   GMC_DCL(tp_LocInp, LocInp)
+Chain_LocInps(tp_LocInp * FirstLocInpPtr,
+              tp_LocInp * LastLocInpPtr, tp_LocInp LocInp)
 {
    tp_FilInp PrvFilInp;
 
@@ -420,51 +327,38 @@ Chain_LocInps(
       FORBIDDEN(*LastLocInpPtr != NIL);
       *FirstLocInpPtr = LocInp;
       *LastLocInpPtr = LocInp;
-      return; }/*if*/;
+      return;
+   }
    PrvFilInp = LocInp_FilInp(*LastLocInpPtr);
    PrvFilInp->InpInf.Next = LocInp;
    SetFilInpModified(PrvFilInp);
    Ret_FilInp(PrvFilInp);
    *LastLocInpPtr = LocInp;
-   }/*Chain_LocInps*/
+}
 
-
-static tp_Str
-Expand_InpSpcStr(
-   GMC_ARG(tp_InpSpc, InpSpc)
-   )
-   GMC_DCL(tp_InpSpc, InpSpc)
+static tp_Str Expand_InpSpcStr(tp_InpSpc InpSpc)
 {
    tp_Str Str;
 
    if (InpSpc->Str == NIL) {
-      return NIL; }/*if*/;
+      return NIL;
+   }
    Str = InpSpc->Str;
    if (InpSpc->IsEnvVar) {
       Str = GetEnv(InpSpc->Str);
       if (Str == NIL) {
-	 Str = ""; }/*if*/; }/*if*/;
+         Str = "";
+      }
+   }
    return Str;
-   }/*Expand_InpSpcStr*/
-
+}
 
 static void
-Get_InpSpc_PrmVals(
-   GMC_ARG(tp_LocHdr*, LocHdrPtr),
-   GMC_ARG(tp_LocPVal*, LocPValPtr),
-   GMC_ARG(tp_InpSpc, InpSpc),
-   GMC_ARG(tp_Str, Str),
-   GMC_ARG(tp_FilHdr, BaseFilHdr),
-   GMC_ARG(tp_FilPrm, InhFilPrm),
-   GMC_ARG(tp_Tool, Tool)
-   )
-   GMC_DCL(tp_LocHdr*, LocHdrPtr)
-   GMC_DCL(tp_LocPVal*, LocPValPtr)
-   GMC_DCL(tp_InpSpc, InpSpc)
-   GMC_DCL(tp_Str, Str)
-   GMC_DCL(tp_FilHdr, BaseFilHdr)
-   GMC_DCL(tp_FilPrm, InhFilPrm)
-   GMC_DCL(tp_Tool, Tool)
+Get_InpSpc_PrmVals(tp_LocHdr * LocHdrPtr,
+                   tp_LocPVal * LocPValPtr,
+                   tp_InpSpc InpSpc,
+                   tp_Str Str,
+                   tp_FilHdr BaseFilHdr, tp_FilPrm InhFilPrm, tp_Tool Tool)
 {
    tp_FilHdr PrmValFilHdr;
    tp_InpSpc ValInpSpc;
@@ -472,48 +366,43 @@ Get_InpSpc_PrmVals(
    tp_LocHdr LocHdr;
    tp_LocPVal LocPVal;
 
-   *LocHdrPtr = NIL; *LocPValPtr = NIL;
+   *LocHdrPtr = NIL;
+   *LocPValPtr = NIL;
 
    if (Str == NIL && InpSpc->InpSpc == NIL) {
       *LocPValPtr = FilPVal_LocPVal(PrmTyp_RootFilPVal(InpSpc->PrmTyp));
-      return; }/*if*/;
+      return;
+   }
 
    if (Str != NIL) {
       PrmValFilHdr = Str_FilHdr(Sym_Str(Str_Sym(Str)), InpSpc->PrmTyp);
       *LocHdrPtr = FilHdr_LocHdr(PrmValFilHdr);
       Ret_FilHdr(PrmValFilHdr);
-      return; }/*if*/;
+      return;
+   }
 
    if (InpSpc->InpSpc->ISKind == ISK_PrmVal) {
       FilPVal = PrmTyp_RootFilPVal(InpSpc->PrmTyp);
       for (ValInpSpc = InpSpc->InpSpc;
-	   ValInpSpc != NIL;
-	   ValInpSpc = ValInpSpc->Next) {
-	 Get_InpSpc_PrmVals(&LocHdr, &LocPVal,
-			    ValInpSpc, Expand_InpSpcStr(ValInpSpc),
-			    BaseFilHdr, InhFilPrm, Tool);
-	 FilPVal = Add_PValInf(FilPVal, LocHdr, LocPVal); }/*for*/;
+           ValInpSpc != NIL; ValInpSpc = ValInpSpc->Next) {
+         Get_InpSpc_PrmVals(&LocHdr, &LocPVal,
+                            ValInpSpc, Expand_InpSpcStr(ValInpSpc),
+                            BaseFilHdr, InhFilPrm, Tool);
+         FilPVal = Add_PValInf(FilPVal, LocHdr, LocPVal);
+      }
       *LocPValPtr = FilPVal_LocPVal(FilPVal);
-      return; }/*if*/;
+      return;
+   }
 
    PrmValFilHdr = Do_InpSpc(Copy_FilHdr(BaseFilHdr),
-			    InhFilPrm, InpSpc->InpSpc, Tool);
+                            InhFilPrm, InpSpc->InpSpc, Tool);
    *LocHdrPtr = FilHdr_LocHdr(PrmValFilHdr);
    Ret_FilHdr(PrmValFilHdr);
-   }/*Get_InpSpc_PrmVals*/
-
+}
 
 static tp_FilHdr
-Do_InpSpc(
-   GMC_ARG(tp_FilHdr, BaseFilHdr),
-   GMC_ARG(tp_FilPrm, InhFilPrm),
-   GMC_ARG(tp_InpSpc, InpSpc),
-   GMC_ARG(tp_Tool, Tool)
-   )
-   GMC_DCL(tp_FilHdr, BaseFilHdr)
-   GMC_DCL(tp_FilPrm, InhFilPrm)
-   GMC_DCL(tp_InpSpc, InpSpc)
-   GMC_DCL(tp_Tool, Tool)
+Do_InpSpc(tp_FilHdr BaseFilHdr,
+          tp_FilPrm InhFilPrm, tp_InpSpc InpSpc, tp_Tool Tool)
 {
    tp_InpSpc OpInpSpc;
    tp_FilHdr FilHdr;
@@ -528,83 +417,100 @@ Do_InpSpc(
    Str = Expand_InpSpcStr(InpSpc);
    OpInpSpc = InpSpc->Next;
    switch (InpSpc->ISKind) {
-      case ISK_EmptyFile: {
-	 FilHdr = Copy_FilHdr(EmptyFilHdr);
-	 break;}/*case*/;
-      case ISK_Str: {
-	 FilHdr = Str_FilHdr(Str, NullPrmTyp);
-	 break;}/*case*/;
-      case ISK_Key: {
-	 Get_PkgDirName(PkgDirName, Tool_Package(Tool));
-	 Push_ContextFilHdr(HostFN_FilHdr(PkgDirName));
-	 FilHdr = HostFN_FilHdr(Str);
-	 Pop_ContextFilHdr();
-	 break;}/*case*/;
-      case ISK_Drv: {
-	 FilHdr = Do_Deriv(Copy_FilHdr(BaseFilHdr),
-			   InhFilPrm, PrecFilPrm, InpSpc->FilTyp);
-	 break;}/*case*/;
-      case ISK_Prm: {
-	 FilHdr = Get_FPVFilHdr(InpSpc->PrmTyp, InhFilPrm);
-	 if (FilHdr == NilStrFilHdr) {
-	    Ret_FilHdr(BaseFilHdr);
-	    return FilHdr; }/*if*/;
-	 break;}/*case*/;
-      case ISK_Sel: {
-	 FilHdr = Copy_FilHdr(RootFilHdr);
-	 if (Str != NIL) FilHdr = Do_Keys(FilHdr, Str);
-	 break;}/*case*/;
-      case ISK_VTgt: {
-	 Get_PkgDirName(PkgDirName, Tool_Package(Tool));
-	 FilHdr = Get_BaseVTgtFilHdr(HostFN_FilHdr(PkgDirName));
-	 OpInpSpc = InpSpc;
-	 break;}/*case*/;
-      default: {
-	 FATALERROR("bad ISKind.\n"); };}/*switch*/;
+   case ISK_EmptyFile:{
+         FilHdr = Copy_FilHdr(EmptyFilHdr);
+         break;
+      }
+   case ISK_Str:{
+         FilHdr = Str_FilHdr(Str, NullPrmTyp);
+         break;
+      }
+   case ISK_Key:{
+         Get_PkgDirName(PkgDirName, Tool_Package(Tool));
+         Push_ContextFilHdr(HostFN_FilHdr(PkgDirName));
+         FilHdr = HostFN_FilHdr(Str);
+         Pop_ContextFilHdr();
+         break;
+      }
+   case ISK_Drv:{
+         FilHdr = Do_Deriv(Copy_FilHdr(BaseFilHdr),
+                           InhFilPrm, PrecFilPrm, InpSpc->FilTyp);
+         break;
+      }
+   case ISK_Prm:{
+         FilHdr = Get_FPVFilHdr(InpSpc->PrmTyp, InhFilPrm);
+         if (FilHdr == NilStrFilHdr) {
+            Ret_FilHdr(BaseFilHdr);
+            return FilHdr;
+         }
+         break;
+      }
+   case ISK_Sel:{
+         FilHdr = Copy_FilHdr(RootFilHdr);
+         if (Str != NIL)
+            FilHdr = Do_Keys(FilHdr, Str);
+         break;
+      }
+   case ISK_VTgt:{
+         Get_PkgDirName(PkgDirName, Tool_Package(Tool));
+         FilHdr = Get_BaseVTgtFilHdr(HostFN_FilHdr(PkgDirName));
+         OpInpSpc = InpSpc;
+         break;
+      }
+   default:{
+         FATALERROR("bad ISKind.\n");
+      }
+   }
 
    while (OpInpSpc != NIL) {
       Str = Expand_InpSpcStr(OpInpSpc);
       switch (OpInpSpc->ISKind) {
-	 case ISK_Drv: {
-	    FilHdr = Do_Deriv(FilHdr, InhFilPrm, PrecFilPrm, OpInpSpc->FilTyp);
-	    PrecFilPrm = RootFilPrm;
-	    break;}/*case*/;
-	 case ISK_Prm: {
-	    Get_InpSpc_PrmVals(&LocHdr, &LocPVal,
-			       OpInpSpc, Str, BaseFilHdr, InhFilPrm, Tool);
-	    PrecFilPrm = Append_PrmInf(PrecFilPrm, OpInpSpc->PrmTyp,
-				       LocHdr, LocPVal);
-	    break;}/*case*/;
-	 case ISK_Sel: {
-	    FilHdr = Do_Key(FilHdr, "");
-	    if (Str != NIL) {
-	       FilHdr = Do_Keys(FilHdr, Str); }/*if*/;
-	    PrecFilPrm = RootFilPrm;
-	    break;}/*case*/;
-	 case ISK_VTgt: {
-	    FilHdr = Do_VTgt(FilHdr, Str);
-	    PrecFilPrm = RootFilPrm;
-	    break;}/*case*/;
-	 default: {
-	    FATALERROR("bad ISKind.\n"); };}/*switch*/;
-      OpInpSpc = OpInpSpc->Next; }/*for*/;
+      case ISK_Drv:{
+            FilHdr =
+                Do_Deriv(FilHdr, InhFilPrm, PrecFilPrm, OpInpSpc->FilTyp);
+            PrecFilPrm = RootFilPrm;
+            break;
+         }
+      case ISK_Prm:{
+            Get_InpSpc_PrmVals(&LocHdr, &LocPVal,
+                               OpInpSpc, Str, BaseFilHdr, InhFilPrm, Tool);
+            PrecFilPrm = Append_PrmInf(PrecFilPrm, OpInpSpc->PrmTyp,
+                                       LocHdr, LocPVal);
+            break;
+         }
+      case ISK_Sel:{
+            FilHdr = Do_Key(FilHdr, "");
+            if (Str != NIL) {
+               FilHdr = Do_Keys(FilHdr, Str);
+            }
+            PrecFilPrm = RootFilPrm;
+            break;
+         }
+      case ISK_VTgt:{
+            FilHdr = Do_VTgt(FilHdr, Str);
+            PrecFilPrm = RootFilPrm;
+            break;
+         }
+      default:{
+            FATALERROR("bad ISKind.\n");
+         }
+      }
+      OpInpSpc = OpInpSpc->Next;
+   }
 
    if (PrecFilPrm != RootFilPrm) {
       ElmFilHdr = Copy_FilHdr(FilHdr);
-      FilHdr = Get_Drv(FilHdr, FK_InpPntr, ObjectFilTyp, RootFilPrm, DfltIdent);
+      FilHdr =
+          Get_Drv(FilHdr, FK_InpPntr, ObjectFilTyp, RootFilPrm, DfltIdent);
       Set_LocElm(FilHdr, Make_LocElm(ElmFilHdr, PrecFilPrm, FilHdr));
-      Ret_FilHdr(ElmFilHdr); }/*if*/;
+      Ret_FilHdr(ElmFilHdr);
+   }
 
    Ret_FilHdr(BaseFilHdr);
    return FilHdr;
-   }/*Do_InpSpc*/
+}
 
-
-tp_LocInp
-Get_LocInp(
-   GMC_ARG(tp_FilHdr, FilHdr)
-   )
-   GMC_DCL(tp_FilHdr, FilHdr)
+tp_LocInp Get_LocInp(tp_FilHdr FilHdr)
 {
    tp_LocInp FirstLI, LastLI;
    tp_FilHdr ToolFilHdr, BaseFilHdr, InpFilHdr;
@@ -616,54 +522,76 @@ Get_LocInp(
    tp_InpSpc InpSpc;
    tp_LocInp LocInp;
 
-   FirstLI = NIL; LastLI = NIL;
+   FirstLI = NIL;
+   LastLI = NIL;
    ToolFilHdr = Copy_FilHdr(FilHdr);
    if (IsInstance(ToolFilHdr)) {
-      ToolFilHdr = FilHdr_Father(ToolFilHdr); }/*if*/;
+      ToolFilHdr = FilHdr_Father(ToolFilHdr);
+   }
    BaseFilHdr = FilHdr_Father(Copy_FilHdr(ToolFilHdr));
 
    switch (FilHdr_FKind(ToolFilHdr)) {
-      case FK_SrcReg: case FK_SrcDir: case FK_SymLinkReg: case FK_SymLinkDir:
-      case FK_BoundSrc: case FK_BoundSymLink: case FK_Str: {
-	 break;}/*case*/;
-      case FK_User: {
-	 Tool = FilHdr_Tool(ToolFilHdr);
-	 FilPrm = FilHdr_FilPrm(ToolFilHdr);
-	 for (InpEdg = Tool_InpEdg(Tool), IArg = 0;
-	      InpEdg != NIL;
-	      InpEdg = InpEdg_Next(InpEdg), IArg += 1) {
-	    InpSpc = InpEdg_InpSpc(InpEdg);
-	    if (InpSpc->FilTyp != NoInputFilTyp) {
-	       InpFilHdr = Do_InpSpc(Copy_FilHdr(BaseFilHdr),
-				     FilPrm, InpSpc, Tool);
-	       if (InpFilHdr != NilStrFilHdr) {
-		  InpNum = (InpEdg_IsUserArg(InpEdg) ? IArg : -1);
-		  InpKind = InpEdg_InpKind(InpEdg);
-		  LocInp = Make_LocInp(InpFilHdr, InpNum, InpKind, FilHdr);
-		  Chain_LocInps(&FirstLI, &LastLI, LocInp); }/*if*/;
-	       Ret_FilHdr(InpFilHdr); }/*if*/; }/*for*/;
-	 if (IsDerefPrmVal_Tool(Tool)) {
-	    Chain_FilPrm_DerefPrmVal(&FirstLI, &LastLI, FilPrm, FilHdr);
-	    }/*if*/;
-	 break;}/*case*/;
-      case FK_DrvDirElm: case FK_VirDirElm:
-      case FK_ActTgtText: case FK_VirTgtText:
-      case FK_ActTgtExText: case FK_VirTgtExText:
-      case FK_VirTgt: case FK_VirCmdTgt: case FK_ActTgt: case FK_ActCmdTgt: {
-	 FirstLI = Make_LocInp(BaseFilHdr, 0, IK_Simple, FilHdr);
-	 break;}/*case*/;
-      case FK_PntrHo: {
-	 FirstLI = Make_LocInp(BaseFilHdr, 0, IK_Pntr, FilHdr);
-	 break;}/*case*/;
-      case FK_PntrElm: {
-	 FirstLI = Make_LocInp(BaseFilHdr, 0, IK_TransName, FilHdr);
-	 break;}/*case*/;
-      case FK_InpPntr: {
-	 break;}/*case*/;
-      default: {
-	 FATALERROR("Bad FKind"); };}/*switch*/;
-   Ret_FilHdr(BaseFilHdr); Ret_FilHdr(ToolFilHdr);
+   case FK_SrcReg:
+   case FK_SrcDir:
+   case FK_SymLinkReg:
+   case FK_SymLinkDir:
+   case FK_BoundSrc:
+   case FK_BoundSymLink:
+   case FK_Str:{
+         break;
+      }
+   case FK_User:{
+         Tool = FilHdr_Tool(ToolFilHdr);
+         FilPrm = FilHdr_FilPrm(ToolFilHdr);
+         for (InpEdg = Tool_InpEdg(Tool), IArg = 0;
+              InpEdg != NIL; InpEdg = InpEdg_Next(InpEdg), IArg += 1) {
+            InpSpc = InpEdg_InpSpc(InpEdg);
+            if (InpSpc->FilTyp != NoInputFilTyp) {
+               InpFilHdr = Do_InpSpc(Copy_FilHdr(BaseFilHdr),
+                                     FilPrm, InpSpc, Tool);
+               if (InpFilHdr != NilStrFilHdr) {
+                  InpNum = (InpEdg_IsUserArg(InpEdg) ? IArg : -1);
+                  InpKind = InpEdg_InpKind(InpEdg);
+                  LocInp = Make_LocInp(InpFilHdr, InpNum, InpKind, FilHdr);
+                  Chain_LocInps(&FirstLI, &LastLI, LocInp);
+               }
+               Ret_FilHdr(InpFilHdr);
+            }
+         }
+         if (IsDerefPrmVal_Tool(Tool)) {
+            Chain_FilPrm_DerefPrmVal(&FirstLI, &LastLI, FilPrm, FilHdr);
+         }
+         break;
+      }
+   case FK_DrvDirElm:
+   case FK_VirDirElm:
+   case FK_ActTgtText:
+   case FK_VirTgtText:
+   case FK_ActTgtExText:
+   case FK_VirTgtExText:
+   case FK_VirTgt:
+   case FK_VirCmdTgt:
+   case FK_ActTgt:
+   case FK_ActCmdTgt:{
+         FirstLI = Make_LocInp(BaseFilHdr, 0, IK_Simple, FilHdr);
+         break;
+      }
+   case FK_PntrHo:{
+         FirstLI = Make_LocInp(BaseFilHdr, 0, IK_Pntr, FilHdr);
+         break;
+      }
+   case FK_PntrElm:{
+         FirstLI = Make_LocInp(BaseFilHdr, 0, IK_TransName, FilHdr);
+         break;
+      }
+   case FK_InpPntr:{
+         break;
+      }
+   default:{
+         FATALERROR("Bad FKind");
+      }
+   }
+   Ret_FilHdr(BaseFilHdr);
+   Ret_FilHdr(ToolFilHdr);
    return FirstLI;
-   }/*Get_LocInp*/
-
-
+}

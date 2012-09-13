@@ -12,6 +12,6 @@ typedef struct _tps_InpEdg {
    boolean Done;
    int Index;
    tp_InpEdg Link;
-   }				tps_InpEdg;
+} tps_InpEdg;
 
 #endif

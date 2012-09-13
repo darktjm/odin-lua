@@ -14,6 +14,6 @@ typedef struct _tps_FilInp {
 
    boolean Modified;
    tp_FilInp NextMod;
-   }				tps_FilInp;
+} tps_FilInp;
 
 #endif

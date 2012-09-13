@@ -6,6 +6,6 @@ typedef struct _tps_Host {
    int FD;
    int RBS_Id;
    tp_Host Next;
-   }				tps_Host;
+} tps_Host;
 
 #endif

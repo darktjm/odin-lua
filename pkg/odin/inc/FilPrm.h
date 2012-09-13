@@ -12,6 +12,6 @@ typedef struct _tps_FilPrm {
    tps_PrmInf PrmInf;
    tp_PrmTyp PrmTyp;
    tp_FilPVal FilPVal;
-   }				tps_FilPrm;
+} tps_FilPrm;
 
 #endif

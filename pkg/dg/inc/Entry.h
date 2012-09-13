@@ -1,6 +1,6 @@
 #define DUMMY_INDEX -2
 
-typedef char tps_EntryStr [20];
+typedef char tps_EntryStr[20];
 
 #ifdef __STDC__
 
@@ -8,7 +8,6 @@ typedef char tps_EntryStr [20];
  (void)fprintf(DRVGRF_FILE, "%d ",num_##x##S); \
  (void)fprintf(DG_C_FILE, "#include \"inc/" #x ".h\"\n"); \
  (void)fprintf(DG_C_FILE, "extern tps_" #x " _" #x "S [];\n")
-
 #define DG_FOREACH(x) \
  { boolean first_time = TRUE; \
  (void)fprintf((FILE*)StdOutFD, "%d " #x "'s\n", num_##x##S); \
@@ -24,14 +23,12 @@ typedef char tps_EntryStr [20];
 #define DG_CONST(x,y) \
  (void)fprintf(DRVGRF_FILE, "%d\n", x->Index); \
  (void)fprintf(DG_C_FILE, "tp_" #y " " #x " = &_" #y "S[%d];\n", x->Index)
-
 #else
 
 #define DG_HEAD(x) \
  (void)fprintf(DRVGRF_FILE, "%d ",num_/**/x/**/S); \
  (void)fprintf(DG_C_FILE, "#include \"inc/x.h\"\n"); \
  (void)fprintf(DG_C_FILE, "extern tps_%s _%sS [];\n", "x", "x")
-
 #define DG_FOREACH(x) \
  { boolean first_time = TRUE; \
  (void)fprintf((FILE*)StdOutFD, "%d x's\n", num_/**/x/**/S); \
@@ -47,13 +44,10 @@ typedef char tps_EntryStr [20];
 #define DG_CONST(x,y) \
  (void)fprintf(DRVGRF_FILE, "%d\n", x->Index); \
  (void)fprintf(DG_C_FILE, "tp_%s x = &_%sS[%d];\n", "y", "y", x->Index)
-
 #endif
 
 #define DG_ENTRY_SEPARATOR() \
  if (!first_time) (void)fprintf(DG_C_FILE, ",\n  ")
-
 #define DG_END_FOREACH(x) \
- first_time = FALSE; }/*for*/; }/*block*/; \
- (void)fprintf(DG_C_FILE, " };\n")
-
+ first_time = FALSE; } } \
+ (void)fprintf(DG_C_FILE, " }\n")

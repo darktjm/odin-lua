@@ -11,12 +11,12 @@
 
 #ifdef HAVE_DIRENT_H
 #include <dirent.h>
-typedef struct dirent	DIRENTRY;
+typedef struct dirent DIRENTRY;
 #else
 #include <sys/dir.h>
-typedef struct direct	DIRENTRY;
+typedef struct direct DIRENTRY;
 #endif
 
 #ifndef S_ISDIR
 #define S_ISDIR(m)		(((m) & S_IFMT) == S_IFDIR)
-#endif	/* !defined(S_ISDIR) */
+#endif                          /* !defined(S_ISDIR) */

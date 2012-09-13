@@ -5,6 +5,6 @@ typedef struct _tps_SrcTyp {
    tp_Pattern Pattern;
    boolean IsPrefix;
    tp_FilTyp FilTyp;
-   }				tps_SrcTyp;
+} tps_SrcTyp;
 
 #endif

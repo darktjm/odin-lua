@@ -16,10 +16,7 @@ geoff@boulder.colorado.edu
 #include "inc/GMC.h"
 #include "inc/NodTyp_.h"
 
-
-Gen_InStub(FilDsc, Root)
-   tp_FilDsc FilDsc;
-   tp_Nod Root;
+int Gen_InStub(tp_FilDsc FilDsc, tp_Nod Root)
 {
    tp_Nod StubNod, MsgNod;
    int MsgNum;
@@ -34,26 +31,29 @@ Gen_InStub(FilDsc, Root)
       Writeln(FilDsc, "");
       Get_MsgNod(&MsgNod, &IsServer, StubNod);
       Write_ServerIfDef(FilDsc, IsServer);
-      /*select*/{
-	 if (Nod_NodTyp(MsgNod) == NOD_splitrequest) {
-	    Write_SplitInMsg(FilDsc, MsgNod);
-	 }else{
-	    Write_InMsg(FilDsc, MsgNod); };}/*select*/;
-      Writeln(FilDsc, "#endif"); }/*for*/;
+      {
+         if (Nod_NodTyp(MsgNod) == NOD_splitrequest) {
+            Write_SplitInMsg(FilDsc, MsgNod);
+         } else {
+            Write_InMsg(FilDsc, MsgNod);
+         }
+      }
+      Writeln(FilDsc, "#endif");
+   }
 
    Writeln(FilDsc, "void");
    Writeln(FilDsc, "IPC_Do_Msg(");
-   Writeln(FilDsc, "   GMC_ARG(boolean*, IPC_AbortPtr),");
-   Writeln(FilDsc, "   GMC_ARG(int, MsgType)");
+   Writeln(FilDsc, "   boolean*  IPC_AbortPtr,");
+   Writeln(FilDsc, "   int  MsgType");
    Writeln(FilDsc, "   )");
-   Writeln(FilDsc, "   GMC_DCL(boolean*, IPC_AbortPtr)");
-   Writeln(FilDsc, "   GMC_DCL(int, MsgType)");
+   Writeln(FilDsc, "   ");
+   Writeln(FilDsc, "   ");
    Writeln(FilDsc, "{");
    Writeln(FilDsc, "   switch (MsgType) {");
    Writeln(FilDsc, "      case 1: {");
    Writeln(FilDsc, "         IPC_Do_Return = TRUE;");
    Writeln(FilDsc, "         *IPC_AbortPtr = FALSE;");
-   Writeln(FilDsc, "         break; }/*case*/;");
+   Writeln(FilDsc, "         break; }");
    MsgNum = 1;
    FOREACH_SON(StubNod, Root) {
       MsgNum += 1;
@@ -68,16 +68,14 @@ Gen_InStub(FilDsc, Root)
       Writeln(FilDsc, "#else");
       Writeln(FilDsc, "         *IPC_AbortPtr = TRUE;");
       Writeln(FilDsc, "#endif");
-      Writeln(FilDsc, "         break; }/*case*/;"); }/*for*/;
+      Writeln(FilDsc, "         break; }");
+   }
    Writeln(FilDsc, "      default: {");
-   Writeln(FilDsc, "         FATALERROR(\"Unexpected message type\"); };}/*switch*/;");
-   Writeln(FilDsc, "   }/*IPC_Do_Msg*/");
-   }/*Gen_InStub*/
+   Writeln(FilDsc, "         FATALERROR(\"Unexpected message type\"); }}");
+   Writeln(FilDsc, "   }");
+}
 
-
-Gen_OutStub(FilDsc, Root)
-   tp_FilDsc FilDsc;
-   tp_Nod Root;
+int Gen_OutStub(tp_FilDsc FilDsc, tp_Nod Root)
 {
    tp_Nod StubNod, MsgNod;
    int MsgNum;
@@ -94,13 +92,11 @@ Gen_OutStub(FilDsc, Root)
       Get_MsgNod(&MsgNod, &IsServer, StubNod);
       Write_ServerIfDef(FilDsc, !IsServer);
       Write_OutMsg(FilDsc, MsgNod, MsgNum, IsServer);
-      Writeln(FilDsc, "#endif"); }/*for*/;
-   }/*Gen_OutStub*/
+      Writeln(FilDsc, "#endif");
+   }
+}
 
-
-Write_InMsg(FilDsc, MsgNod)
-   tp_FilDsc FilDsc;
-   tp_Nod MsgNod;
+int Write_InMsg(tp_FilDsc FilDsc, tp_Nod MsgNod)
 {
    tp_Nod ArgDclsNod, ArgDclNod;
    tp_NodTyp ArgKind;
@@ -109,72 +105,82 @@ Write_InMsg(FilDsc, MsgNod)
    Writeln(FilDsc, "static void");
    Write_NodSym(FilDsc, Nod_Son(1, MsgNod));
    Writeln(FilDsc, "_Msg(");
-   Writeln(FilDsc, "   GMC_ARG(boolean*, IPC_AbortPtr)");
+   Writeln(FilDsc, "   boolean*  IPC_AbortPtr");
    Writeln(FilDsc, "   )");
-   Writeln(FilDsc, "   GMC_DCL(boolean*, IPC_AbortPtr)");
+   Writeln(FilDsc, "   ");
    Writeln(FilDsc, "{");
    ArgDclsNod = Nod_Son(3, MsgNod);
    FOREACH_SON(ArgDclNod, ArgDclsNod) {
-      ;/*select*/{
-	 if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
-	    Write(FilDsc, "   int ");
-	 }else{
-	    Write(FilDsc, "   tps_Str "); };}/*select*/;
+      ; {
+         if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
+            Write(FilDsc, "   int ");
+         } else {
+            Write(FilDsc, "   tps_Str ");
+         }
+      }
       Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-      Writeln(FilDsc, ";"); }/*for*/;
+      Writeln(FilDsc, ";");
+   }
    Writeln(FilDsc, "");
 
    Writeln(FilDsc, "   *IPC_AbortPtr = FALSE;");
    FOREACH_SON(ArgDclNod, ArgDclsNod) {
       ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
       if (ArgKind == NOD_in || ArgKind == NOD_inout) {
-	 /*select*/{
-	    if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
-	       Write(FilDsc, "   IPC_Read_Int(IPC_AbortPtr, &");
-	    }else{
-	       Write(FilDsc, "   IPC_Read_Str(IPC_AbortPtr, "); };}/*select*/;
-	 Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-	 Writeln(FilDsc, ");");
-	 Writeln(FilDsc, "   if (*IPC_AbortPtr) return;");
-	 }/*if*/; }/*for*/;
+         {
+            if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
+               Write(FilDsc, "   IPC_Read_Int(IPC_AbortPtr, &");
+            } else {
+               Write(FilDsc, "   IPC_Read_Str(IPC_AbortPtr, ");
+            }
+         }
+         Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
+         Writeln(FilDsc, ");");
+         Writeln(FilDsc, "   if (*IPC_AbortPtr) return;");
+      }
+   }
 
    Write(FilDsc, "   Local_");
    Write_NodSym(FilDsc, Nod_Son(1, MsgNod));
    Write(FilDsc, "(");
    IsFirst = TRUE;
    FOREACH_SON(ArgDclNod, ArgDclsNod) {
-      if (!IsFirst) Write(FilDsc, ", ");
+      if (!IsFirst)
+         Write(FilDsc, ", ");
       IsFirst = FALSE;
       ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
       if (ArgKind == NOD_out || ArgKind == NOD_inout) {
-	 if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
-	    Write(FilDsc, "&"); }/*if*/; }/*if*/;
-      Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod)); }/*for*/;
+         if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
+            Write(FilDsc, "&");
+         }
+      }
+      Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
+   }
    Writeln(FilDsc, ");");
-   
+
    if (Nod_NodTyp(MsgNod) == NOD_request) {
       Writeln(FilDsc, "   IPC_Write_Int(IPC_AbortPtr, 1);");
       Writeln(FilDsc, "   if (*IPC_AbortPtr) return;");
       FOREACH_SON(ArgDclNod, ArgDclsNod) {
-	 ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
-	 if (ArgKind == NOD_out || ArgKind == NOD_inout) {
-	    /*select*/{
-	       if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
-		  Write(FilDsc, "   IPC_Write_Int(IPC_AbortPtr, ");
-	       }else{
-		  Write(FilDsc, "   IPC_Write_Str(IPC_AbortPtr, ");
-		  };}/*select*/;
-	    Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-	    Writeln(FilDsc, ");");
-	    Writeln(FilDsc, "   if (*IPC_AbortPtr) return;");
-	    }/*if*/; }/*for*/; }/*if*/;
+         ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
+         if (ArgKind == NOD_out || ArgKind == NOD_inout) {
+            {
+               if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
+                  Write(FilDsc, "   IPC_Write_Int(IPC_AbortPtr, ");
+               } else {
+                  Write(FilDsc, "   IPC_Write_Str(IPC_AbortPtr, ");
+               }
+            }
+            Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
+            Writeln(FilDsc, ");");
+            Writeln(FilDsc, "   if (*IPC_AbortPtr) return;");
+         }
+      }
+   }
    Writeln(FilDsc, "}");
-   }/*Write_InMsg*/
+}
 
-
-Write_SplitInMsg(FilDsc, MsgNod)
-   tp_FilDsc FilDsc;
-   tp_Nod MsgNod;
+int Write_SplitInMsg(tp_FilDsc FilDsc, tp_Nod MsgNod)
 {
    tp_Nod ArgDclsNod, ArgDclNod, ArgTypeNod;
    tp_NodTyp ArgKind;
@@ -184,35 +190,42 @@ Write_SplitInMsg(FilDsc, MsgNod)
    Writeln(FilDsc, "static void");
    Write_NodSym(FilDsc, Nod_Son(1, MsgNod));
    Writeln(FilDsc, "_Msg(");
-   Writeln(FilDsc, "   GMC_ARG(boolean*, IPC_AbortPtr)");
+   Writeln(FilDsc, "   boolean*  IPC_AbortPtr");
    Writeln(FilDsc, "   )");
-   Writeln(FilDsc, "   GMC_DCL(boolean*, IPC_AbortPtr)");
+   Writeln(FilDsc, "   ");
    Writeln(FilDsc, "{");
    ArgDclsNod = Nod_Son(3, MsgNod);
    FOREACH_SON(ArgDclNod, ArgDclsNod) {
       ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
       if (ArgKind == NOD_in || ArgKind == NOD_inout) {
-	 ;/*select*/{
-	    if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
-	       Write(FilDsc, "   int ");
-	    }else{
-	       Write(FilDsc, "   tps_Str "); };}/*select*/;
-	 Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-	 Writeln(FilDsc, ";"); }/*if*/; }/*for*/;
+         ; {
+            if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
+               Write(FilDsc, "   int ");
+            } else {
+               Write(FilDsc, "   tps_Str ");
+            }
+         }
+         Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
+         Writeln(FilDsc, ";");
+      }
+   }
    Writeln(FilDsc, "");
 
    FOREACH_SON(ArgDclNod, ArgDclsNod) {
       ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
       if (ArgKind == NOD_in || ArgKind == NOD_inout) {
-	 /*select*/{
-	    if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
-	       Write(FilDsc, "   IPC_Read_Int(IPC_AbortPtr, &");
-	    }else{
-	       Write(FilDsc, "   IPC_Read_Str(IPC_AbortPtr, "); };}/*select*/;
-	 Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-	 Writeln(FilDsc, ");");
-	 Writeln(FilDsc, "   if (*IPC_AbortPtr) return;");
-	 }/*if*/; }/*for*/;
+         {
+            if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
+               Write(FilDsc, "   IPC_Read_Int(IPC_AbortPtr, &");
+            } else {
+               Write(FilDsc, "   IPC_Read_Str(IPC_AbortPtr, ");
+            }
+         }
+         Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
+         Writeln(FilDsc, ");");
+         Writeln(FilDsc, "   if (*IPC_AbortPtr) return;");
+      }
+   }
 
    Write(FilDsc, "   Local_");
    Write_NodSym(FilDsc, Nod_Son(1, MsgNod));
@@ -221,9 +234,12 @@ Write_SplitInMsg(FilDsc, MsgNod)
    FOREACH_SON(ArgDclNod, ArgDclsNod) {
       ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
       if (ArgKind == NOD_in || ArgKind == NOD_inout) {
-	 if (!IsFirst) Write(FilDsc, ", ");
-	 IsFirst = FALSE;
-	 Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod)); }/*if*/; }/*for*/;
+         if (!IsFirst)
+            Write(FilDsc, ", ");
+         IsFirst = FALSE;
+         Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
+      }
+   }
    Writeln(FilDsc, ");\n}\n");
 
    Writeln(FilDsc, "void");
@@ -235,39 +251,35 @@ Write_SplitInMsg(FilDsc, MsgNod)
    FOREACH_SON(ArgDclNod, ArgDclsNod) {
       ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
       if (ArgKind == NOD_out || ArgKind == NOD_inout) {
-	 if (!IsFirst) Write(FilDsc, ",");
-	 IsFirst = FALSE;
-	 Writeln(FilDsc, "");
-	 Write(FilDsc, "   GMC_ARG(");
-	 ArgTypeNod = Nod_Son(3, ArgDclNod);
-	 /*select*/{
-	    if (Nod_NodTyp(ArgTypeNod) == NOD_pointer) {
-	       Write_NodSym(FilDsc, Nod_Son(1, ArgTypeNod));
-	    }else{
-	       Write_NodSym(FilDsc, ArgTypeNod); };}/*select*/;
-	 Write(FilDsc, ", ");
-	 Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-         Write(FilDsc, ")"); }/*if*/; }/*for*/;
-   /*select*/{
+         if (!IsFirst)
+            Write(FilDsc, ",");
+         IsFirst = FALSE;
+         Writeln(FilDsc, "");
+         ArgTypeNod = Nod_Son(3, ArgDclNod);
+         {
+            if (Nod_NodTyp(ArgTypeNod) == NOD_pointer) {
+               Write_NodSym(FilDsc, Nod_Son(1, ArgTypeNod));
+            } else {
+               Write_NodSym(FilDsc, ArgTypeNod);
+            }
+         }
+         Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
+      }
+   }
+   {
       if (IsFirst) {
-	 Writeln(FilDsc, "GMC_ARG_VOID)");
-      }else{
-	 Writeln(FilDsc, "");
-	 Writeln(FilDsc, "   )"); };}/*select*/;
+         Writeln(FilDsc, "void)");
+      } else {
+         Writeln(FilDsc, "");
+         Writeln(FilDsc, "   )");
+      }
+   }
 
    FOREACH_SON(ArgDclNod, ArgDclsNod) {
       ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
       if (ArgKind == NOD_out || ArgKind == NOD_inout) {
-	 Write(FilDsc, "   GMC_DCL(");
-	 ArgTypeNod = Nod_Son(3, ArgDclNod);
-	 /*select*/{
-	    if (Nod_NodTyp(ArgTypeNod) == NOD_pointer) {
-	       Write_NodSym(FilDsc, Nod_Son(1, ArgTypeNod));
-	    }else{
-	       Write_NodSym(FilDsc, ArgTypeNod); };}/*select*/;
-	 Write(FilDsc, ", ");
-	 Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-	 Writeln(FilDsc, ")"); }/*if*/; }/*for*/;
+      }
+   }
 
    Writeln(FilDsc, "{");
    Writeln(FilDsc, "   boolean IPC_Abort;\n");
@@ -278,46 +290,49 @@ Write_SplitInMsg(FilDsc, MsgNod)
       i += 1;
       ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
       if (ArgKind == NOD_out || ArgKind == NOD_inout) {
-	 ;/*select*/{
-	    if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
-	       Write(FilDsc, "      *IPC_IArg");
-	       WriteInt(FilDsc, i);
-	       Write(FilDsc, " = ");
-	       Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-	       Writeln(FilDsc, ";");
-	    }else{
-	       Write(FilDsc, "      (void)strcpy(IPC_SArg");
-	       WriteInt(FilDsc, i);
-	       Write(FilDsc, ", ");
-	       Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-	       Writeln(FilDsc, ");"); };}/*select*/; }/*if*/; }/*for*/;
+         ; {
+            if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
+               Write(FilDsc, "      *IPC_IArg");
+               WriteInt(FilDsc, i);
+               Write(FilDsc, " = ");
+               Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
+               Writeln(FilDsc, ";");
+            } else {
+               Write(FilDsc, "      (void)strcpy(IPC_SArg");
+               WriteInt(FilDsc, i);
+               Write(FilDsc, ", ");
+               Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
+               Writeln(FilDsc, ");");
+            }
+         }
+      }
+   }
    Writeln(FilDsc, "      FORBIDDEN(IPC_Do_Return);\n");
    Writeln(FilDsc, "      IPC_Do_Return = TRUE;\n");
-   Writeln(FilDsc, "      return; };\n");
+   Writeln(FilDsc, "      return; }\n");
 
    Writeln(FilDsc, "   IPC_Write_Int(&IPC_Abort, 1);");
    Writeln(FilDsc, "   if (IPC_Abort) IPC_Do_Abort();");
    FOREACH_SON(ArgDclNod, ArgDclsNod) {
       ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
       if (ArgKind == NOD_out || ArgKind == NOD_inout) {
-	 /*select*/{
-	    if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
-	       Write(FilDsc, "   IPC_Write_Int(&IPC_Abort, ");
-	    }else{
-	       Write(FilDsc, "   IPC_Write_Str(&IPC_Abort, "); };}/*select*/;
-	 Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-	 Writeln(FilDsc, ");");
-	 Writeln(FilDsc, "   if (IPC_Abort) IPC_Do_Abort();");
-	 }/*if*/; }/*for*/;
+         {
+            if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
+               Write(FilDsc, "   IPC_Write_Int(&IPC_Abort, ");
+            } else {
+               Write(FilDsc, "   IPC_Write_Str(&IPC_Abort, ");
+            }
+         }
+         Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
+         Writeln(FilDsc, ");");
+         Writeln(FilDsc, "   if (IPC_Abort) IPC_Do_Abort();");
+      }
+   }
    Writeln(FilDsc, "}");
-   }/*Write_SplitInMsg*/
+}
 
-
-Write_OutMsg(FilDsc, MsgNod, MsgNum, IsServer)
-   tp_FilDsc FilDsc;
-   tp_Nod MsgNod;
-   int MsgNum;
-   boolean IsServer;
+int Write_OutMsg(tp_FilDsc FilDsc, tp_Nod MsgNod, int MsgNum,
+                 boolean IsServer)
 {
    tp_Nod ArgDclsNod, ArgDclNod, ArgTypeNod;
    tp_NodTyp ArgKind;
@@ -333,45 +348,38 @@ Write_OutMsg(FilDsc, MsgNod, MsgNum, IsServer)
    Write(FilDsc, "(");
    IsFirst = TRUE;
    FOREACH_SON(ArgDclNod, ArgDclsNod) {
-      if (!IsFirst) Write(FilDsc, ",");
+      if (!IsFirst)
+         Write(FilDsc, ",");
       IsFirst = FALSE;
       Writeln(FilDsc, "");
-      Write(FilDsc, "   GMC_ARG(");
       ArgTypeNod = Nod_Son(3, ArgDclNod);
-      /*select*/{
-	 if (Nod_NodTyp(ArgTypeNod) == NOD_pointer) {
-	    Write_NodSym(FilDsc, Nod_Son(1, ArgTypeNod));
-	    Write(FilDsc, "*");
-	 }else{
-	    Write_NodSym(FilDsc, ArgTypeNod); };}/*select*/;
-      Write(FilDsc, ", ");
+      {
+         if (Nod_NodTyp(ArgTypeNod) == NOD_pointer) {
+            Write_NodSym(FilDsc, Nod_Son(1, ArgTypeNod));
+         } else {
+            Write_NodSym(FilDsc, ArgTypeNod);
+         }
+      }
       Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-      Write(FilDsc, ")"); }/*for*/;
-   /*select*/{
+   }
+   {
       if (IsFirst) {
-	 Writeln(FilDsc, "GMC_ARG_VOID)");
-      }else{
-	 Writeln(FilDsc, "");
-	 Writeln(FilDsc, "   )"); };}/*select*/;
+         Writeln(FilDsc, "void)");
+      } else {
+         Writeln(FilDsc, "");
+         Writeln(FilDsc, "   )");
+      }
+   }
 
    FOREACH_SON(ArgDclNod, ArgDclsNod) {
-      Write(FilDsc, "   GMC_DCL(");
-      ArgTypeNod = Nod_Son(3, ArgDclNod);
-      /*select*/{
-	 if (Nod_NodTyp(ArgTypeNod) == NOD_pointer) {
-	    Write_NodSym(FilDsc, Nod_Son(1, ArgTypeNod));
-	    Write(FilDsc, "*");
-	 }else{
-	    Write_NodSym(FilDsc, ArgTypeNod); };}/*select*/;
-      Write(FilDsc, ", ");
-      Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-      Writeln(FilDsc, ")"); }/*for*/;
+   }
 
    Writeln(FilDsc, "{");
    Writeln(FilDsc, "   boolean IPC_Abort;\n");
    if (Nod_NodTyp(MsgNod) == NOD_request
        || Nod_NodTyp(MsgNod) == NOD_splitrequest) {
-      Writeln(FilDsc, "   boolean IPC_Cmd_Abort;\n"); }/*if*/;
+      Writeln(FilDsc, "   boolean IPC_Cmd_Abort;\n");
+   }
 
    Write_ServerIfDef(FilDsc, IsServer);
    Writeln(FilDsc, "   if (IsServer && Is_LocalClient(CurrentClient)) {");
@@ -379,22 +387,25 @@ Write_OutMsg(FilDsc, MsgNod, MsgNum, IsServer)
       Writeln(FilDsc, "      FORBIDDEN(IPC_Do_Return);");
       i = 0;
       FOREACH_SON(ArgDclNod, ArgDclsNod) {
-	 i += 1;
-	 ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
-	 if (ArgKind == NOD_out || ArgKind == NOD_inout) {
-	    ArgStr = (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int
-		      ? "IPC_IArg" : "IPC_SArg");
-	    Write(FilDsc, "      FORBIDDEN(");
-	    Write(FilDsc, ArgStr);
-	    WriteInt(FilDsc, i);
-	    Writeln(FilDsc, " != NIL);");
+         i += 1;
+         ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
+         if (ArgKind == NOD_out || ArgKind == NOD_inout) {
+            ArgStr = (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int
+                      ? "IPC_IArg" : "IPC_SArg");
+            Write(FilDsc, "      FORBIDDEN(");
+            Write(FilDsc, ArgStr);
+            WriteInt(FilDsc, i);
+            Writeln(FilDsc, " != NIL);");
 
-	    Write(FilDsc, "      ");
-	    Write(FilDsc, ArgStr);
-	    WriteInt(FilDsc, i);
-	    Write(FilDsc, " = ");
-	    Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-	    Writeln(FilDsc, ";"); }/*if*/; }/*for*/; }/*if*/;
+            Write(FilDsc, "      ");
+            Write(FilDsc, ArgStr);
+            WriteInt(FilDsc, i);
+            Write(FilDsc, " = ");
+            Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
+            Writeln(FilDsc, ";");
+         }
+      }
+   }
 
    Write(FilDsc, "      Local_");
    Write_NodSym(FilDsc, Nod_Son(1, MsgNod));
@@ -403,28 +414,35 @@ Write_OutMsg(FilDsc, MsgNod, MsgNum, IsServer)
    FOREACH_SON(ArgDclNod, ArgDclsNod) {
       ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
       if (!(Nod_NodTyp(MsgNod) == NOD_splitrequest && ArgKind == NOD_out)) {
-	 if (!IsFirst) Write(FilDsc, ", ");
-	 IsFirst = FALSE;
-	 Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod)); }/*if*/; }/*for*/;
+         if (!IsFirst)
+            Write(FilDsc, ", ");
+         IsFirst = FALSE;
+         Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
+      }
+   }
    Writeln(FilDsc, ");");
 
    if (Nod_NodTyp(MsgNod) == NOD_splitrequest) {
       Writeln(FilDsc, "      if (!IPC_Do_Return) {");
-      Writeln(FilDsc, "         IPC_Get_Commands(&IPC_Cmd_Abort, (char *)NIL);");
+      Writeln(FilDsc,
+              "         IPC_Get_Commands(&IPC_Cmd_Abort, (char *)NIL);");
       Writeln(FilDsc, "         FORBIDDEN(IPC_Cmd_Abort);");
-      Writeln(FilDsc, "         FORBIDDEN(!IPC_Do_Return); }/*if*/;");
+      Writeln(FilDsc, "         FORBIDDEN(!IPC_Do_Return); }");
       Writeln(FilDsc, "      IPC_Do_Return = FALSE;");
       i = 0;
       FOREACH_SON(ArgDclNod, ArgDclsNod) {
-	 i += 1;
-	 ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
-	 if (ArgKind == NOD_out || ArgKind == NOD_inout) {
-	    ArgStr = (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int
-		      ? "IPC_IArg" : "IPC_SArg");
-	    Write(FilDsc, "      ");
-	    Write(FilDsc, ArgStr);
-	    WriteInt(FilDsc, i);
-	    Writeln(FilDsc, " = NIL;"); }/*if*/; }/*for*/; }/*if*/;
+         i += 1;
+         ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
+         if (ArgKind == NOD_out || ArgKind == NOD_inout) {
+            ArgStr = (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int
+                      ? "IPC_IArg" : "IPC_SArg");
+            Write(FilDsc, "      ");
+            Write(FilDsc, ArgStr);
+            WriteInt(FilDsc, i);
+            Writeln(FilDsc, " = NIL;");
+         }
+      }
+   }
    Writeln(FilDsc, "   }else{");
    Writeln(FilDsc, "#endif");
 
@@ -435,16 +453,20 @@ Write_OutMsg(FilDsc, MsgNod, MsgNum, IsServer)
    FOREACH_SON(ArgDclNod, ArgDclsNod) {
       ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
       if (ArgKind == NOD_in || ArgKind == NOD_inout) {
-	 /*select*/{
-	    if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
-	       Write(FilDsc, "   IPC_Write_Int(&IPC_Abort, ");
-	       if (ArgKind == NOD_inout) Write(FilDsc, "*");
-	    }else{
-	       Write(FilDsc, "   IPC_Write_Str(&IPC_Abort, "); };}/*select*/;
-	 Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-	 Writeln(FilDsc, ");");
-	 Writeln(FilDsc, "   if (IPC_Abort) IPC_Do_Abort();");
-	 }/*if*/; }/*for*/;
+         {
+            if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
+               Write(FilDsc, "   IPC_Write_Int(&IPC_Abort, ");
+               if (ArgKind == NOD_inout)
+                  Write(FilDsc, "*");
+            } else {
+               Write(FilDsc, "   IPC_Write_Str(&IPC_Abort, ");
+            }
+         }
+         Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
+         Writeln(FilDsc, ");");
+         Writeln(FilDsc, "   if (IPC_Abort) IPC_Do_Abort();");
+      }
+   }
    if (Nod_NodTyp(MsgNod) == NOD_request
        || Nod_NodTyp(MsgNod) == NOD_splitrequest) {
       Writeln(FilDsc, "   IPC_Get_Commands(&IPC_Cmd_Abort, (char *)NIL);");
@@ -452,66 +474,61 @@ Write_OutMsg(FilDsc, MsgNod, MsgNum, IsServer)
       Writeln(FilDsc, "   FORBIDDEN(!IPC_Do_Return);");
       Writeln(FilDsc, "   IPC_Do_Return = FALSE;");
       FOREACH_SON(ArgDclNod, ArgDclsNod) {
-	 ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
-	 if (ArgKind == NOD_out || ArgKind == NOD_inout) {
-	    /*select*/{
-	       if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
-		  Write(FilDsc, "   IPC_Read_Int(&IPC_Abort, ");
-	       }else{
-		  Write(FilDsc, "   IPC_Read_Str(&IPC_Abort, "); };}/*select*/;
-	    Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
-	    Writeln(FilDsc, ");");
-	    Writeln(FilDsc, "   if (IPC_Abort) IPC_Do_Abort();");
-	    }/*if*/; }/*for*/; }/*if*/;
+         ArgKind = Nod_NodTyp(Nod_Son(1, ArgDclNod));
+         if (ArgKind == NOD_out || ArgKind == NOD_inout) {
+            {
+               if (Nod_NodTyp(Nod_Son(2, ArgDclNod)) == NOD_int) {
+                  Write(FilDsc, "   IPC_Read_Int(&IPC_Abort, ");
+               } else {
+                  Write(FilDsc, "   IPC_Read_Str(&IPC_Abort, ");
+               }
+            }
+            Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
+            Writeln(FilDsc, ");");
+            Writeln(FilDsc, "   if (IPC_Abort) IPC_Do_Abort();");
+         }
+      }
+   }
 
    Write_ServerIfDef(FilDsc, IsServer);
-   Writeln(FilDsc, "   };");
+   Writeln(FilDsc, "   }");
    Writeln(FilDsc, "#endif");
    Writeln(FilDsc, "   }");
-   }/*Write_OutMsg*/
+}
 
-
-Get_MsgNod(MsgNodPtr, IsServerPtr, StubNod)
-   tp_Nod *MsgNodPtr;
-   boolean *IsServerPtr;
-   tp_Nod StubNod;
+int Get_MsgNod(tp_Nod * MsgNodPtr, boolean * IsServerPtr, tp_Nod StubNod)
 {
    switch (Nod_NodTyp(StubNod)) {
-      case NOD_server: {
-	 *IsServerPtr = TRUE;
-	 break; }/*case*/;
-      case NOD_client: {
-	 *IsServerPtr = FALSE;
-	 break; }/*case*/;
-      default: {
-	 FATALERROR("Unexpected Stub NodTyp"); };}/*switch*/;
+   case NOD_server:{
+         *IsServerPtr = TRUE;
+         break;
+      }
+   case NOD_client:{
+         *IsServerPtr = FALSE;
+         break;
+      }
+   default:{
+         FATALERROR("Unexpected Stub NodTyp");
+      }
+   }
    *MsgNodPtr = Nod_Son(1, StubNod);
-   }/*Get_MsgNod*/
+}
 
-
-Write_ServerIfDef(FilDsc, IsServer)
-   tp_FilDsc FilDsc;
-   boolean IsServer;
+int Write_ServerIfDef(tp_FilDsc FilDsc, boolean IsServer)
 {
    if (IsServer) {
       Writeln(FilDsc, "#ifndef CLIENT_ONLY");
-      return; }/*if*/;
+      return;
+   }
    Writeln(FilDsc, "#ifndef SERVER_ONLY");
-   }/*Write_ServerIfDef*/
+}
 
-
-Write_Args(FilDsc, ArgsNod)
-   tp_FilDsc FilDsc;
-   tp_Nod ArgsNod;
+int Write_Args(tp_FilDsc FilDsc, tp_Nod ArgsNod)
 {
 
-   }/*Write_Args*/
+}
 
-
-Write_NodSym(FilDsc, Nod)
-   tp_FilDsc FilDsc;
-   tp_Nod Nod;
+int Write_NodSym(tp_FilDsc FilDsc, tp_Nod Nod)
 {
    Write(FilDsc, Sym_Str(Nod_Sym(Nod)));
-   }/*Write_NodSym*/
-
+}

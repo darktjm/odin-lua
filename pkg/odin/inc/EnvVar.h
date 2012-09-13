@@ -7,6 +7,6 @@ typedef struct _tps_EnvVar {
    int HelpLevel;
    tp_Str Default;
    boolean IsFile;
-   }				tps_EnvVar;
+} tps_EnvVar;
 
 #endif

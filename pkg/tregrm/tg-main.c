@@ -15,14 +15,11 @@ geoff@boulder.colorado.edu
 
 #include "inc/GMC.h"
 
-tp_Str		Author = "geoff@cs.colorado.edu";
-
+tp_Str Author = "geoff@cs.colorado.edu";
 
 #define		MAX_Dummys 100
 
-
-int
-main()
+int main(void)
 {
    tp_Nod Root, Includes_Nod, Scanner_Nod, Nodes_Nod, Rules_Nod;
    tp_FilDsc FilDsc;
@@ -33,7 +30,8 @@ main()
    Init_Err();
 
    Root = YY_Parse();
-   if (Num_Errors() > 0) return 101;
+   if (Num_Errors() > 0)
+      return 101;
 
    Includes_Nod = Nod_Son(1, Root);
    Scanner_Nod = Nod_Son(2, Root);
@@ -41,27 +39,30 @@ main()
    Rules_Nod = Nod_Son(4, Root);
 
    Analyze(Scanner_Nod, Nodes_Nod, Rules_Nod);
-   if (Num_Errors() > 0) return 102;
+   if (Num_Errors() > 0)
+      return 102;
 
    FilDsc = FileName_WFilDsc("LEX_TAB", FALSE);
    Gen_LexTypes(FilDsc, Scanner_Nod);
    Close(FilDsc);
-   if (Num_Errors() > 0) return 103;
+   if (Num_Errors() > 0)
+      return 103;
 
    FilDsc = FileName_WFilDsc("NOD_TAB", FALSE);
    Gen_NodeTypes(FilDsc, Nodes_Nod);
    Close(FilDsc);
-   if (Num_Errors() > 0) return 104;
+   if (Num_Errors() > 0)
+      return 104;
 
    FilDsc = FileName_WFilDsc("GRM_TAB", FALSE);
    Gen_Grammar(FilDsc, Includes_Nod, Scanner_Nod, Rules_Nod);
    Close(FilDsc);
-   if (Num_Errors() > 0) return 105;
+   if (Num_Errors() > 0)
+      return 105;
 
    Write_Node_Grammar(StdOutFD, Rules_Nod);
-   if (Num_Errors() > 0) return 106;
+   if (Num_Errors() > 0)
+      return 106;
 
    return 0;
-   }/*main*/
-
-
+}

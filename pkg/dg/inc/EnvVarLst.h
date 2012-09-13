@@ -8,6 +8,6 @@ typedef struct _tps_EnvVarLst {
    tp_EnvVarLst Son;
    int Index;
    tp_EnvVarLst Link;
-   }				tps_EnvVarLst;
+} tps_EnvVarLst;
 
 #endif

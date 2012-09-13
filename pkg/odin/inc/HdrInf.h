@@ -45,6 +45,6 @@ typedef struct _tps_HdrInf {
    tp_Date OrigModDate;
 
    tp_LocHdr AliasLocHdr;
-   }				tps_HdrInf;
+} tps_HdrInf;
 
 #endif

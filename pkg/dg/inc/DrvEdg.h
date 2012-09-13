@@ -10,6 +10,6 @@ typedef struct _tps_DrvEdg {
    int Index;
    tp_DrvEdg Link;
    boolean Flag;
-   }				tps_DrvEdg;
+} tps_DrvEdg;
 
 #endif

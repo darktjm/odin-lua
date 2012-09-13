@@ -14,6 +14,6 @@ typedef struct _tps_Client {
    boolean Interrupted;
    tp_Client Next;
    boolean InUse;
-   }				tps_Client;
+} tps_Client;
 
 #endif

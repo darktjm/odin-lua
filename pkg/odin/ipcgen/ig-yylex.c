@@ -19,17 +19,15 @@ geoff@boulder.colorado.edu
 #include "inc/Str.h"
 #include "inc/TokTyp_.h"
 
+int LineNum;
 
-int	LineNum;
+tps_Str ParseBuf;
 
-tps_Str	ParseBuf;
+tp_Str OrigParseStr;
+tp_Str PrevParseStr;
+tp_Str ParseStr;
 
-tp_Str	OrigParseStr;
-tp_Str	PrevParseStr;
-tp_Str	ParseStr;
-
-
-Init_Lex()
+int Init_Lex(void)
 {
    tp_Sym Sym;
 
@@ -56,10 +54,9 @@ Init_Lex()
    Set_Sym_Att(Sym, TOK_str);
    Sym = Str_Sym("int");
    Set_Sym_Att(Sym, TOK_int);
-   }/*Init_Lex*/
+}
 
-
-YY_Lex()
+int YY_Lex(void)
 {
    char Chr;
    tps_Str Str;
@@ -67,97 +64,125 @@ YY_Lex()
    int Token;
 
    if (ParseStr == ERROR) {
-      return TOK_EOF; }/*if*/;
+      return TOK_EOF;
+   }
    PrevParseStr = ParseStr;
    while (TRUE) {
       Chr = *ParseStr;
       while (Chr == 0) {
-	 LineNum += 1;
-	 ParseStr = Readln(ParseBuf, StdInFD);
-	 if (ParseStr == ERROR) {
-	    return TOK_EOF; }/*if*/;
-	 Chr = *ParseStr;
-	 OrigParseStr = ParseStr;
-	 PrevParseStr = ParseStr; }/*if*/;
+         LineNum += 1;
+         ParseStr = Readln(ParseBuf, StdInFD);
+         if (ParseStr == ERROR) {
+            return TOK_EOF;
+         }
+         Chr = *ParseStr;
+         OrigParseStr = ParseStr;
+         PrevParseStr = ParseStr;
+      }
       ParseStr += 1;
       switch (Chr) {
-	 case ' ': case '\t': case ';': {
-	    break;}/*case*/;
-         case '/': {
-	    if (*ParseStr != '*') {
-	       ParseError("'*' expected following '/'");
-	       return TOK_ERR; }/*if*/;
-	    ParseStr += 1;
-	    iStr = 0;
-	    while (*ParseStr != '*') {
-	       Str[iStr] = *ParseStr;
-	       iStr += 1; ParseStr += 1; }/*while*/;
-	    Str[iStr] = 0;
-	    ParseStr += 1;
-	    if (*ParseStr != '/') {
-	       return TOK_ERR; }/*if*/;
-	    ParseStr += 1;
-	    Token = (int)Sym_Att(Str_Sym(Str));
-	    if (Token == 0) {
-	       return TOK_ERR; }/*if*/;
-	    return Token;
-	    break;}/*case*/;
-         case '*': {
-	    return TOK_star;
-	    break;}/*case*/;
-         case ',': {
-	    return TOK_comma;
-	    break;}/*case*/;
-         case '(': {
-	    return TOK_lparen;
-	    break;}/*case*/;
-         case ')': {
-	    return TOK_rparen;
-	    break;}/*case*/;
-         case '{': {
-	    return TOK_lbrkt;
-	    break;}/*case*/;
-         case '}': {
-	    return TOK_rbrkt;
-	    break;}/*case*/;
-	 default: {
-	    iStr = 0;
-	    Str[iStr] = Chr; iStr += 1;
-	    while (YY_IsWordChr(*ParseStr)) {
-	       Str[iStr] = *ParseStr; iStr += 1;
-	       ParseStr += 1; }/*while*/;
-	    Str[iStr] = 0;
-	    Push_SymStack(Str_Sym(Str));
-	    return TOK_ident; };}/*switch*/; }/*while*/;
-   }/*YY_Lex*/
-
+      case ' ':
+      case '\t':
+      case ';':{
+            break;
+         }
+      case '/':{
+            if (*ParseStr != '*') {
+               ParseError("'*' expected following '/'");
+               return TOK_ERR;
+            }
+            ParseStr += 1;
+            iStr = 0;
+            while (*ParseStr != '*') {
+               Str[iStr] = *ParseStr;
+               iStr += 1;
+               ParseStr += 1;
+            }
+            Str[iStr] = 0;
+            ParseStr += 1;
+            if (*ParseStr != '/') {
+               return TOK_ERR;
+            }
+            ParseStr += 1;
+            Token = (int) Sym_Att(Str_Sym(Str));
+            if (Token == 0) {
+               return TOK_ERR;
+            }
+            return Token;
+            break;
+         }
+      case '*':{
+            return TOK_star;
+            break;
+         }
+      case ',':{
+            return TOK_comma;
+            break;
+         }
+      case '(':{
+            return TOK_lparen;
+            break;
+         }
+      case ')':{
+            return TOK_rparen;
+            break;
+         }
+      case '{':{
+            return TOK_lbrkt;
+            break;
+         }
+      case '}':{
+            return TOK_rbrkt;
+            break;
+         }
+      default:{
+            iStr = 0;
+            Str[iStr] = Chr;
+            iStr += 1;
+            while (YY_IsWordChr(*ParseStr)) {
+               Str[iStr] = *ParseStr;
+               iStr += 1;
+               ParseStr += 1;
+            }
+            Str[iStr] = 0;
+            Push_SymStack(Str_Sym(Str));
+            return TOK_ident;
+         }
+      }
+   }
+}
 
 /*private*/ boolean
-YY_IsWordChr(Chr)
-   char Chr;
+int YY_IsWordChr(char Chr)
 {
    switch (Chr) {
-      case '\0': case ' ': case '\t':
-      case '{': case '}': case '(': case ')':
-      case '*': case ',': case ';': case '/': {
-	 return FALSE;
-	 break;}/*case*/;
-      default: {
-	 return TRUE; };}/*switch*/;
+   case '\0':
+   case ' ':
+   case '\t':
+   case '{':
+   case '}':
+   case '(':
+   case ')':
+   case '*':
+   case ',':
+   case ';':
+   case '/':{
+         return FALSE;
+         break;
+      }
+   default:{
+         return TRUE;
+      }
+   }
 /* NOTREACHED */
-   }/*YY_IsWordChr*/
+}
 
-
-EndLex()
+int EndLex(void)
 {
    SystemError("Unexpected call to EndLex");
-   }/*EndLex*/
+}
 
-
-ParseError(Str)
-   tp_Str Str;
+int ParseError(tp_Str Str)
 {
    SystemError("%s at <%s> at line %d.\n", Str, PrevParseStr, LineNum);
-   }/*ParseError*/
-
-
+}

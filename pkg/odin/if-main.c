@@ -16,66 +16,50 @@ geoff@boulder.colorado.edu
 #include "inc/GMC.h"
 #include "inc/FileName.h"
 
+tp_Str Author = "odin-build-users@lists.sourceforge.net";
 
-tp_Str		Author = "odin-build-users@lists.sourceforge.net";
+boolean IsTTY;
 
-boolean		IsTTY;
-
-void
-InterruptAction(GMC_ARG_VOID)
+void InterruptAction(void)
 {
    Do_Interrupt(TRUE);
-   }/*InterruptAction*/
+}
 
-
-void
-TopLevelCI(
-   GMC_ARG(boolean*, AbortPtr),
-   GMC_ARG(tp_Str, Str)
-   )
-   GMC_DCL(boolean*, AbortPtr)
-   GMC_DCL(tp_Str, Str)
+void TopLevelCI(boolean * AbortPtr, tp_Str Str)
 {
    tp_Nod Root;
 
-   Root = OC_Parser(Str, (tp_FileName)NIL, (int *)NIL);
+   Root = OC_Parser(Str, (tp_FileName) NIL, (int *) NIL);
    if (Root == ERROR) {
       *AbortPtr = TRUE;
-      return; }/*if*/;
+      return;
+   }
    if (VerifyLevel >= 2 && IsTTY) {
-      Test_All(); }/*if*/;
+      Test_All();
+   }
    CommandInterpreter(AbortPtr, Root, IsTTY);
    Ret_Nod(Root);
-   }/*TopLevelCI*/
+}
 
-
-void
-Get_Commands(
-   GMC_ARG(boolean*, AbortPtr)
-   )
-   GMC_DCL(boolean*, AbortPtr)
+void Get_Commands(boolean * AbortPtr)
 {
    static boolean In_Get_Commands = FALSE;
 
    if (In_Get_Commands) {
       SystemError("Already reading commands.\n");
       *AbortPtr = TRUE;
-      return; }/*if*/;
+      return;
+   }
    In_Get_Commands = TRUE;
-   if (IsTTY) Print_Banner();
+   if (IsTTY)
+      Print_Banner();
    IPC_Get_Commands(AbortPtr, (IsServer ? "=> " : "-> "));
-   if (IsTTY) Writeln(StdOutFD, "");
+   if (IsTTY)
+      Writeln(StdOutFD, "");
    In_Get_Commands = FALSE;
-   }/*Get_Commands*/
+}
 
-
-int
-main(
-   GMC_ARG(int, argc),
-   GMC_ARG(char**, argv)
-   )
-   GMC_DCL(int, argc)
-   GMC_DCL(char**, argv)
+int main(int argc, char **argv)
 {
    boolean Abort, NewFlag;
    int i;
@@ -98,35 +82,43 @@ main(
       Init_FilHdrTree();
       Activate_Client(LocalClient);
       if (NewFlag) {
-	 Write_ENV2(); }/*if*/; }/*if*/;
+         Write_ENV2();
+      }
+   }
 
    if (IsClient) {
       IsTTY = GetIsTTY();
       Init_Vars();
-      Init_CWD(); }/*if*/;
+      Init_CWD();
+   }
 
    Read_ENV2();
 
    if (IsClient) {
-      if (VerifyLevel >= 1) Test_All();
+      if (VerifyLevel >= 1)
+         Test_All();
 
       if (argc <= 1) {
-	 Get_Commands(&Abort);
-	 Exit((Abort?1:0)); }/*if*/;
+         Get_Commands(&Abort);
+         Exit((Abort ? 1 : 0));
+      }
 
-      for (i=1; i<argc; i+=1) {
-	 ;/*select*/{
-	    if (strlen(argv[i]) == 0) {
-	       Get_Commands(&Abort);
-	    }else{
-	       TopLevelCI(&Abort, argv[i]); };}/*select*/;
-	 if (Abort) {
-	    Exit(1); }/*if*/; }/*for*/;
-      Exit(0); }/*if*/;
+      for (i = 1; i < argc; i += 1) {
+         ; {
+            if (strlen(argv[i]) == 0) {
+               Get_Commands(&Abort);
+            } else {
+               TopLevelCI(&Abort, argv[i]);
+            }
+         }
+         if (Abort) {
+            Exit(1);
+         }
+      }
+      Exit(0);
+   }
 
-   IPC_Get_Commands(&Abort, (tp_Str)NIL);
-   Exit((Abort?1:0));
-   return 0; /*to make lint happy*/
-   }/*main*/
-
-
+   IPC_Get_Commands(&Abort, (tp_Str) NIL);
+   Exit((Abort ? 1 : 0));
+   return 0;                    /*to make lint happy */
+}

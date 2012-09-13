@@ -8,6 +8,6 @@ typedef struct _tps_DrvPth {
    tp_DrvEdg DrvEdg;
    tp_DrvPth Next;
    boolean InUse;
-   }				tps_DrvPth;
+} tps_DrvPth;
 
 #endif

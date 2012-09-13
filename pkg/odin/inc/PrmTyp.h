@@ -10,6 +10,6 @@ typedef struct _tps_PrmTyp {
    tp_LocHdr StrDirLocHdr;
    boolean Mark;
    int IPrmTyp;
-   }				tps_PrmTyp;
+} tps_PrmTyp;
 
 #endif

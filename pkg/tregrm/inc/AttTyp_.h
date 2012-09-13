@@ -1,7 +1,6 @@
 #ifndef TP_ATTTYP
 #define TP_ATTTYP
 
-
 #define	ATP_Keyword	1
 #define	ATP_Declared	2
 #define	ATP_Lexical	3

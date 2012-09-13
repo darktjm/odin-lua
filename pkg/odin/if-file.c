@@ -24,14 +24,9 @@ geoff@boulder.colorado.edu
 #include "inc/FileName.h"
 #include "inc/SKind_.h"
 
-static mode_t	ModeMask = 0777;
+static mode_t ModeMask = 0777;
 
-
-void
-Set_ModeMask(
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_FileName, FileName)
+void Set_ModeMask(tp_FileName FileName)
 {
    int status;
    struct stat buf;
@@ -40,19 +35,11 @@ Set_ModeMask(
    status = stat(FileName, &buf);
    FORBIDDEN(status != 0);
    ModeMask = buf.st_mode;
-   (void)umask(ModeMask ^ 0777);
-   }/*Set_ModeMask*/
-
+   (void) umask(ModeMask ^ 0777);
+}
 
 void
-Get_FileInfo(
-   GMC_ARG(tp_SKind*, SKindPtr),
-   GMC_ARG(int*, SysModTimePtr),
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_SKind*, SKindPtr)
-   GMC_DCL(int*, SysModTimePtr)
-   GMC_DCL(tp_FileName, FileName)
+Get_FileInfo(tp_SKind * SKindPtr, int *SysModTimePtr, tp_FileName FileName)
 {
    struct stat buf;
    int status;
@@ -63,56 +50,48 @@ Get_FileInfo(
    if (status != 0) {
       *SKindPtr = SK_NoFile;
       *SysModTimePtr = 0;
-      return; }/*if*/;
+      return;
+   }
    *SysModTimePtr = buf.st_mtime;
-   /*select*/{
+   {
       if ((buf.st_mode & S_IFLNK) == S_IFLNK) {
-	 *SKindPtr = SK_SymLink;
-	 status = stat(FileName, &buf); /*give automounter a kick*/
-      }else if ((buf.st_mode & S_IFDIR) == S_IFDIR) {
-	 *SKindPtr = SK_Dir;
-      }else if ((buf.st_mode & S_IEXEC) == S_IEXEC) {
-	 *SKindPtr = SK_Exec;
-      }else if ((buf.st_mode & S_IFREG) == S_IFREG) {
-	 *SKindPtr = SK_Reg;
-      }else{
-	 *SKindPtr = SK_Special; };}/*select*/;
-   }/*Get_FileInfo*/
+         *SKindPtr = SK_SymLink;
+         status = stat(FileName, &buf); /*give automounter a kick */
+      } else if ((buf.st_mode & S_IFDIR) == S_IFDIR) {
+         *SKindPtr = SK_Dir;
+      } else if ((buf.st_mode & S_IEXEC) == S_IEXEC) {
+         *SKindPtr = SK_Exec;
+      } else if ((buf.st_mode & S_IFREG) == S_IFREG) {
+         *SKindPtr = SK_Reg;
+      } else {
+         *SKindPtr = SK_Special;
+      }
+   }
+}
 
-
-void
-MakePlnFile(
-   GMC_ARG(boolean*, AbortPtr),
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(boolean*, AbortPtr)
-   GMC_DCL(tp_FileName, FileName)
+void MakePlnFile(boolean * AbortPtr, tp_FileName FileName)
 {
    int fd, status;
 
    *AbortPtr = TRUE;
-   fd = open(FileName, O_WRONLY|O_CREAT|O_TRUNC, 0666);
+   fd = open(FileName, O_WRONLY | O_CREAT | O_TRUNC, 0666);
    if (fd < 0) {
-      return; }/*if*/;
+      return;
+   }
    status = fchmod(fd, 0666 & ModeMask);
    if (status != 0) {
-      (void)close(fd);
-      return; }/*if*/;
+      (void) close(fd);
+      return;
+   }
    status = close(fd);
    if (status != 0) {
-      (void)close(fd);
-      return; }/*if*/;
+      (void) close(fd);
+      return;
+   }
    *AbortPtr = FALSE;
-   }/*MakePlnFile*/
+}
 
-
-void
-MakeDirFile(
-   GMC_ARG(boolean*, AbortPtr),
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(boolean*, AbortPtr)
-   GMC_DCL(tp_FileName, FileName)
+void MakeDirFile(boolean * AbortPtr, tp_FileName FileName)
 {
    struct stat buf;
    int status;
@@ -125,97 +104,72 @@ MakeDirFile(
    status = stat(FileName, &buf);
    if (status == 0) {
       FORBIDDEN((buf.st_mode & S_IFDIR) != S_IFDIR);
-      return; }/*if*/;
+      return;
+   }
    status = mkdir(FileName, (0777 & ModeMask));
    if (status != 0) {
       i = strlen(FileName) - 2;
-      while (i > 0 && FileName[i] != '/') i -= 1;
+      while (i > 0 && FileName[i] != '/')
+         i -= 1;
       if (i < 1) {
-	 SystemError("\"%s\": cannot create.\n", FileName);
-	 *AbortPtr = TRUE;
-	 return; }/*if*/;
-      (void)strcpy(DirName, FileName);
+         SystemError("\"%s\": cannot create.\n", FileName);
+         *AbortPtr = TRUE;
+         return;
+      }
+      (void) strcpy(DirName, FileName);
       DirName[i] = 0;
       MakeDirFile(AbortPtr, DirName);
       if (*AbortPtr) {
-	 return; }/*if*/;
+         return;
+      }
       status = mkdir(FileName, (0777 & ModeMask));
       if (status != 0) {
-	 SystemError("\"%s\": cannot create.\n", FileName);
-	 *AbortPtr = TRUE;
-	 return; }/*if*/; }/*if*/;
-   }/*MakeDirFile*/
-
+         SystemError("\"%s\": cannot create.\n", FileName);
+         *AbortPtr = TRUE;
+         return;
+      }
+   }
+}
 
 char *getcwd();
 
-void
-GetWorkingDir(
-   GMC_ARG(boolean*, AbortPtr),
-   GMC_ARG(tp_Str, DirName)
-   )
-   GMC_DCL(boolean*, AbortPtr)
-   GMC_DCL(tp_Str, DirName)
+void GetWorkingDir(boolean * AbortPtr, tp_Str DirName)
 {
    char *WDstat;
 
    WDstat = getcwd(DirName, MAX_Str);
    *AbortPtr = (WDstat == 0);
-   }/*GetWorkingDir*/
-
+}
 
 #ifndef HAVE_GETCWD
-char *
-getcwd(
-   GMC_ARG(char*, buf),
-   GMC_ARG(int, size)
-   )
-   GMC_DCL(char*, buf)
-   GMC_DCL(int, size)
+char *getcwd(char *buf, int size)
 {
    char *result, *getwd();
 
    result = getwd(buf);
    FORBIDDEN(result != 0 && strlen(result) >= size);
    return result;
-   }/*getcwd*/
+}
 #endif
 
-
-void
-ChangeDir(
-   GMC_ARG(boolean*, AbortPtr),
-   GMC_ARG(tp_FileName, DirName)
-   )
-   GMC_DCL(boolean*, AbortPtr)
-   GMC_DCL(tp_FileName, DirName)
+void ChangeDir(boolean * AbortPtr, tp_FileName DirName)
 {
    int status;
 
    status = chdir(DirName);
    *AbortPtr = (status != 0);
-   }/*ChangeDir*/
+}
 
-
-boolean
-IsExecutable(
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_FileName, FileName)
+boolean IsExecutable(tp_FileName FileName)
 {
    int status;
    struct stat buf;
 
    status = stat(FileName, &buf);
    return ((status == 0) && ((buf.st_mode & S_IEXEC) == S_IEXEC));
-   }/*IsExecutable*/
+}
 
-
-void
-MakeExecutable(
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_FileName, FileName)
+void MakeExecutable(tp_FileName FileName)
 {
    int status;
    struct stat buf;
@@ -225,20 +179,16 @@ MakeExecutable(
    status = stat(FileName, &buf);
    if (status == 0) {
       if ((buf.st_mode & S_IEXEC) != S_IEXEC) {
-	 mode = ((buf.st_mode | 0111) & ModeMask);
-	 status = chmod(FileName, mode); }/*if*/; }/*if*/;
+         mode = ((buf.st_mode | 0111) & ModeMask);
+         status = chmod(FileName, mode);
+      }
+   }
    if (status != 0) {
-      SystemError("\"%s\": cannot make executable.\n", FileName); }/*if*/;
-   }/*MakeExecutable*/
+      SystemError("\"%s\": cannot make executable.\n", FileName);
+   }
+}
 
-
-void
-MakeReadOnly(
-   GMC_ARG(boolean*, AbortPtr),
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(boolean*, AbortPtr)
-   GMC_DCL(tp_FileName, FileName)
+void MakeReadOnly(boolean * AbortPtr, tp_FileName FileName)
 {
    int status;
    struct stat buf;
@@ -248,25 +198,20 @@ MakeReadOnly(
    status = stat(FileName, &buf);
    if (status != 0) {
       *AbortPtr = TRUE;
-      return; }/*if*/;
+      return;
+   }
    NewMode = ((buf.st_mode | 0444) & 0555 & ModeMask);
    if (NewMode == buf.st_mode) {
       *AbortPtr = FALSE;
-      return; }/*if*/;
+      return;
+   }
    status = chmod(FileName, NewMode);
    *AbortPtr = (status != 0);
-   }/*MakeReadOnly*/
-
+}
 
 void
-SymLink(
-   GMC_ARG(boolean*, AbortPtr),
-   GMC_ARG(tp_FileName, ToFileName),
-   GMC_ARG(tp_FileName, FromFileName)
-   )
-   GMC_DCL(boolean*, AbortPtr)
-   GMC_DCL(tp_FileName, ToFileName)
-   GMC_DCL(tp_FileName, FromFileName)
+SymLink(boolean * AbortPtr,
+        tp_FileName ToFileName, tp_FileName FromFileName)
 {
    int status;
 
@@ -275,18 +220,14 @@ SymLink(
    status = symlink(FromFileName, ToFileName);
    if (status != 0) {
       SysCallError(StdOutFD, "symlink");
-      SystemError("\"%s\": Cannot make symbolic link to %s.\n", ToFileName, FromFileName);
-      *AbortPtr = TRUE; }/*if*/;
-   }/*SymLink*/
-
+      SystemError("\"%s\": Cannot make symbolic link to %s.\n", ToFileName,
+                  FromFileName);
+      *AbortPtr = TRUE;
+   }
+}
 
 void
-FileName_SymLinkFileName(
-   GMC_ARG(tp_FileName, SymLinkFileName),
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_FileName, SymLinkFileName)
-   GMC_DCL(tp_FileName, FileName)
+FileName_SymLinkFileName(tp_FileName SymLinkFileName, tp_FileName FileName)
 {
    int cc;
    tps_Str buf;
@@ -295,36 +236,28 @@ FileName_SymLinkFileName(
    cc = readlink(FileName, buf, MAX_Str - 1);
    if (cc < 0) {
       perror("readlink");
-      exit(1); }/*if*/;
+      exit(1);
+   }
    FORBIDDEN(cc == 0);
    buf[cc] = '\0';
    sz = snprintf(SymLinkFileName, MAX_FileName, "%s", buf);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s\n",
-                  MAX_FileName, buf);
-      exit(1); }/*if*/;
-   }/*FileName_SymLinkFileName*/
+      (void) fprintf(stderr, "File name too long (MAX_FileName=%d): %s\n",
+                     MAX_FileName, buf);
+      exit(1);
+   }
+}
 
-
-boolean
-IsDirectory_FileName(
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_FileName, FileName)
+boolean IsDirectory_FileName(tp_FileName FileName)
 {
    int status;
    struct stat buf;
 
    status = stat(FileName, &buf);
    return ((status == 0) && ((buf.st_mode & S_IFDIR) == S_IFDIR));
-   }/*IsDirectory_FileName*/
+}
 
-
-boolean
-Exists(
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_FileName, FileName)
+boolean Exists(tp_FileName FileName)
 {
    int status;
    struct stat buf;
@@ -332,14 +265,9 @@ Exists(
    FORBIDDEN(FileName == ERROR);
    status = stat(FileName, &buf);
    return (status == 0);
-   }/*Exists*/
+}
 
-
-boolean
-Empty(
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_FileName, FileName)
+boolean Empty(tp_FileName FileName)
 {
    int status;
    struct stat buf;
@@ -348,18 +276,9 @@ Empty(
    status = stat(FileName, &buf);
    FORBIDDEN(status != 0);
    return (buf.st_size == 0);
-   }/*Empty*/
+}
 
-
-void
-FileSize(
-   GMC_ARG(boolean*, AbortPtr),
-   GMC_ARG(int*, SizePtr),
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(boolean*, AbortPtr)
-   GMC_DCL(int*, SizePtr)
-   GMC_DCL(tp_FileName, FileName)
+void FileSize(boolean * AbortPtr, int *SizePtr, tp_FileName FileName)
 {
    int status;
    struct stat buf;
@@ -370,30 +289,22 @@ FileSize(
    status = stat(FileName, &buf);
    if (status != 0) {
       *AbortPtr = TRUE;
-      return; }/*if*/;
+      return;
+   }
    *SizePtr = buf.st_size;
-   }/*FileSize*/
+}
 
-
-void
-Remove(
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_FileName, FileName)
+void Remove(tp_FileName FileName)
 {
    int status;
 
    FORBIDDEN(FileName == ERROR);
    status = unlink(FileName);
-   if (status != 0) SystemError("\"%s\": rm failed.\n", FileName);
-   }/*Remove*/
+   if (status != 0)
+      SystemError("\"%s\": rm failed.\n", FileName);
+}
 
-
-void
-RemoveDir(
-   GMC_ARG(tp_FileName, DirName)
-   )
-   GMC_DCL(tp_FileName, DirName)
+void RemoveDir(tp_FileName DirName)
 {
    int status;
    tps_Str NFS_Hack;
@@ -401,35 +312,31 @@ RemoveDir(
    FORBIDDEN(DirName == ERROR);
    status = rmdir(DirName);
    if (status != 0) {
-      (void)sprintf(NFS_Hack, "rm -f %s/.nfs*", DirName);
+      (void) sprintf(NFS_Hack, "rm -f %s/.nfs*", DirName);
       status = system(NFS_Hack);
       status = rmdir(DirName);
       if (status != 0) {
-	 SystemError("\"%s\": rmdir failed.\n", DirName); }/*if*/; }/*if*/;
-   }/*RemoveDir*/
-
+         SystemError("\"%s\": rmdir failed.\n", DirName);
+      }
+   }
+}
 
 void
-Rename(
-   GMC_ARG(boolean*, AbortPtr),
-   GMC_ARG(tp_FileName, OldFileName),
-   GMC_ARG(tp_FileName, NewFileName)
-   )
-   GMC_DCL(boolean*, AbortPtr)
-   GMC_DCL(tp_FileName, OldFileName)
-   GMC_DCL(tp_FileName, NewFileName)
+Rename(boolean * AbortPtr,
+       tp_FileName OldFileName, tp_FileName NewFileName)
 {
    int status;
 
-   FORBIDDEN(OldFileName == ERROR  || NewFileName == ERROR);
+   FORBIDDEN(OldFileName == ERROR || NewFileName == ERROR);
    status = rename(OldFileName, NewFileName);
    if (status != 0) {
-      SystemError("\"%s\": bad status from rename to %s.\n", OldFileName, NewFileName);
+      SystemError("\"%s\": bad status from rename to %s.\n", OldFileName,
+                  NewFileName);
       if (Exists(OldFileName) || !Exists(NewFileName)) {
-	 *AbortPtr = TRUE;
-	 return; }/*if*/;
-      SystemError("  (but it apparently worked).\n"); }/*if*/;
+         *AbortPtr = TRUE;
+         return;
+      }
+      SystemError("  (but it apparently worked).\n");
+   }
    *AbortPtr = FALSE;
-   }/*Rename*/
-
-
+}

@@ -8,6 +8,6 @@ typedef struct _tps_PrmTyp {
    tp_FilTyp FilTyp;
    int Index;
    tp_PrmTyp Link;
-   }				tps_PrmTyp;
+} tps_PrmTyp;
 
 #endif

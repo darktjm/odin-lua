@@ -21,11 +21,13 @@ extern tp_DrvEdg DrvEdg_FrmNext(GMC_P1(tp_DrvEdg));
 extern tp_DrvEdg DrvEdg_Next(GMC_P1(tp_DrvEdg));
 extern tp_FilTyp InpEdg_FilTyp(GMC_P1(tp_InpEdg));
 extern tp_InpEdg InpEdg_Next(GMC_P1(tp_InpEdg));
-extern void Add_InpEdg(GMC_P1(tp_InpSpc) GMC_PN(tp_InpKind) GMC_PN(boolean) GMC_PN(tp_Tool));
+extern void Add_InpEdg(GMC_P1(tp_InpSpc) GMC_PN(tp_InpKind) GMC_PN(boolean)
+                       GMC_PN(tp_Tool));
 extern void Add_HomInpEdg(GMC_P1(tp_InpSpc) GMC_PN(tp_Tool));
 extern boolean HasInput(GMC_P1(tp_Tool));
 extern void Set_SystemTool_InpKinds(GMC_P1(tp_Tool) GMC_PN(tp_InpKind));
-extern void Set_SystemTool_InpKind(GMC_P1(tp_Tool) GMC_PN(int) GMC_PN(tp_InpKind));
+extern void Set_SystemTool_InpKind(GMC_P1(tp_Tool) GMC_PN(int)
+                                   GMC_PN(tp_InpKind));
 extern tp_FilTyp MemEdg_FilTyp(GMC_P1(tp_MemEdg));
 extern void Add_MemEdg(GMC_P1(tp_FilTyp) GMC_PN(tp_FilTyp));
 extern void Add_EqvEdg(GMC_P1(tp_FilTyp) GMC_PN(tp_FilTyp));
@@ -39,11 +41,14 @@ extern void Write_Edgs(GMC_P1(FILE *) GMC_PN(FILE *));
 extern void Init_EnvVars(GMC_P1(void));
 extern tp_EnvVar Lookup_EnvVar(GMC_P1(tp_Str));
 extern tp_Desc EnvVar_Desc(GMC_P1(tp_EnvVar));
-extern void Set_EnvVar_Desc(GMC_P1(tp_EnvVar) GMC_PN(tp_Desc) GMC_PN(boolean));
-extern void Set_EnvVar_Default(GMC_P1(tp_EnvVar) GMC_PN(tp_Str) GMC_PN(boolean));
+extern void Set_EnvVar_Desc(GMC_P1(tp_EnvVar) GMC_PN(tp_Desc)
+                            GMC_PN(boolean));
+extern void Set_EnvVar_Default(GMC_P1(tp_EnvVar) GMC_PN(tp_Str)
+                               GMC_PN(boolean));
 extern tp_EnvVarLst EnvVarLst_Next(GMC_P1(tp_EnvVarLst));
 extern tp_EnvVarLst Make_EnvVarLst(GMC_P1(tp_EnvVar));
-extern tp_EnvVarLst Union_EnvVarLst(GMC_P1(tp_EnvVarLst) GMC_PN(tp_EnvVarLst));
+extern tp_EnvVarLst Union_EnvVarLst(GMC_P1(tp_EnvVarLst)
+                                    GMC_PN(tp_EnvVarLst));
 extern void Print_EnvVarLst(GMC_P1(tp_FilDsc) GMC_PN(tp_EnvVarLst));
 extern void Write_EnvVars(GMC_P1(FILE *) GMC_PN(FILE *));
 extern tp_InpSpc New_InpSpc(GMC_P1(void));
@@ -56,11 +61,13 @@ extern void Write_InpSpcs(GMC_P1(FILE *) GMC_PN(FILE *));
 extern void Init_FilTyps(GMC_P1(void));
 extern void Set_Tool(GMC_P1(tp_FilTyp) GMC_PN(tp_Tool));
 extern tp_Desc FilTyp_Desc(GMC_P1(tp_FilTyp));
-extern void Set_FilTyp_Desc(GMC_P1(tp_FilTyp) GMC_PN(tp_Desc) GMC_PN(boolean));
+extern void Set_FilTyp_Desc(GMC_P1(tp_FilTyp) GMC_PN(tp_Desc)
+                            GMC_PN(boolean));
 extern int FilTyp_Index(GMC_P1(tp_FilTyp));
 extern boolean Has_SubTypes(GMC_P1(tp_FilTyp));
 extern tp_FilTyp Create_StructFilTyp(GMC_P1(tp_Package) GMC_PN(tp_FTName));
-extern tp_FilTyp Create_OutputFilTyp(GMC_P1(tp_Package) GMC_PN(tp_Package) GMC_PN(tp_FTName));
+extern tp_FilTyp Create_OutputFilTyp(GMC_P1(tp_Package) GMC_PN(tp_Package)
+                                     GMC_PN(tp_FTName));
 extern tp_FilTyp Lookup_SecOrdFilTyp(GMC_P1(tp_FTName) GMC_PN(tp_FilTyp));
 extern tp_FilTyp Lookup_FilTyp(GMC_P1(tp_FTName));
 extern tp_SrcTyp Lookup_SrcTyp(GMC_P1(tp_Pattern) GMC_PN(boolean));
@@ -77,14 +84,16 @@ extern int main(GMC_P1(int) GMC_PN(char **));
 extern void Init_PrmTyps(GMC_P1(void));
 extern tp_PTName PrmTyp_PTName(GMC_P1(tp_PrmTyp));
 extern tp_Desc PrmTyp_Desc(GMC_P1(tp_PrmTyp));
-extern void Set_PrmTyp_Desc(GMC_P1(tp_PrmTyp) GMC_PN(tp_Desc) GMC_PN(boolean));
+extern void Set_PrmTyp_Desc(GMC_P1(tp_PrmTyp) GMC_PN(tp_Desc)
+                            GMC_PN(boolean));
 extern tp_FilTyp PrmTyp_FilTyp(GMC_P1(tp_PrmTyp));
 extern void Set_PrmTyp_FilTyp(GMC_P1(tp_PrmTyp) GMC_PN(tp_FilTyp));
 extern tp_PrmTyp Lookup_PrmTyp(GMC_P1(tp_PTName));
 extern void Print_PrmTyp(GMC_P1(tp_FilDsc) GMC_PN(tp_PrmTyp));
 extern tp_PrmTypLst PrmTypLst_Next(GMC_P1(tp_PrmTypLst));
 extern tp_PrmTypLst Make_PrmTypLst(GMC_P1(tp_PrmTyp));
-extern tp_PrmTypLst Union_PrmTypLst(GMC_P1(tp_PrmTypLst) GMC_PN(tp_PrmTypLst));
+extern tp_PrmTypLst Union_PrmTypLst(GMC_P1(tp_PrmTypLst)
+                                    GMC_PN(tp_PrmTypLst));
 extern void Print_PrmTypLst(GMC_P1(tp_FilDsc) GMC_PN(tp_PrmTypLst));
 extern void Write_PrmTyps(GMC_P1(FILE *) GMC_PN(FILE *));
 /* dg-tool.c */
@@ -151,19 +160,23 @@ extern boolean IsGeneric_FilTyp(GMC_P1(tp_FilTyp));
 extern boolean IsPipe_FilTyp(GMC_P1(tp_FilTyp));
 /* if-lvl.c */
 extern boolean IsSubType(GMC_P1(tp_FilTyp) GMC_PN(tp_FilTyp));
-extern void Do_Search(GMC_P1(tp_DrvPth *) GMC_PN(boolean *) GMC_PN(tp_FKind) GMC_PN(tp_FilTyp) GMC_PN(tp_FilTyp));
+extern void Do_Search(GMC_P1(tp_DrvPth *) GMC_PN(boolean *)
+                      GMC_PN(tp_FKind) GMC_PN(tp_FilTyp)
+                      GMC_PN(tp_FilTyp));
 /* if.err.c */
 extern void Init_Err(GMC_P1(void));
 extern void Set_IPC_Err(GMC_P1(boolean));
-extern void Set_ErrFile(GMC_P1(tp_FileName) GMC_PN(boolean) GMC_PN(tp_FilDsc));
-extern void Save_ErrFile(GMC_P1(tp_FileName *) GMC_PN(boolean *) GMC_PN(tp_FilDsc *));
+extern void Set_ErrFile(GMC_P1(tp_FileName) GMC_PN(boolean)
+                        GMC_PN(tp_FilDsc));
+extern void Save_ErrFile(GMC_P1(tp_FileName *) GMC_PN(boolean *)
+                         GMC_PN(tp_FilDsc *));
 extern boolean IsErr(GMC_P1(void));
 extern void Reset_Err(GMC_P1(void));
 extern void Increment_Errors(GMC_P1(void));
 extern int Num_Errors(GMC_P1(void));
 extern void SysCallError(GMC_P1(tp_FilDsc) GMC_PN(char *));
-extern void FatalError(GMC_P1(char *) GMC_PN(char *) GMC_PN(int));
-extern void SystemError(GMC_P1(char *) GMC_PN(...));
+extern void FatalError(GMC_P1(char *)GMC_PN(char *)GMC_PN(int));
+extern void SystemError(GMC_P1(char *)GMC_PN(...));
 extern void Local_ErrMessage(GMC_P1(tp_Str));
 extern void fatal_err(GMC_P1(char *));
 /* if-file.c */
@@ -176,15 +189,18 @@ extern void ChangeDir(GMC_P1(boolean *) GMC_PN(tp_FileName));
 extern boolean IsExecutable(GMC_P1(tp_FileName));
 extern void MakeExecutable(GMC_P1(tp_FileName));
 extern void MakeReadOnly(GMC_P1(boolean *) GMC_PN(tp_FileName));
-extern void SymLink(GMC_P1(boolean *) GMC_PN(tp_FileName) GMC_PN(tp_FileName));
-extern void FileName_SymLinkFileName(GMC_P1(tp_FileName) GMC_PN(tp_FileName));
+extern void SymLink(GMC_P1(boolean *) GMC_PN(tp_FileName)
+                    GMC_PN(tp_FileName));
+extern void FileName_SymLinkFileName(GMC_P1(tp_FileName)
+                                     GMC_PN(tp_FileName));
 extern boolean IsDirectory_FileName(GMC_P1(tp_FileName));
 extern boolean Exists(GMC_P1(tp_FileName));
 extern boolean Empty(GMC_P1(tp_FileName));
-extern void FileSize(GMC_P1(boolean *) GMC_PN(int *) GMC_PN(tp_FileName));
+extern void FileSize(GMC_P1(boolean *) GMC_PN(int *)GMC_PN(tp_FileName));
 extern void Remove(GMC_P1(tp_FileName));
 extern void RemoveDir(GMC_P1(tp_FileName));
-extern void Rename(GMC_P1(boolean *) GMC_PN(tp_FileName) GMC_PN(tp_FileName));
+extern void Rename(GMC_P1(boolean *) GMC_PN(tp_FileName)
+                   GMC_PN(tp_FileName));
 /* if-io.c */
 extern void Init_IO(GMC_P1(void));
 extern boolean GetIsTTY(GMC_P1(void));

@@ -18,13 +18,8 @@ geoff@boulder.colorado.edu
 
 #include "inc/GMC.h"
 
-
 #ifndef HAVE_PUTENV
-int
-putenv(
-   GMC_ARG(char*, str)
-   )
-   GMC_DCL(char*, str)
+int putenv(char *str)
 {
    extern char *strdup();
    char *strbuf, *equal;
@@ -33,32 +28,31 @@ putenv(
    status = 1;
    strbuf = strdup(str);
    if (strbuf == NULL) {
-      return status; }/*if*/;
+      return status;
+   }
    equal = index(strbuf, '=');
    if (equal != NULL) {
       *equal = '\0';
-      status = setenv(strbuf, equal+1, 1); }/*if*/;
-   (void)free(strbuf);
+      status = setenv(strbuf, equal + 1, 1);
+   }
+   (void) free(strbuf);
    return status;
-   }/*putenv*/
+}
 #endif
 
 #ifdef NO_STRCASECMP
 #include <ctype.h>
 #define ToLower(ch) (isupper(ch)?tolower(ch):(ch))
-strcasecmp(
-   GMC_ARG(char*, str1),
-   GMC_ARG(char*, str2)
-   )
-   GMC_DCL(char*, str1)
-   GMC_DCL(char*, str2)
+int strcasecmp(char *str1, char *str2)
 {
    while (ToLower(*str1) == ToLower(*str2)) {
-      if (*str1 == 0) return 0;
-      str1 += 1; str2 += 1; }/*while*/;
-   if (*str1 < *str2) return -1;
+      if (*str1 == 0)
+         return 0;
+      str1 += 1;
+      str2 += 1;
+   }
+   if (*str1 < *str2)
+      return -1;
    return 1;
-   }/*strcasecmp*/
+}
 #endif
-
-

@@ -18,6 +18,6 @@ typedef struct _tps_FilTyp {
    boolean Mark;
    tp_Pos Pos;
    int IFilTyp;
-   }				tps_FilTyp;
+} tps_FilTyp;
 
 #endif

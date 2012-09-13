@@ -13,6 +13,6 @@ typedef struct _tps_Tool {
    int Defer;
    int Index;
    tp_Tool Link;
-   }				tps_Tool;
+} tps_Tool;
 
 #endif

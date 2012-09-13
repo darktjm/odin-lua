@@ -4,6 +4,6 @@
 typedef struct _tps_Item {
    tp_Loc Loc;
    tp_Item NextHash;
-   }				tps_Item;
+} tps_Item;
 
 #endif

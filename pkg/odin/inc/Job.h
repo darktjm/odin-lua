@@ -10,6 +10,6 @@ typedef struct _tps_Job {
    boolean Canceled;
    tp_Job Next;
    boolean InUse;
-   }				tps_Job;
+} tps_Job;
 
 #endif

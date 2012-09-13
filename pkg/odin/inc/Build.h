@@ -6,6 +6,6 @@ typedef struct _tps_Build {
    tp_BuildID BuildID;
    tp_JobID JobID;
    tp_Build Next;
-   }				tps_Build;
+} tps_Build;
 
 #endif

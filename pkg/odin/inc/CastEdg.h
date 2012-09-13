@@ -4,6 +4,6 @@
 typedef struct _tps_CastEdg {
    tp_FilTyp FilTyp;
    tp_CastEdg Next;
-   }				tps_CastEdg;
+} tps_CastEdg;
 
 #endif

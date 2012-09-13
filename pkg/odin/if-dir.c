@@ -25,27 +25,18 @@ geoff@boulder.colorado.edu
 #include "inc/FileName.h"
 #include "inc/Str.h"
 
-
-tp_FilDsc
-OpenDir(
-   GMC_ARG(tp_FileName, FileName)
-   )
-   GMC_DCL(tp_FileName, FileName)
+tp_FilDsc OpenDir(tp_FileName FileName)
 {
    tp_FilDsc FilDsc;
 
-   FilDsc = (tp_FilDsc)opendir(FileName);
+   FilDsc = (tp_FilDsc) opendir(FileName);
    if (FilDsc == NULL) {
-      return ERROR; }/*if*/;
+      return ERROR;
+   }
    return FilDsc;
-   }/*OpenDir*/
+}
 
-
-void
-CloseDir(
-   GMC_ARG(tp_FilDsc, FilDsc)
-   )
-   GMC_DCL(tp_FilDsc, FilDsc)
+void CloseDir(tp_FilDsc FilDsc)
 {
 #ifdef HAVE_DIRENT_H
    int status;
@@ -53,23 +44,15 @@ CloseDir(
 
    FORBIDDEN(FilDsc == NIL);
 #ifdef HAVE_DIRENT_H
-   status = closedir((DIR *)FilDsc);
-   if (status == -1) SysCallError(StdOutFD, "closedir(CloseDir)");
+   status = closedir((DIR *) FilDsc);
+   if (status == -1)
+      SysCallError(StdOutFD, "closedir(CloseDir)");
 #else
-   (void)closedir((DIR *)FilDsc);
+   (void) closedir((DIR *) FilDsc);
 #endif
-   }/*CloseDir*/
+}
 
-
-void
-ReadDir(
-   GMC_ARG(tp_FileName, FileName),
-   GMC_ARG(boolean*, EndPtr),
-   GMC_ARG(tp_FilDsc, FilDsc)
-   )
-   GMC_DCL(tp_FileName, FileName)
-   GMC_DCL(boolean*, EndPtr)
-   GMC_DCL(tp_FilDsc, FilDsc)
+void ReadDir(tp_FileName FileName, boolean * EndPtr, tp_FilDsc FilDsc)
 {
 #ifdef HAVE_DIRENT_H
    struct dirent *dp;
@@ -81,31 +64,29 @@ ReadDir(
 
    FORBIDDEN(FilDsc == NIL);
    *EndPtr = FALSE;
-   dp = readdir((DIR *)FilDsc);
+   dp = readdir((DIR *) FilDsc);
    if (dp == NULL) {
       *EndPtr = TRUE;
-      return; }/*if*/;
+      return;
+   }
 #ifdef HAVE_DIRENT_H
-   (void)strcpy(Str, dp->d_name);
+   (void) strcpy(Str, dp->d_name);
 #else
-   (void)strncpy(Str, dp->d_name, (int)dp->d_namlen);
+   (void) strncpy(Str, dp->d_name, (int) dp->d_namlen);
    Str[dp->d_namlen] = 0;
 #endif
    sz = snprintf(FileName, MAX_FileName, "%s", Str);
    if (sz >= MAX_FileName) {
-      (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s\n",
-                  MAX_FileName, Str);
-      exit(1); }/*if*/;
+      (void) fprintf(stderr, "File name too long (MAX_FileName=%d): %s\n",
+                     MAX_FileName, Str);
+      exit(1);
+   }
    if (strcmp(FileName, ".") == 0 || strcmp(FileName, "..") == 0) {
-      ReadDir(FileName, EndPtr, FilDsc); }/*if*/;
-   }/*ReadDir*/
+      ReadDir(FileName, EndPtr, FilDsc);
+   }
+}
 
-
-void
-ClearDir(
-   GMC_ARG(tp_FileName, DirName)
-   )
-   GMC_DCL(tp_FileName, DirName)
+void ClearDir(tp_FileName DirName)
 {
    tp_FilDsc FilDsc;
    tps_Str Str;
@@ -116,15 +97,17 @@ ClearDir(
    FORBIDDEN(DirName == NIL);
    FilDsc = OpenDir(DirName);
    if (FilDsc == ERROR) {
-      return; }/*if*/;
+      return;
+   }
    for (ReadDir(Str, &End, FilDsc); !End; ReadDir(Str, &End, FilDsc)) {
       sz = snprintf(FileName, MAX_FileName, "%s/%s", DirName, Str);
       if (sz >= MAX_FileName) {
-         (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/%s\n",
-	             MAX_FileName, DirName, Str);
-	 exit(1); }/*if*/;
-      Remove(FileName); }/*for*/;
+         (void) fprintf(stderr,
+                        "File name too long (MAX_FileName=%d): %s/%s\n",
+                        MAX_FileName, DirName, Str);
+         exit(1);
+      }
+      Remove(FileName);
+   }
    CloseDir(FilDsc);
-   }/*ClearDir*/
-
-
+}

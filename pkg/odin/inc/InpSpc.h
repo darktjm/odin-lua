@@ -1,7 +1,6 @@
 #ifndef TPS_INPSPC
 #define TPS_INPSPC
 
-
 typedef struct _tps_InpSpc {
    tp_ISKind ISKind;
    tp_FilTyp FilTyp;
@@ -10,6 +9,6 @@ typedef struct _tps_InpSpc {
    boolean IsEnvVar;
    tp_InpSpc InpSpc;
    tp_InpSpc Next;
-   }				tps_InpSpc;
+} tps_InpSpc;
 
 #endif

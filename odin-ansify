@@ -1,0 +1,87 @@
+#!/bin/sh
+# note: this sometimes misses minor issues the first pass, so run repeatedly
+#       until no more changes are made
+# note: uses GNU indent and GNU sed (-i)
+find pkg -type f \( -name '*.[ch]' -o -name \*.hh \) -print | while read x; do
+  sed -i '# get rid of pre-c89 function def support
+          s/GMC_DCL *([^()"]*)//g;
+          s/GMC_ARG *(\([^(),"]*\),\([^(),"]*\))/\1 \2/g;
+	  s/GMC_ARG_VOID/void/g;
+	  # texscan.c uses a different syntax
+	  s/(T\(([^)]*\))/\1/;s/ D(.*//;
+          # get rid of pointless }/*if*/-style comments
+          s%}/\*[^*]*\*/%}%g;
+          # similarly, /*select*/{-style comments
+          s%/\*[^*]*\*/{%{%g' "$x"
+  # While the bracing style used by odin is line-efficient, it is hard to
+  # match braces without the annoying comments removed above.  It's also
+  # just not my style, and I don't want to reconfigure my editor just for
+  # Odin source.  -kr isn't really my style either, but at least it's
+  # a "standard".  As a compromise, I'll keep the 3-space indentation.
+  # note: if-stub.c needs to remain formatted as is for ipcgen
+  test "$x" = pkg/odin/if-stub.c || indent -kr -sob -i3 -nut "$x"
+  # some post-processing
+  sed -i '# get rid of superfluous ;
+          # these are OK only after struct defs and compound initializer,
+	  # and there are no struct defs in Odin code other than typedefs,
+	  # which do not end in };
+	  # static compound initializers do matter, though, so skip } at BOL
+          s/\(.}\);/\1/g;
+          # -sob does not work, so remove excess line at fn def
+	  /)$/{N;N;s/\n\n/\n/;}' "$x"
+done
+# clean up after indent
+find -name '*~' -exec rm {} \;
+# One last little bit of cleanup for removing non-ANSI fun decls
+sed -i '/__STDC__/,/#endif/d' pkg/odin/inc/GMC.h pkg/tex/texscan.c
+sed -i '/GMC_ARG/,/")"/{/Write(/d;}' pkg/odin/ipcgen/ig-gen.c
+# technically, the entire loop should be removed.  Hopefully the optimizier
+# will take care of that.
+sed -i '/GMC_DCL/,/")"/d' pkg/odin/ipcgen/ig-gen.c
+
+# there are a few files that did not use GMC_, but are old k&r-style anyway
+# I could use cproto -a to correct these, if cproto weren't horribly broken
+# (at least for ansification)
+find pkg -name \*.c | while read x; do      
+  test "$x" = pkg/odin/if-stub.c && continue
+  # this sed script cannot possibly work everywhere, but it will work
+  # on odin sources
+  scr='# find what looks like a function def: type name (...
+       /^[a-zA-Z_][a-zA-Z_ ]*[^;]*$/{
+         # suck in next line if this might by its type
+	 /[a-zA-Z_][a-zA-Z_ ]*$/N
+	 # skip if not
+	 /(/!b
+         # suck in entire def until closing paren
+         :a /)/bb; N; ba;
+	 # only accept if closing paren was at EOL.
+	 :b /)$/!b;
+	 # no point in dealing with \n; indent will reintroduce
+	 # tc also clears t flag so next s// will set it
+	 s/\n/ /g;tc
+	 # pull in all lines until next {
+	 # make sure that nothing that does not look like a def gets added
+	 :c N;/).*[^a-zA-Z_*,;{ \t\n]/b;/{/!bc;
+	 # add implicit int in front of function name
+	 s/^[a-zA-Z_]* *(/int &/;
+	 s/()/(void)/;
+	 # if there are no k&r-style decls, skip
+	 /)\n{/T;
+	 # replace each variable name in parameter list with associated
+	 # decl in decl list until no more replacements can be made
+	 :d s/\([( ]\)\([a-zA-Z_]*\)\([,)].*\)\n\([^ ]* \**\2\);/\1\4\3/;td;
+	    # prev. is for single-decl; this is for multi-decl
+	    s/\([( ]\)\([a-zA-Z_]*\)\([,)].*\)\n\([^ ]*\)\( \**\2\),/\1\4\5\3\n\4/;td;
+	    # this is to add implicit int on parameters w/o types
+	    s/,\( [a-zA-Z_]*[,)]\)/, int\1/;td;
+	    s/(\([a-zA-Z_]*[,)]\)/(int \1/;
+	    s/(int void/(void/;
+	 # closing } left out so more can be added
+	 '
+  repl=$(sed -n "${scr}p;}" "$x")
+  test -z "$repl" && continue
+  sed -i "$scr}" "$x"
+  # reindent long parameter lists
+  indent -kr -sob -i3 -nut "$x"
+  rm -f "${x}~"
+done

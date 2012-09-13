@@ -20,35 +20,19 @@ geoff@boulder.colorado.edu
 #include "inc/Status_.h"
 #include "inc/Str.h"
 
-
 static void
-Set_UpToDate(
-   GMC_ARG(tp_FilHdr, FilHdr),
-   GMC_ARG(tp_Status, Status),
-   GMC_ARG(tp_Date, DepModDate)
-   )
-   GMC_DCL(tp_FilHdr, FilHdr)
-   GMC_DCL(tp_Status, Status)
-   GMC_DCL(tp_Date, DepModDate)
+Set_UpToDate(tp_FilHdr FilHdr, tp_Status Status, tp_Date DepModDate)
 {
    FORBIDDEN(Status <= STAT_Unknown);
    Set_Status(FilHdr, Status);
-   if (FilHdr_ModDate(FilHdr) == 0) Set_ModDate(FilHdr);
+   if (FilHdr_ModDate(FilHdr) == 0)
+      Set_ModDate(FilHdr);
    Set_ConfirmDate(FilHdr, DepModDate);
-   }/*Set_UpToDate*/
-
+}
 
 static void
-Update_File(
-   GMC_ARG(tp_FilHdr, FilHdr),
-   GMC_ARG(tp_Status, Status),
-   GMC_ARG(tp_Date, DepModDate),
-   GMC_ARG(tp_FileName, WorkFileName)
-   )
-   GMC_DCL(tp_FilHdr, FilHdr)
-   GMC_DCL(tp_Status, Status)
-   GMC_DCL(tp_Date, DepModDate)
-   GMC_DCL(tp_FileName, WorkFileName)
+Update_File(tp_FilHdr FilHdr,
+            tp_Status Status, tp_Date DepModDate, tp_FileName WorkFileName)
 {
    tp_Status NewStatus;
    int NewSize;
@@ -59,7 +43,8 @@ Update_File(
    FORBIDDEN(Status < STAT_Busy);
    NewStatus = Status;
    if (IsVoid(FilHdr)) {
-      goto done; }/*if*/;
+      goto done;
+   }
 
    FilHdr_DataFileName(DataFileName, FilHdr);
    FileSize(&Abort, &NewSize, WorkFileName);
@@ -67,10 +52,12 @@ Update_File(
       FORBIDDEN(NewStatus < STAT_NoFile);
       NewStatus = STAT_NoFile;
       if (Data_Exists(FilHdr)) {
-	 Remove(DataFileName);
-	 Set_Size(FilHdr, -1); }/*if*/;
+         Remove(DataFileName);
+         Set_Size(FilHdr, -1);
+      }
       Add_ErrStatus(FilHdr, STAT_NoFile);
-      goto done; }/*if*/;
+      goto done;
+   }
 
    Changed = (FilHdr_Size(FilHdr) != NewSize || !Data_Exists(FilHdr));
    if (!Changed && NewSize > 0) {
@@ -79,55 +66,44 @@ Update_File(
       DataFD = FileName_RFilDsc(DataFileName, TRUE);
       FORBIDDEN(DataFD == ERROR);
       Changed = !(Equal(WorkFD, DataFD));
-      Close(WorkFD); Close(DataFD); }/*if*/;
+      Close(WorkFD);
+      Close(DataFD);
+   }
 
-   /*select*/{
+   {
       if (Changed) {
-	 Rename(&Abort, WorkFileName, DataFileName);
-	 if (Abort) {
-	    SystemError("Cannot write to cache file: %s.\n", DataFileName);
-	    Set_Status(FilHdr, STAT_Unknown);
-	    Local_Do_Interrupt(FALSE);
-	    return; }/*if*/;
-	 Set_ModDate(FilHdr);
-	 Set_Size(FilHdr, NewSize);
-	 MakeReadOnly(&Abort, DataFileName);
-	 if (Abort) Do_MakeReadOnly(DataFileName);
-      }else{
-	 Remove(WorkFileName); };}/*select*/;
+         Rename(&Abort, WorkFileName, DataFileName);
+         if (Abort) {
+            SystemError("Cannot write to cache file: %s.\n", DataFileName);
+            Set_Status(FilHdr, STAT_Unknown);
+            Local_Do_Interrupt(FALSE);
+            return;
+         }
+         Set_ModDate(FilHdr);
+         Set_Size(FilHdr, NewSize);
+         MakeReadOnly(&Abort, DataFileName);
+         if (Abort)
+            Do_MakeReadOnly(DataFileName);
+      } else {
+         Remove(WorkFileName);
+      }
+   }
 
-done:;
+ done:;
    Set_UpToDate(FilHdr, NewStatus, DepModDate);
-   }/*Update_File*/
-
+}
 
 static void
-Update_Struct(
-   GMC_ARG(tp_FilHdr, FilHdr),
-   GMC_ARG(tp_Status, Status),
-   GMC_ARG(tp_Date, DepModDate)
-   )
-   GMC_DCL(tp_FilHdr, FilHdr)
-   GMC_DCL(tp_Status, Status)
-   GMC_DCL(tp_Date, DepModDate)
+Update_Struct(tp_FilHdr FilHdr, tp_Status Status, tp_Date DepModDate)
 {
    FORBIDDEN(FilHdr == ERROR || !IsStruct(FilHdr));
    Set_ModDate(FilHdr);
    Set_UpToDate(FilHdr, Status, DepModDate);
-   }/*Update_Struct*/
-
+}
 
 static void
-Do_DrvDir(
-   GMC_ARG(tp_Status*, StatusPtr),
-   GMC_ARG(tp_FilHdr, FilHdr),
-   GMC_ARG(tp_Date, DepModDate),
-   GMC_ARG(tp_Job, Job)
-   )
-   GMC_DCL(tp_Status*, StatusPtr)
-   GMC_DCL(tp_FilHdr, FilHdr)
-   GMC_DCL(tp_Date, DepModDate)
-   GMC_DCL(tp_Job, Job)
+Do_DrvDir(tp_Status * StatusPtr,
+          tp_FilHdr FilHdr, tp_Date DepModDate, tp_Job Job)
 {
    tps_FileName WorkFileName;
    tp_FilHdr ElmFilHdr;
@@ -142,57 +118,53 @@ Do_DrvDir(
    if (!Data_Exists(FilHdr)) {
       MakeDirFile(&Abort, DirName);
       FORBIDDEN(Abort);
-      Set_Size(FilHdr, 1); }/*if*/;
+      Set_Size(FilHdr, 1);
+   }
    ClearDir(DirName);
 
    Get_WorkFileName(WorkFileName, Job, FilHdr);
-   FirstLE = NIL; LastLE = NIL;
+   FirstLE = NIL;
+   LastLE = NIL;
    WorkDirFilDsc = OpenDir(WorkFileName);
    if (WorkDirFilDsc != ERROR) {
       for (ReadDir(Key, &End, WorkDirFilDsc);
-	   !End;
-	   ReadDir(Key, &End, WorkDirFilDsc)) {
-	 sz = snprintf(InFileName, MAX_FileName, "%s/%s", WorkFileName, Key);
-	 if (sz >= MAX_FileName) {
-	    (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/%s\n",
-	                MAX_FileName, WorkFileName, Key);
-	    exit(1); }/*if*/;
-	 ElmFilHdr = Do_Key(Copy_FilHdr(FilHdr), Key);
-	 Update_File(ElmFilHdr, *StatusPtr, DepModDate, InFileName);
-	 LocElm = Make_LocElm(ElmFilHdr, RootFilPrm, FilHdr);
-	 Chain_LocElms(&FirstLE, &LastLE, LocElm);
-	 FilHdr_DataFileName(ElmFileName, ElmFilHdr);
-	 sz = snprintf(LinkFileName, MAX_FileName, "%s/%s", DirName, Key);
-	 if (sz >= MAX_FileName) {
-	    (void)fprintf(stderr, "File name too long (MAX_FileName=%d): %s/%s\n",
-	                MAX_FileName, DirName, Key);
-	    exit(1); }/*if*/;
-	 SymLink(&Abort, LinkFileName, ElmFileName);
-	 FORBIDDEN(Abort);
-	 Ret_FilHdr(ElmFilHdr); }/*for*/;
+           !End; ReadDir(Key, &End, WorkDirFilDsc)) {
+         sz = snprintf(InFileName, MAX_FileName, "%s/%s", WorkFileName,
+                       Key);
+         if (sz >= MAX_FileName) {
+            (void) fprintf(stderr,
+                           "File name too long (MAX_FileName=%d): %s/%s\n",
+                           MAX_FileName, WorkFileName, Key);
+            exit(1);
+         }
+         ElmFilHdr = Do_Key(Copy_FilHdr(FilHdr), Key);
+         Update_File(ElmFilHdr, *StatusPtr, DepModDate, InFileName);
+         LocElm = Make_LocElm(ElmFilHdr, RootFilPrm, FilHdr);
+         Chain_LocElms(&FirstLE, &LastLE, LocElm);
+         FilHdr_DataFileName(ElmFileName, ElmFilHdr);
+         sz = snprintf(LinkFileName, MAX_FileName, "%s/%s", DirName, Key);
+         if (sz >= MAX_FileName) {
+            (void) fprintf(stderr,
+                           "File name too long (MAX_FileName=%d): %s/%s\n",
+                           MAX_FileName, DirName, Key);
+            exit(1);
+         }
+         SymLink(&Abort, LinkFileName, ElmFileName);
+         FORBIDDEN(Abort);
+         Ret_FilHdr(ElmFilHdr);
+      }
       CloseDir(WorkDirFilDsc);
-      RemoveDir(WorkFileName); }/*if*/;
+      RemoveDir(WorkFileName);
+   }
    Set_LocElm(FilHdr, FirstLE);
-   }/*Do_DrvDir*/
-
+}
 
 void
-Do_Update(
-   GMC_ARG(tp_FilHdr, FilHdr),
-   GMC_ARG(tp_OutFilHdrs, OutFilHdrs),
-   GMC_ARG(int, NumOuts),
-   GMC_ARG(tp_Job, Job),
-   GMC_ARG(tp_Status, Status),
-   GMC_ARG(tp_Date, DepModDate),
-   GMC_ARG(boolean, IsInternal)
-   )
-   GMC_DCL(tp_FilHdr, FilHdr)
-   GMC_DCL(tp_OutFilHdrs, OutFilHdrs)
-   GMC_DCL(int, NumOuts)
-   GMC_DCL(tp_Job, Job)
-   GMC_DCL(tp_Status, Status)
-   GMC_DCL(tp_Date, DepModDate)
-   GMC_DCL(boolean, IsInternal)
+Do_Update(tp_FilHdr FilHdr,
+          tp_OutFilHdrs OutFilHdrs,
+          int NumOuts,
+          tp_Job Job,
+          tp_Status Status, tp_Date DepModDate, boolean IsInternal)
 {
    tp_Date NewDepModDate;
    tp_Status NewStatus;
@@ -205,105 +177,85 @@ Do_Update(
    NewDepModDate = DepModDate;
    if (IsStruct(FilHdr)) {
       Update_Struct(FilHdr, Status, DepModDate);
-      NewDepModDate = FilHdr_ModDate(FilHdr); }/*if*/;
-   for (i=0; i<NumOuts; i++) {
+      NewDepModDate = FilHdr_ModDate(FilHdr);
+   }
+   for (i = 0; i < NumOuts; i++) {
       NewStatus = Status;
       OutFilHdr = Copy_FilHdr(OutFilHdrs[i]);
-      /*select*/{
-	 if (IsVirDir(OutFilHdr)) {
-	    Set_ModDate(OutFilHdr);
-	    Set_UpToDate(OutFilHdr, NewStatus, NewDepModDate);
-	 }else if (IsDrvDir(OutFilHdr)) {
-	    FORBIDDEN(IsInternal);
-	    Do_DrvDir(&NewStatus, OutFilHdr, NewDepModDate, Job);
-	    Update_RefFile(OutFilHdr, NewStatus, NewDepModDate);
-	    Set_DrvDirConfirm(OutFilHdr, NewStatus);
-	 }else if (IsAtmc(OutFilHdr)) {
-	    Get_WorkFileName(WorkFileName, Job, OutFilHdr);
-	    Update_File(OutFilHdr, NewStatus, NewDepModDate, WorkFileName);
-	 }else{
-	    FORBIDDEN(!IsInternal);
-	    Update_RefFile(OutFilHdr, NewStatus, NewDepModDate);
-	    Set_DrvDirConfirm(OutFilHdr, NewStatus); };}/*select*/;
-      Ret_FilHdr(OutFilHdr); }/*for*/;
-   }/*Do_Update*/
+      {
+         if (IsVirDir(OutFilHdr)) {
+            Set_ModDate(OutFilHdr);
+            Set_UpToDate(OutFilHdr, NewStatus, NewDepModDate);
+         } else if (IsDrvDir(OutFilHdr)) {
+            FORBIDDEN(IsInternal);
+            Do_DrvDir(&NewStatus, OutFilHdr, NewDepModDate, Job);
+            Update_RefFile(OutFilHdr, NewStatus, NewDepModDate);
+            Set_DrvDirConfirm(OutFilHdr, NewStatus);
+         } else if (IsAtmc(OutFilHdr)) {
+            Get_WorkFileName(WorkFileName, Job, OutFilHdr);
+            Update_File(OutFilHdr, NewStatus, NewDepModDate, WorkFileName);
+         } else {
+            FORBIDDEN(!IsInternal);
+            Update_RefFile(OutFilHdr, NewStatus, NewDepModDate);
+            Set_DrvDirConfirm(OutFilHdr, NewStatus);
+         }
+      }
+      Ret_FilHdr(OutFilHdr);
+   }
+}
 
-
-void
-Validate_IsPntr(
-   GMC_ARG(tp_FilHdr, FilHdr)
-   )
-   GMC_DCL(tp_FilHdr, FilHdr)
+void Validate_IsPntr(tp_FilHdr FilHdr)
 {
    tp_FilElm FilElm;
 
    FilElm = LocElm_FilElm(FilHdr_LocElm(FilHdr));
-   /*select*/{
+   {
       if (FilElm == NIL) {
-	 FilHdr_Error("Empty pointer file : <%s>.\n", FilHdr);
-      }else{
-	 if (FilElm_Next(FilElm) != NIL) {
-	    FilHdr_Error
-	       ("Too many elements in pointer file : <%s>.\n", FilHdr);
-	    }/*if*/;
-	 Ret_FilElm(FilElm); };}/*select*/;
-   }/*Validate_IsPntr*/
+         FilHdr_Error("Empty pointer file : <%s>.\n", FilHdr);
+      } else {
+         if (FilElm_Next(FilElm) != NIL) {
+            FilHdr_Error
+                ("Too many elements in pointer file : <%s>.\n", FilHdr);
+         }
+         Ret_FilElm(FilElm);
+      }
+   }
+}
 
-
-void
-Update_RefFile(
-   GMC_ARG(tp_FilHdr, FilHdr),
-   GMC_ARG(tp_Status, Status),
-   GMC_ARG(tp_Date, DepModDate)
-   )
-   GMC_DCL(tp_FilHdr, FilHdr)
-   GMC_DCL(tp_Status, Status)
-   GMC_DCL(tp_Date, DepModDate)
+void Update_RefFile(tp_FilHdr FilHdr, tp_Status Status, tp_Date DepModDate)
 {
    FORBIDDEN(Status < STAT_Busy);
    if (!IsEquiv_LocElms(FilHdr_OldLocElm(FilHdr), FilHdr_LocElm(FilHdr))) {
       Set_ModDate(FilHdr);
-      Set_ElmNameStatus(FilHdr, STAT_Unknown); }/*if*/;
+      Set_ElmNameStatus(FilHdr, STAT_Unknown);
+   }
    Set_OldLocElm(FilHdr);
    Set_UpToDate(FilHdr, Status, DepModDate);
-   }/*Update_RefFile*/
+}
 
-
-void
-Set_DrvDirConfirm(
-   GMC_ARG(tp_FilHdr, FilHdr),
-   GMC_ARG(tp_Status, Status)
-   )
-   GMC_DCL(tp_FilHdr, FilHdr)
-   GMC_DCL(tp_Status, Status)
+void Set_DrvDirConfirm(tp_FilHdr FilHdr, tp_Status Status)
 {
    tp_FilElm FilElm;
    tp_FilHdr ElmFilHdr;
    tp_Date DepModDate;
 
    if (!IsKeyList(FilHdr) || Status <= STAT_Error) {
-      return; }/*if*/;
+      return;
+   }
 
    DepModDate = FilHdr_ModDate(FilHdr);
    for (FilElm = LocElm_FilElm(FilHdr_LocElm(FilHdr));
-	FilElm != NIL;
-	FilElm = FilElm_NextFilElm(FilElm)) {
+        FilElm != NIL; FilElm = FilElm_NextFilElm(FilElm)) {
       ElmFilHdr = FilElm_FilHdr(FilElm);
       FORBIDDEN(ElmFilHdr == ERROR);
       FORBIDDEN(!IsKeyListElm(ElmFilHdr));
       Set_Status(ElmFilHdr, Status);
       Set_ConfirmDate(ElmFilHdr, DepModDate);
-      Ret_FilHdr(ElmFilHdr); }/*for*/;
-   }/*Set_DrvDirConfirm*/
+      Ret_FilHdr(ElmFilHdr);
+   }
+}
 
-
-void
-Set_ListStatus(
-   GMC_ARG(tp_FilHdr, FilHdr),
-   GMC_ARG(tp_Status, Status)
-   )
-   GMC_DCL(tp_FilHdr, FilHdr)
-   GMC_DCL(tp_Status, Status)
+void Set_ListStatus(tp_FilHdr FilHdr, tp_Status Status)
 {
    tp_FilElm FilElm;
    tp_FilHdr ElmFilHdr;
@@ -311,13 +263,12 @@ Set_ListStatus(
    Set_Status(FilHdr, Status);
    if (IsKeyList(FilHdr) && Status > STAT_Error) {
       for (FilElm = LocElm_FilElm(FilHdr_LocElm(FilHdr));
-	   FilElm != NIL;
-	   FilElm = FilElm_NextFilElm(FilElm)) {
-	 ElmFilHdr = FilElm_FilHdr(FilElm);
-	 FORBIDDEN(ElmFilHdr == ERROR);
-	 FORBIDDEN(!IsKeyListElm(ElmFilHdr));
-	 Set_Status(ElmFilHdr, Status);
-	 Ret_FilHdr(ElmFilHdr); }/*for*/; }/*if*/;
-   }/*Set_ListStatus*/
-
-
+           FilElm != NIL; FilElm = FilElm_NextFilElm(FilElm)) {
+         ElmFilHdr = FilElm_FilHdr(FilElm);
+         FORBIDDEN(ElmFilHdr == ERROR);
+         FORBIDDEN(!IsKeyListElm(ElmFilHdr));
+         Set_Status(ElmFilHdr, Status);
+         Ret_FilHdr(ElmFilHdr);
+      }
+   }
+}

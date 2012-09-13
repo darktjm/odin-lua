@@ -9,6 +9,6 @@ typedef struct _tps_DrvSpc {
    tp_FilHdr FilHdr;
    tp_DrvSpc Next;
    boolean InUse;
-   }				tps_DrvSpc;
+} tps_DrvSpc;
 
 #endif

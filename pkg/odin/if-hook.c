@@ -18,56 +18,54 @@ geoff@boulder.colorado.edu
 #include "inc/Str.h"
 #include "inc/DPType_.h"
 
-
 static void
-Find_HookClose(
-   GMC_ARG(boolean*, AbortPtr),
-   GMC_ARG(tp_FilDsc, OutFD),
-   GMC_ARG(tp_FilDsc, InFD)
-   )
-   GMC_DCL(boolean*, AbortPtr)
-   GMC_DCL(tp_FilDsc, OutFD)
-   GMC_DCL(tp_FilDsc, InFD)
+Find_HookClose(boolean * AbortPtr, tp_FilDsc OutFD, tp_FilDsc InFD)
 {
    int i;
 
    while (!EndOfFile(InFD)) {
       i = Readch(InFD);
-      ;/*select*/{
-	 if ((char)i == '(') {
-	    if (OutFD != NIL) Writech(OutFD, (char)i);
-	    i = Readch(InFD);
-	    if (OutFD != NIL) Writech(OutFD, (char)i);
-	    if ((char)i == '|') {
-	       Find_HookClose(AbortPtr, OutFD, InFD);
-	       if (OutFD != NIL) Write(OutFD, "|)");
-	       if (*AbortPtr) {
-		  return; }/*if*/; }/*if*/;
-	 }else if ((char)i == '|') {
-	    i = Readch(InFD);
-	    if ((char)i == ')') {
-	       *AbortPtr = FALSE;
-	       return; }/*if*/;
-	    if (OutFD != NIL) {
-	       Writech(OutFD, '|'); Writech(OutFD, (char)i); }/*if*/;
-	 }else if ((char)i == '\\') {
-	    if (OutFD != NIL) Writech(OutFD, (char)i);
-	    i = Readch(InFD);
-	    if (OutFD != NIL) Writech(OutFD, (char)i);
-	 }else{
-	    if (OutFD != NIL) Writech(OutFD, (char)i);
-	    };}/*select*/; }/*while*/;
+      ; {
+         if ((char) i == '(') {
+            if (OutFD != NIL)
+               Writech(OutFD, (char) i);
+            i = Readch(InFD);
+            if (OutFD != NIL)
+               Writech(OutFD, (char) i);
+            if ((char) i == '|') {
+               Find_HookClose(AbortPtr, OutFD, InFD);
+               if (OutFD != NIL)
+                  Write(OutFD, "|)");
+               if (*AbortPtr) {
+                  return;
+               }
+            }
+         } else if ((char) i == '|') {
+            i = Readch(InFD);
+            if ((char) i == ')') {
+               *AbortPtr = FALSE;
+               return;
+            }
+            if (OutFD != NIL) {
+               Writech(OutFD, '|');
+               Writech(OutFD, (char) i);
+            }
+         } else if ((char) i == '\\') {
+            if (OutFD != NIL)
+               Writech(OutFD, (char) i);
+            i = Readch(InFD);
+            if (OutFD != NIL)
+               Writech(OutFD, (char) i);
+         } else {
+            if (OutFD != NIL)
+               Writech(OutFD, (char) i);
+         };
+      }
+   }
    *AbortPtr = TRUE;
-   }/*Find_HookClose*/
+}
 
-
-static tp_DrvPth
-Get_HookDrvPth(
-   GMC_ARG(tp_FilHdr, FilHdr),
-   GMC_ARG(tp_FilTyp, FilTyp)
-   )
-   GMC_DCL(tp_FilHdr, FilHdr)
-   GMC_DCL(tp_FilTyp, FilTyp)
+static tp_DrvPth Get_HookDrvPth(tp_FilHdr FilHdr, tp_FilTyp FilTyp)
 {
    tp_DrvPth DrvPth, TmpDP;
    boolean HasDrv;
@@ -76,39 +74,35 @@ Get_HookDrvPth(
    DrvPth = Get_DrvPth(FilHdr, FilTyp);
    for (TmpDP = DrvPth; TmpDP != ERROR; TmpDP = DrvPth_Next(TmpDP)) {
       switch (DrvPth_DPType(TmpDP)) {
-	 case DPT_Cast: {
-	    Ret_DrvPth(DrvPth);
-	    return ERROR;
-	    break; }/*case*/;
-	 case DPT_Eqv: {
-	    break; }/*case*/;
-	 case DPT_Drv: {
-	    if (HasDrv) {
-	       Ret_DrvPth(DrvPth);
-	       return ERROR; }/*if*/;
-	    HasDrv = TRUE;
-	    break; }/*case*/;
-	 default: {
-	    FATALERROR("Unknown DPType"); };}/*switch*/; }/*for*/;
+      case DPT_Cast:{
+            Ret_DrvPth(DrvPth);
+            return ERROR;
+            break;
+         }
+      case DPT_Eqv:{
+            break;
+         }
+      case DPT_Drv:{
+            if (HasDrv) {
+               Ret_DrvPth(DrvPth);
+               return ERROR;
+            }
+            HasDrv = TRUE;
+            break;
+         }
+      default:{
+            FATALERROR("Unknown DPType");
+         }
+      }
+   }
    return DrvPth;
-   }/*Get_HookDrvPth*/
-
+}
 
 static void
-Get_Hook(
-   GMC_ARG(tp_FilHdr*, FilHdrPtr),
-   GMC_ARG(tp_FilDsc, OutFD),
-   GMC_ARG(tp_FilHdr, HookValsFilHdr),
-   GMC_ARG(tp_FilDsc, InFD),
-   GMC_ARG(tp_FilPrm, FilPrm),
-   GMC_ARG(int, HookNum)
-   )
-   GMC_DCL(tp_FilHdr*, FilHdrPtr)
-   GMC_DCL(tp_FilDsc, OutFD)
-   GMC_DCL(tp_FilHdr, HookValsFilHdr)
-   GMC_DCL(tp_FilDsc, InFD)
-   GMC_DCL(tp_FilPrm, FilPrm)
-   GMC_DCL(int, HookNum)
+Get_Hook(tp_FilHdr * FilHdrPtr,
+         tp_FilDsc OutFD,
+         tp_FilHdr HookValsFilHdr,
+         tp_FilDsc InFD, tp_FilPrm FilPrm, int HookNum)
 {
    int i, iStr;
    tps_Str StrBuf;
@@ -122,79 +116,80 @@ Get_Hook(
    *FilHdrPtr = ERROR;
    i = Readch(InFD);
    iStr = 0;
-   while ((char)i != '|' && !EndOfFile(InFD)) {
-      StrBuf[iStr] = (char)i;
+   while ((char) i != '|' && !EndOfFile(InFD)) {
+      StrBuf[iStr] = (char) i;
       iStr += 1;
-      i = Readch(InFD); }/*while*/;
+      i = Readch(InFD);
+   }
    StrBuf[iStr] = 0;
    FilHdr = DataFileName_FilHdr(StrBuf);
    if (FilHdr == ERROR) {
       SystemError("Bad Hook FileName : <%s>.\n", StrBuf);
-      return; }/*if*/;
+      return;
+   }
 
    i = Readch(InFD);
    iStr = 0;
-   while ((char)i != '|' && !EndOfFile(InFD)) {
-      StrBuf[iStr] = (char)i;
+   while ((char) i != '|' && !EndOfFile(InFD)) {
+      StrBuf[iStr] = (char) i;
       iStr += 1;
-      i = Readch(InFD); }/*while*/;
+      i = Readch(InFD);
+   }
    StrBuf[iStr] = 0;
    if (EndOfFile(InFD)) {
       SystemError("** Error: Hook terminated by EOF\n");
       Ret_FilHdr(FilHdr);
-      return; }/*if*/;
+      return;
+   }
    HookFilTyp = FTName_FilTyp(StrBuf);
    if (HookFilTyp == ERROR) {
       SystemError("Bad Hook Type : <%s>.\n", StrBuf);
       Ret_FilHdr(FilHdr);
-      return; }/*if*/;
+      return;
+   }
 
-   (void)sprintf(StrBuf, "%d", HookNum);
+   (void) sprintf(StrBuf, "%d", HookNum);
    HookNumStr = StrBuf;
-   Write(OutFD, "%"); Write(OutFD, HookNumStr);
+   Write(OutFD, "%");
+   Write(OutFD, HookNumStr);
    Writeln(OutFD, " == << \\\\\n|HOOK-VALUE-TAG|");
    Find_HookClose(&Abort, OutFD, InFD);
    Writeln(OutFD, "\n|HOOK-VALUE-TAG|\n");
    if (Abort) {
       SystemError("** Error: Hook terminated by EOF\n");
       Ret_FilHdr(FilHdr);
-      return; }/*if*/;
+      return;
+   }
 
    HookValFilHdr = Do_VTgt(Copy_FilHdr(HookValsFilHdr), HookNumStr);
    HookFilPrm = Append_PrmInf(FilPrm, HookValPrmTyp,
-			      FilHdr_LocHdr(HookValFilHdr), (tp_LocPVal)NIL);
+                              FilHdr_LocHdr(HookValFilHdr),
+                              (tp_LocPVal) NIL);
    DrvPth = Get_HookDrvPth(FilHdr, HookFilTyp);
    while (DrvPth == ERROR && !IsSource(FilHdr)) {
       HookFilPrm = Append_FilPrm(FilHdr_FilPrm(FilHdr), HookFilPrm);
       FilHdr = FilHdr_Father(FilHdr);
-      DrvPth = Get_HookDrvPth(FilHdr, HookFilTyp); }/*while*/;
-   /*select*/{
+      DrvPth = Get_HookDrvPth(FilHdr, HookFilTyp);
+   }
+   {
       if (DrvPth == ERROR) {
-	 Ret_FilHdr(FilHdr);
-	 FilHdr = Copy_FilHdr(HookValFilHdr);
-      }else{
-	 FilHdr = Do_DrvPth(FilHdr, HookFilPrm, RootFilPrm, DrvPth);
-	 Ret_DrvPth(DrvPth); };}/*select*/;
+         Ret_FilHdr(FilHdr);
+         FilHdr = Copy_FilHdr(HookValFilHdr);
+      } else {
+         FilHdr = Do_DrvPth(FilHdr, HookFilPrm, RootFilPrm, DrvPth);
+         Ret_DrvPth(DrvPth);
+      }
+   }
    Ret_FilHdr(HookValFilHdr);
    FilHdr = Do_Deriv(FilHdr, HookFilPrm, RootFilPrm, ExpandHooksFilTyp);
    FORBIDDEN(FilHdr == ERROR);
    *FilHdrPtr = FilHdr;
-   }/*Get_Hook*/
-
+}
 
 void
-NestedHooks(
-   GMC_ARG(tp_FilHdr, FilHdr),
-   GMC_ARG(tp_FilHdr, HookValsFilHdr),
-   GMC_ARG(tp_FilDsc, OutFD),
-   GMC_ARG(tp_FilDsc, InFD),
-   GMC_ARG(tp_FilPrm, FilPrm)
-   )
-   GMC_DCL(tp_FilHdr, FilHdr)
-   GMC_DCL(tp_FilHdr, HookValsFilHdr)
-   GMC_DCL(tp_FilDsc, OutFD)
-   GMC_DCL(tp_FilDsc, InFD)
-   GMC_DCL(tp_FilPrm, FilPrm)
+NestedHooks(tp_FilHdr FilHdr,
+            tp_FilHdr HookValsFilHdr,
+            tp_FilDsc OutFD, tp_FilDsc InFD, tp_FilPrm FilPrm)
 {
    int i, HookNum;
    tp_LocElm FirstLE, LastLE, LocElm;
@@ -202,44 +197,43 @@ NestedHooks(
 
    HookNum = 0;
    i = Readch(InFD);
-   FirstLE = NIL; LastLE = NIL;
+   FirstLE = NIL;
+   LastLE = NIL;
    while (!EndOfFile(InFD)) {
-      ;/*select*/{
-	 if ((char)i == '(') {
-	    i = Readch(InFD);
-	    if ((char)i == '|') {
-	       HookNum += 1;
-	       Get_Hook(&ElmFilHdr, OutFD, HookValsFilHdr,
-			InFD, FilPrm, HookNum);
-	       if (ElmFilHdr == ERROR) {
-		  DeAlloc_ElmInf(FirstLE);
-		  Set_LocElm(FilHdr, (tp_LocElm)NIL);
-		  return; }/*if*/;
-	       LocElm = Make_LocElm(ElmFilHdr, RootFilPrm, FilHdr);
-	       Ret_FilHdr(ElmFilHdr);
-	       Chain_LocElms(&FirstLE, &LastLE, LocElm);
-	       i = Readch(InFD); }/*if*/;
-	 }else if ((char)i == '\\') {
-	    i = Readch(InFD);
-	    if ((char)i == '(') {
-	       i = Readch(InFD);
-	       if ((char)i == '|') {
-		  i = Readch(InFD); }/*if*/; }/*if*/;
-	 }else{
-	    i = Readch(InFD); };}/*select*/; }/*while*/;
+      ; {
+         if ((char) i == '(') {
+            i = Readch(InFD);
+            if ((char) i == '|') {
+               HookNum += 1;
+               Get_Hook(&ElmFilHdr, OutFD, HookValsFilHdr,
+                        InFD, FilPrm, HookNum);
+               if (ElmFilHdr == ERROR) {
+                  DeAlloc_ElmInf(FirstLE);
+                  Set_LocElm(FilHdr, (tp_LocElm) NIL);
+                  return;
+               }
+               LocElm = Make_LocElm(ElmFilHdr, RootFilPrm, FilHdr);
+               Ret_FilHdr(ElmFilHdr);
+               Chain_LocElms(&FirstLE, &LastLE, LocElm);
+               i = Readch(InFD);
+            }
+         } else if ((char) i == '\\') {
+            i = Readch(InFD);
+            if ((char) i == '(') {
+               i = Readch(InFD);
+               if ((char) i == '|') {
+                  i = Readch(InFD);
+               }
+            }
+         } else {
+            i = Readch(InFD);
+         }
+      }
+   }
    Set_LocElm(FilHdr, FirstLE);
-   }/*NestedHooks*/
+}
 
-
-void
-ExpandHooks(
-   GMC_ARG(tp_FilDsc, OutFD),
-   GMC_ARG(tp_FilDsc, InFD),
-   GMC_ARG(tp_FilHdr, HooksFilHdr)
-   )
-   GMC_DCL(tp_FilDsc, OutFD)
-   GMC_DCL(tp_FilDsc, InFD)
-   GMC_DCL(tp_FilHdr, HooksFilHdr)
+void ExpandHooks(tp_FilDsc OutFD, tp_FilDsc InFD, tp_FilHdr HooksFilHdr)
 {
    int i;
    tp_LocElm LocElm;
@@ -252,43 +246,50 @@ ExpandHooks(
    i = Readch(InFD);
    LocElm = FilHdr_LocElm(HooksFilHdr);
    while (!EndOfFile(InFD)) {
-      ;/*select*/{
-	 if ((char)i == '(') {
-	    i = Readch(InFD);
-	    ;/*select*/{
-	       if ((char)i == '|') {
-		  FORBIDDEN(LocElm == NIL);
-		  FilElm = LocElm_FilElm(LocElm);
-		  HookFilHdr = Deref(FilElm_FilHdr(FilElm));
-		  LocElm = FilElm_Next(FilElm);
-		  Ret_FilElm(FilElm);
-		  FilHdr_DataFileName(FileName, HookFilHdr);
-		  Ret_FilHdr(HookFilHdr);
-		  HookFD = FileName_RFilDsc(FileName, TRUE);
-		  FileCopy(OutFD, HookFD);
-		  Close(HookFD);
-		  Find_HookClose(&Abort, (tp_FilDsc)NIL, InFD);
-		  FORBIDDEN(Abort);
-		  i = Readch(InFD);
-	       }else{
-		  Writech(OutFD, '('); };}/*select*/;
-	 }else if ((char)i == '\\') {
-	    i = Readch(InFD);
-	    ;/*select*/{
-	       if ((char)i == '(') {
-		  i = Readch(InFD);
-		  ;/*select*/{
-		     if ((char)i == '|') {
-			Write(OutFD, "(|");
-			i = Readch(InFD);
-		     }else{
-			Write(OutFD, "\\("); };}/*select*/;
-	       }else{
-		  Writech(OutFD, '\\'); };}/*select*/;
-	 }else{
-	    Writech(OutFD, (char)i);
-	    i = Readch(InFD); };}/*select*/; }/*while*/;
+      ; {
+         if ((char) i == '(') {
+            i = Readch(InFD);
+            ; {
+               if ((char) i == '|') {
+                  FORBIDDEN(LocElm == NIL);
+                  FilElm = LocElm_FilElm(LocElm);
+                  HookFilHdr = Deref(FilElm_FilHdr(FilElm));
+                  LocElm = FilElm_Next(FilElm);
+                  Ret_FilElm(FilElm);
+                  FilHdr_DataFileName(FileName, HookFilHdr);
+                  Ret_FilHdr(HookFilHdr);
+                  HookFD = FileName_RFilDsc(FileName, TRUE);
+                  FileCopy(OutFD, HookFD);
+                  Close(HookFD);
+                  Find_HookClose(&Abort, (tp_FilDsc) NIL, InFD);
+                  FORBIDDEN(Abort);
+                  i = Readch(InFD);
+               } else {
+                  Writech(OutFD, '(');
+               }
+            }
+         } else if ((char) i == '\\') {
+            i = Readch(InFD);
+            ; {
+               if ((char) i == '(') {
+                  i = Readch(InFD);
+                  ; {
+                     if ((char) i == '|') {
+                        Write(OutFD, "(|");
+                        i = Readch(InFD);
+                     } else {
+                        Write(OutFD, "\\(");
+                     }
+                  }
+               } else {
+                  Writech(OutFD, '\\');
+               }
+            }
+         } else {
+            Writech(OutFD, (char) i);
+            i = Readch(InFD);
+         }
+      }
+   }
    FORBIDDEN(LocElm != NIL);
-   }/*ExpandHooks*/
-
-
+}

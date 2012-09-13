@@ -19,13 +19,9 @@ geoff@boulder.colorado.edu
 #include "inc/GMC.h"
 #include "inc/Str.h"
 
+tp_Str Author = "geoff@cs.colorado.edu";
 
-tp_Str		Author = "geoff@cs.colorado.edu";
-
-
-main(argc, argv)
-   int argc;
-   char **argv;
+int main(int argc, char **argv)
 {
    tp_Package Pkg;
    tps_Str StrBuf;
@@ -42,23 +38,26 @@ main(argc, argv)
    Init_InpSpcs();
    if (argc < 4 || argc > 4) {
       SystemError("Usage: dg.exe PKGS ToolDir SkipFlag \n");
-      exit(102); }/*if*/;
+      exit(102);
+   }
    FilDsc = FileName_RFilDsc(argv[1], FALSE);
-   for (Pkg=Readln(StrBuf, FilDsc); Pkg!=NIL; Pkg=Readln(StrBuf, FilDsc)) {
-      Build_DerivationGraph(argv[2], Sym_Str(Str_Sym(Pkg))); }/*for*/;
+   for (Pkg = Readln(StrBuf, FilDsc); Pkg != NIL;
+        Pkg = Readln(StrBuf, FilDsc)) {
+      Build_DerivationGraph(argv[2], Sym_Str(Str_Sym(Pkg)));
+   }
    Write_ENV();
-   if (strcmp (argv[3], "1") == 0) {
-      exit(0); }/*if*/;
+   if (strcmp(argv[3], "1") == 0) {
+      exit(0);
+   }
    Set_FTClasses();
    Make_DrvEdgs();
    Make_PrmTypLsts();
    Validate_DerivationGraph();
    if (Num_Errors() > 0) {
-      exit(1); }/*if*/;
+      exit(1);
+   }
    Print_Info(StdOutFD);
    Write_DerivationGraph();
    exit(0);
-   return 0; /* to make lint happy */
-   }/*main*/
-
-
+   return 0;                    /* to make lint happy */
+}

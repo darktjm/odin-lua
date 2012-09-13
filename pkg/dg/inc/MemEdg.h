@@ -6,6 +6,6 @@ typedef struct _tps_MemEdg {
    tp_MemEdg Next;
    int Index;
    tp_MemEdg Link;
-   }				tps_MemEdg;
+} tps_MemEdg;
 
 #endif

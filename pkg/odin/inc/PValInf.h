@@ -7,6 +7,6 @@ typedef struct _tps_PValInf {
    tp_LocHdr LocHdr;
    tp_LocPVal ValLocPVal;
    tp_LocHdr DataLocHdr;
-   }				tps_PValInf;
+} tps_PValInf;
 
 #endif

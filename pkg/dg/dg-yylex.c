@@ -21,18 +21,15 @@ geoff@boulder.colorado.edu
 #include "inc/TokTyp_.h"
 #include "inc/NodTyp_.h"
 
+tp_FileName ParseFN;
+tp_FilDsc ParseFD;
+int *ParseLNPtr;
+static tp_Str PrevParseStr;
+static tp_Str ParseStr;
 
-tp_FileName	ParseFN;
-tp_FilDsc	ParseFD;
-int		*ParseLNPtr;
-static tp_Str		PrevParseStr;
-static tp_Str		ParseStr;
+static tps_Str StrBuf;
 
-static tps_Str		StrBuf;
-
-
-void
-Init_Parse()
+void Init_Parse(void)
 {
    tp_Sym Sym;
 
@@ -40,86 +37,95 @@ Init_Parse()
    Set_Sym_Att(Sym, TOK_BANNER);
    Sym = Str_Sym("NEEDS");
    Set_Sym_Att(Sym, TOK_NEEDS);
-   }/*Init_Parse*/
+}
 
-
-static void
-FileError(Str)
-   tp_Str Str;
+static void FileError(tp_Str Str)
 {
    if (ParseFN == NIL) {
       FORBIDDEN(ParseLNPtr != NIL);
       SystemError(Str);
-      return; }/*if*/;
+      return;
+   }
    if (ParseLNPtr == NIL) {
       SystemError("\"%s\": %s", ParseFN, Str);
-      return; }/*if*/;
+      return;
+   }
    SystemError("\"%s\", line %d: %s", ParseFN, *ParseLNPtr, Str);
-   }/*FileError*/
+}
 
-
-void
-ParseError(Str)
-   tp_Str Str;
+void ParseError(tp_Str Str)
 {
    FileError(Str);
    SystemError(" at <%s>.\n", PrevParseStr);
-   }/*ParseError*/
+}
 
-
-static void
-NextChar()
+static void NextChar(void)
 {
    int Length;
 
    if (*ParseStr == '\0') {
-      return; }/*if*/;
+      return;
+   }
    ParseStr += 1;
    if (*ParseStr == '\0') {
       ParseStr = ReadLine(StrBuf, ParseFD);
       PrevParseStr = ParseStr;
       if (ParseStr == NIL) {
-	 ParseStr = "";
-	 return; }/*if*/;
+         ParseStr = "";
+         return;
+      }
       Length = strlen(ParseStr);
-      ParseStr[Length] = '\n'; ParseStr[Length+1] = '\0'; }/*while*/;
-   }/*NextChar*/
+      ParseStr[Length] = '\n';
+      ParseStr[Length + 1] = '\0';
+   }
+}
 
-
-void
-Init_Lex()
+void Init_Lex(void)
 {
    ParseStr = ".";
    NextChar();
-   }/*Init_Lex*/
+}
 
-
-void
-EndLex()
+void EndLex(void)
 {
    SystemError("Unexpected call to EndLex.\n");
-   }/*EndLex*/
+}
 
-
-static boolean
-YY_IsWordChr(Chr)
-   char Chr;
+static boolean YY_IsWordChr(char Chr)
 {
    switch (Chr) {
-      case '\0': case ' ': case '\t': case '\n': case '#': case '\'':
-      case ':': case '+': case '=': case '(': case ')': 
-      case '%': case '/': case ';': case '?': case '<': case '>': 
-      case '&': case '@': case '*': case '\\': {
-	 return FALSE;
-	 break;}/*case*/;
-      default: {
-	 return TRUE; };}/*switch*/;
+   case '\0':
+   case ' ':
+   case '\t':
+   case '\n':
+   case '#':
+   case '\'':
+   case ':':
+   case '+':
+   case '=':
+   case '(':
+   case ')':
+   case '%':
+   case '/':
+   case ';':
+   case '?':
+   case '<':
+   case '>':
+   case '&':
+   case '@':
+   case '*':
+   case '\\':{
+         return FALSE;
+         break;
+      }
+   default:{
+         return TRUE;
+      }
+   }
 /* NOTREACHED */
-   }/*YY_IsWordChr*/
+}
 
-
-int
-YY_Lex()
+int YY_Lex(void)
 {
    tps_Str Str;
    int iStr;
@@ -130,219 +136,275 @@ YY_Lex()
    PrevParseStr = ParseStr;
    while (TRUE) {
       switch (*ParseStr) {
-	 case 0: {
-	    return TOK_EOF;
-	    break;}/*case*/;
-	 case ' ': case '\t': {
-	    NextChar();
-	    break;}/*case*/;
-	 case '\n': {
-	    NextChar();
-	    if (ParseLNPtr != NIL) *ParseLNPtr = *ParseLNPtr + 1;
-	    break;}/*case*/;
-	 case '#': {
-	    while (*ParseStr != '\0' && *ParseStr != '\n') NextChar();
-	    break;}/*case*/;
-         case ':' :{
-	    NextChar();
-	    return TOK_Colon;
-	    break;}/*case*/;
-         case '+' :{
-	    NextChar();
-	    return TOK_Plus;
-	    break;}/*case*/;
-         case '=' :{
-	    NextChar();
-	    return TOK_Equals;
-	    break;}/*case*/;
-         case '(' :{
-	    NextChar();
-	    return TOK_LeftParen;
-	    break;}/*case*/;
-         case ')' :{
-	    NextChar();
-	    return TOK_RightParen;
-	    break;}/*case*/;
-         case '%' :{
-	    NextChar();
-	    return TOK_Percent;
-	    break;}/*case*/;
-         case '/' :{
-	    NextChar();
-	    return TOK_Slash;
-	    break;}/*case*/;
-         case ';' :{
-	    NextChar();
-	    return TOK_Semicolon;
-	    break;}/*case*/;
-         case '?' :{
-	    NextChar();
-	    return TOK_Question;
-	    break;}/*case*/;
-         case '<' :{
-	    NextChar();
-	    return TOK_LeftAngle;
-	    break;}/*case*/;
-         case '>' :{
-	    NextChar();
-	    return TOK_RightAngle;
-	    break;}/*case*/;
-         case '&' :{
-	    NextChar();
-	    return TOK_Ampersand;
-	    break;}/*case*/;
-         case '@' :{
-	    NextChar();
-	    return TOK_At;
-	    break;}/*case*/;
-         case '*' :{
-	    NextChar();
-	    return TOK_Asterisk;
-	    break;}/*case*/;
-         case '$' :{
-	    NextChar();
-	    return TOK_Dollar;
-	    break;}/*case*/;
-	 default: {
-	    KeywordFlag = TRUE;
-	    iStr = 0;
-	    while (TRUE) {
-	       /*select*/{
-		  if (YY_IsWordChr(*ParseStr)) {
-		     Str[iStr] = *ParseStr; iStr += 1;
-		     NextChar();
-		  }else if (*ParseStr == '\\') {
-		     KeywordFlag = FALSE;
-		     NextChar();
-		     if (*ParseStr == '\0') {
-			ParseError("backslash followed by EOF");
-			return TOK_ERR; }/*if*/;
-		     if (*ParseStr == '\n' && ParseLNPtr != NIL) {
-			*ParseLNPtr = *ParseLNPtr + 1; }/*if*/;
-		     Str[iStr] = *ParseStr; iStr += 1;
-		     NextChar();
-		  }else if (*ParseStr == '\'') {
-		     KeywordFlag = FALSE;
-		     NextChar();
-		     while (*ParseStr != '\'') {
-			if (*ParseStr == '\\') {
-			   NextChar(); }/*if*/;
-			if (*ParseStr == '\0') {
-			   ParseError("Unterminated string");
-			   return TOK_ERR; }/*if*/;
-			if (*ParseStr == '\n' && ParseLNPtr != NIL) {
-			   *ParseLNPtr = *ParseLNPtr + 1; }/*if*/;
-			Str[iStr] = *ParseStr; iStr += 1;
-			NextChar(); }/*while*/;
-		     NextChar();
-		  }else{
-		     Str[iStr] = '\0';
-		     Sym = Str_Sym(Str);
-		     if (KeywordFlag) {
-			SymTok = Sym_Att(Sym);
-			if (SymTok != 0) {
-			   return SymTok; }/*if*/; }/*if*/;
-		     Push_SymStack(Sym);
-		     return TOK_Word;
-		     };}/*select*/; }/*while*/; };}/*switch*/; }/*while*/;
-   }/*YY_Lex*/
+      case 0:{
+            return TOK_EOF;
+            break;
+         }
+      case ' ':
+      case '\t':{
+            NextChar();
+            break;
+         }
+      case '\n':{
+            NextChar();
+            if (ParseLNPtr != NIL)
+               *ParseLNPtr = *ParseLNPtr + 1;
+            break;
+         }
+      case '#':{
+            while (*ParseStr != '\0' && *ParseStr != '\n')
+               NextChar();
+            break;
+         }
+      case ':':{
+            NextChar();
+            return TOK_Colon;
+            break;
+         }
+      case '+':{
+            NextChar();
+            return TOK_Plus;
+            break;
+         }
+      case '=':{
+            NextChar();
+            return TOK_Equals;
+            break;
+         }
+      case '(':{
+            NextChar();
+            return TOK_LeftParen;
+            break;
+         }
+      case ')':{
+            NextChar();
+            return TOK_RightParen;
+            break;
+         }
+      case '%':{
+            NextChar();
+            return TOK_Percent;
+            break;
+         }
+      case '/':{
+            NextChar();
+            return TOK_Slash;
+            break;
+         }
+      case ';':{
+            NextChar();
+            return TOK_Semicolon;
+            break;
+         }
+      case '?':{
+            NextChar();
+            return TOK_Question;
+            break;
+         }
+      case '<':{
+            NextChar();
+            return TOK_LeftAngle;
+            break;
+         }
+      case '>':{
+            NextChar();
+            return TOK_RightAngle;
+            break;
+         }
+      case '&':{
+            NextChar();
+            return TOK_Ampersand;
+            break;
+         }
+      case '@':{
+            NextChar();
+            return TOK_At;
+            break;
+         }
+      case '*':{
+            NextChar();
+            return TOK_Asterisk;
+            break;
+         }
+      case '$':{
+            NextChar();
+            return TOK_Dollar;
+            break;
+         }
+      default:{
+            KeywordFlag = TRUE;
+            iStr = 0;
+            while (TRUE) {
+               {
+                  if (YY_IsWordChr(*ParseStr)) {
+                     Str[iStr] = *ParseStr;
+                     iStr += 1;
+                     NextChar();
+                  } else if (*ParseStr == '\\') {
+                     KeywordFlag = FALSE;
+                     NextChar();
+                     if (*ParseStr == '\0') {
+                        ParseError("backslash followed by EOF");
+                        return TOK_ERR;
+                     }
+                     if (*ParseStr == '\n' && ParseLNPtr != NIL) {
+                        *ParseLNPtr = *ParseLNPtr + 1;
+                     }
+                     Str[iStr] = *ParseStr;
+                     iStr += 1;
+                     NextChar();
+                  } else if (*ParseStr == '\'') {
+                     KeywordFlag = FALSE;
+                     NextChar();
+                     while (*ParseStr != '\'') {
+                        if (*ParseStr == '\\') {
+                           NextChar();
+                        }
+                        if (*ParseStr == '\0') {
+                           ParseError("Unterminated string");
+                           return TOK_ERR;
+                        }
+                        if (*ParseStr == '\n' && ParseLNPtr != NIL) {
+                           *ParseLNPtr = *ParseLNPtr + 1;
+                        }
+                        Str[iStr] = *ParseStr;
+                        iStr += 1;
+                        NextChar();
+                     }
+                     NextChar();
+                  } else {
+                     Str[iStr] = '\0';
+                     Sym = Str_Sym(Str);
+                     if (KeywordFlag) {
+                        SymTok = Sym_Att(Sym);
+                        if (SymTok != 0) {
+                           return SymTok;
+                        }
+                     }
+                     Push_SymStack(Sym);
+                     return TOK_Word;
+                  }
+               }
+            }
+         }
+      }
+   }
+}
 
-
-static void
-Unlex(OutStr, InStr)
-   tp_Str OutStr, InStr;
+static void Unlex(tp_Str OutStr, tp_Str InStr)
 {
    if (*InStr == 0) {
-      (void)strcpy(OutStr, "''");
-      return; }/*if*/;
-   if (*InStr == '~' || !YY_IsWordChr(*InStr)) *OutStr++ = '\\';
+      (void) strcpy(OutStr, "''");
+      return;
+   }
+   if (*InStr == '~' || !YY_IsWordChr(*InStr))
+      *OutStr++ = '\\';
    *OutStr++ = *InStr++;
    while (*InStr != 0) {
-      if (!YY_IsWordChr(*InStr)) *OutStr++ = '\\';
-      *OutStr++ = *InStr++; }/*while*/;
+      if (!YY_IsWordChr(*InStr))
+         *OutStr++ = '\\';
+      *OutStr++ = *InStr++;
+   }
    *OutStr = 0;
-   }/*Unlex*/
+}
 
-
-void
-YY_Unparse(Str, Nod)
-   tp_Str Str;
-   tp_Nod Nod;
+void YY_Unparse(tp_Str Str, tp_Nod Nod)
 {
    tp_Nod Son;
    tp_Str SubStr;
 
    switch (Nod_NodTyp(Nod)) {
-      case NOD_OdinExpr: case NOD_Oprs: {
-	 (void)strcpy(Str, "(");
-	 Son = Nod_Son(1, Nod);
-	 YY_Unparse(Tail(Str), Son);
-	 for (Son = Nod_Brother(Son), SubStr = Tail(Str);
-	      Son != NIL;
-	      Son = Nod_Brother(Son), SubStr = Tail(SubStr)) {
-	    YY_Unparse(SubStr, Son); }/*for*/;
-	 (void)strcat(SubStr, ")");
-	 break; }/*case*/;
-      case NOD_VarWord: {
-	 (void)strcpy(Str, "$");
-	 YY_Unparse(Tail(Str), Nod_Son(1, Nod));
-	 break; }/*case*/;
-      case NOD_Word: {
-	 Unlex(Str, Sym_Str(Nod_Sym(Nod)));
-	 break; }/*case*/;
-      case NOD_EmptyFile: {
-	 (void)strcpy(Str, "()");
-	 break; }/*case*/;
-      case NOD_AbsRoot: {
-	 (void)strcpy(Str, "/");
-	 break; }/*case*/;
-      case NOD_AbsFile: {
-	 (void)strcpy(Str, "/");
-	 YY_Unparse(Tail(Str), Nod_Son(1, Nod));
-	 break; }/*case*/;
-      case NOD_PrmInput: {
-	 (void)strcpy(Str, "+");
-	 YY_Unparse(Tail(Str), Nod_Son(1, Nod));
-	 break; }/*case*/;
-      case NOD_PrmOpr: {
-	 (void)strcpy(Str, "+");
-	 YY_Unparse(Tail(Str), Nod_Son(1, Nod));
-	 if (Nod_NumSons(Nod) > 1) {
-	    (void)strcpy(Tail(Str), "=");
-	    YY_Unparse(Tail(Str), Nod_Son(2, Nod)); }/*if*/;
-	 break; }/*case*/;
-      case NOD_AplOpr: {
-	 (void)strcpy(Str, "+(");
-	 YY_Unparse(Tail(Str), Nod_Son(1, Nod));
-	 (void)strcat(Str, ")");
-	 break; }/*case*/;
-      case NOD_PrmVals: {
-	 YY_Unparse(Str, Nod_Son(1, Nod));
-	 for (Son = Nod_Son(2, Nod); Son != NIL; Son = Nod_Brother(Son)) {
-	    (void)strcpy(Tail(Str), " ");
-	    YY_Unparse(Tail(Str), Son); }/*for*/;
-	 break; }/*case*/;
-      case NOD_DrvInput: case NOD_DrvOpr: {
-	 (void)strcpy(Str, ":");
-	 YY_Unparse(Tail(Str), Nod_Son(1, Nod));
-	 break; }/*case*/;
-      case NOD_SecOrdDrvOpr: {
-	 (void)strcpy(Str, ":");
-	 YY_Unparse(Tail(Str), Nod_Son(1, Nod));
-	 (void)strcpy(Tail(Str), "=:");
-	 YY_Unparse(Tail(Str), Nod_Son(2, Nod));
-	 break; }/*case*/;
-      case NOD_SelOpr: {
-	 (void)strcpy(Str, "/");
-	 YY_Unparse(Tail(Str), Nod_Son(1, Nod));
-	 break; }/*case*/;
-      case NOD_VirSelOpr: {
-	 (void)strcpy(Str, "%");
-	 YY_Unparse(Tail(Str), Nod_Son(1, Nod));
-	 break;}/*case*/;
-      case NOD_DirOpr: {
-	 (void)strcpy(Str, "/");
-	 break; }/*case*/;
-      default: {
-	 FATALERROR("Unexpected NodTyp"); };}/*switch*/;
-   }/*YY_Unparse*/
+   case NOD_OdinExpr:
+   case NOD_Oprs:{
+         (void) strcpy(Str, "(");
+         Son = Nod_Son(1, Nod);
+         YY_Unparse(Tail(Str), Son);
+         for (Son = Nod_Brother(Son), SubStr = Tail(Str);
+              Son != NIL; Son = Nod_Brother(Son), SubStr = Tail(SubStr)) {
+            YY_Unparse(SubStr, Son);
+         }
+         (void) strcat(SubStr, ")");
+         break;
+      }
+   case NOD_VarWord:{
+         (void) strcpy(Str, "$");
+         YY_Unparse(Tail(Str), Nod_Son(1, Nod));
+         break;
+      }
+   case NOD_Word:{
+         Unlex(Str, Sym_Str(Nod_Sym(Nod)));
+         break;
+      }
+   case NOD_EmptyFile:{
+         (void) strcpy(Str, "()");
+         break;
+      }
+   case NOD_AbsRoot:{
+         (void) strcpy(Str, "/");
+         break;
+      }
+   case NOD_AbsFile:{
+         (void) strcpy(Str, "/");
+         YY_Unparse(Tail(Str), Nod_Son(1, Nod));
+         break;
+      }
+   case NOD_PrmInput:{
+         (void) strcpy(Str, "+");
+         YY_Unparse(Tail(Str), Nod_Son(1, Nod));
+         break;
+      }
+   case NOD_PrmOpr:{
+         (void) strcpy(Str, "+");
+         YY_Unparse(Tail(Str), Nod_Son(1, Nod));
+         if (Nod_NumSons(Nod) > 1) {
+            (void) strcpy(Tail(Str), "=");
+            YY_Unparse(Tail(Str), Nod_Son(2, Nod));
+         }
+         break;
+      }
+   case NOD_AplOpr:{
+         (void) strcpy(Str, "+(");
+         YY_Unparse(Tail(Str), Nod_Son(1, Nod));
+         (void) strcat(Str, ")");
+         break;
+      }
+   case NOD_PrmVals:{
+         YY_Unparse(Str, Nod_Son(1, Nod));
+         for (Son = Nod_Son(2, Nod); Son != NIL; Son = Nod_Brother(Son)) {
+            (void) strcpy(Tail(Str), " ");
+            YY_Unparse(Tail(Str), Son);
+         }
+         break;
+      }
+   case NOD_DrvInput:
+   case NOD_DrvOpr:{
+         (void) strcpy(Str, ":");
+         YY_Unparse(Tail(Str), Nod_Son(1, Nod));
+         break;
+      }
+   case NOD_SecOrdDrvOpr:{
+         (void) strcpy(Str, ":");
+         YY_Unparse(Tail(Str), Nod_Son(1, Nod));
+         (void) strcpy(Tail(Str), "=:");
+         YY_Unparse(Tail(Str), Nod_Son(2, Nod));
+         break;
+      }
+   case NOD_SelOpr:{
+         (void) strcpy(Str, "/");
+         YY_Unparse(Tail(Str), Nod_Son(1, Nod));
+         break;
+      }
+   case NOD_VirSelOpr:{
+         (void) strcpy(Str, "%");
+         YY_Unparse(Tail(Str), Nod_Son(1, Nod));
+         break;
+      }
+   case NOD_DirOpr:{
+         (void) strcpy(Str, "/");
+         break;
+      }
+   default:{
+         FATALERROR("Unexpected NodTyp");
+      }
+   }
+}

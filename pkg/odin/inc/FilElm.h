@@ -15,6 +15,6 @@ typedef struct _tps_FilElm {
 
    boolean Modified;
    tp_FilElm NextMod;
-   }				tps_FilElm;
+} tps_FilElm;
 
 #endif

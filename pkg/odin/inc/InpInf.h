@@ -1,7 +1,6 @@
 #ifndef TPS_INPINF
 #define TPS_INPINF
 
-
 typedef struct _tps_InpInf {
    int IArg;
    tp_LocHdr LocHdr;
@@ -10,6 +9,6 @@ typedef struct _tps_InpInf {
    tp_InpKind InpKind;
    tp_LocHdr OutLocHdr;
    tp_LocInp Next;
-   }				tps_InpInf;
+} tps_InpInf;
 
 #endif

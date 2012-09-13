@@ -6,6 +6,6 @@ typedef struct _tps_PrmInf {
 
    int IPrmTyp;
    tp_LocPVal LocPVal;
-   }				tps_PrmInf;
+} tps_PrmInf;
 
 #endif

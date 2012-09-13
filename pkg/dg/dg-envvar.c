@@ -26,29 +26,28 @@ geoff@boulder.colorado.edu
 #include "inc/PrmTyp.h"
 #include "inc/Str.h"
 
+tp_EnvVar EnvVarS = NIL;
+static tp_EnvVar LastEnvVar = NIL;
+int num_EnvVarS = 0;
 
-tp_EnvVar		EnvVarS = NIL;
-static tp_EnvVar		LastEnvVar = NIL;
-int			num_EnvVarS = 0;
+static tp_EnvVarLst EnvVarLstS = NIL;
+static tp_EnvVarLst LastEnvVarLst = NIL;
+int num_EnvVarLstS = 0;
 
-static tp_EnvVarLst		EnvVarLstS = NIL;
-static tp_EnvVarLst		LastEnvVarLst = NIL;
-int			num_EnvVarLstS = 0;
+tp_EnvVarLst DfltEnvVarLst;
 
-tp_EnvVarLst		DfltEnvVarLst;
-
-
-static tp_EnvVarLst
-New_EnvVarLst()
+static tp_EnvVarLst New_EnvVarLst(void)
 {
    tp_EnvVarLst EnvVarLst;
 
-   EnvVarLst = (tp_EnvVarLst)malloc(sizeof(tps_EnvVarLst));
-   /*select*/{
+   EnvVarLst = (tp_EnvVarLst) malloc(sizeof(tps_EnvVarLst));
+   {
       if (LastEnvVarLst == NIL) {
-	 EnvVarLstS = EnvVarLst;
-      }else{
-	 LastEnvVarLst->Link = EnvVarLst; };}/*select*/;
+         EnvVarLstS = EnvVarLst;
+      } else {
+         LastEnvVarLst->Link = EnvVarLst;
+      }
+   }
    LastEnvVarLst = EnvVarLst;
    EnvVarLst->EnvVar = 0;
    EnvVarLst->Next = 0;
@@ -58,27 +57,25 @@ New_EnvVarLst()
    EnvVarLst->Link = NIL;
    num_EnvVarLstS++;
    return EnvVarLst;
-   }/*New_EnvVarLst*/
+}
 
-
-void
-Init_EnvVars()
+void Init_EnvVars(void)
 {
    DfltEnvVarLst = New_EnvVarLst();
-   }/*Init_EnvVars*/
+}
 
-
-static tp_EnvVar
-New_EnvVar()
+static tp_EnvVar New_EnvVar(void)
 {
    tp_EnvVar EnvVar;
 
-   EnvVar = (tp_EnvVar)malloc(sizeof(tps_EnvVar));
-   /*select*/{
+   EnvVar = (tp_EnvVar) malloc(sizeof(tps_EnvVar));
+   {
       if (LastEnvVar == NIL) {
-	 EnvVarS = EnvVar;
-      }else{
-	 LastEnvVar->Link = EnvVar; };}/*select*/;
+         EnvVarS = EnvVar;
+      } else {
+         LastEnvVar->Link = EnvVar;
+      }
+   }
    LastEnvVar = EnvVar;
    EnvVar->Name = NIL;
    EnvVar->Desc = NIL;
@@ -89,146 +86,118 @@ New_EnvVar()
    EnvVar->Link = NIL;
    num_EnvVarS++;
    return EnvVar;
-   }/*New_EnvVar*/
+}
 
-
-static tp_EnvVar
-Create_EnvVar(Name)
-   tp_Str Name;
+static tp_EnvVar Create_EnvVar(tp_Str Name)
 {
    tp_EnvVar EnvVar;
 
    EnvVar = New_EnvVar();
    EnvVar->Name = Name;
    return EnvVar;
-   }/*Create_EnvVar*/
+}
 
-
-tp_EnvVar
-Lookup_EnvVar(Name)
-   tp_Str Name;
+tp_EnvVar Lookup_EnvVar(tp_Str Name)
 {
    tp_EnvVar EnvVar;
 
    for (EnvVar = EnvVarS; EnvVar != NIL; EnvVar = EnvVar->Link) {
       if (Name == EnvVar->Name) {
-	 return EnvVar; }/*if*/; }/*for*/;
+         return EnvVar;
+      }
+   }
    return Create_EnvVar(Name);
-   }/*Lookup_EnvVar*/
+}
 
-
-tp_Desc
-EnvVar_Desc(EnvVar)
-   tp_EnvVar EnvVar;
+tp_Desc EnvVar_Desc(tp_EnvVar EnvVar)
 {
-   if (EnvVar == ERROR) return ERROR;
+   if (EnvVar == ERROR)
+      return ERROR;
    return EnvVar->Desc;
-   }/*EnvVar_Desc*/
+}
 
-
-void
-Set_EnvVar_Desc(EnvVar, Desc, Hidden)
-   tp_EnvVar EnvVar;
-   tp_Desc Desc;
-   boolean Hidden;
+void Set_EnvVar_Desc(tp_EnvVar EnvVar, tp_Desc Desc, boolean Hidden)
 {
    FORBIDDEN(EnvVar == ERROR || Desc == ERROR);
    FORBIDDEN(EnvVar->Desc != NIL);
    EnvVar->Desc = Desc;
    EnvVar->HelpLevel = (Hidden ? 2 : 1);
-   }/*Set_EnvVar_Desc*/
+}
 
-
-void
-Set_EnvVar_Default(EnvVar, Default, IsFile)
-   tp_EnvVar EnvVar;
-   tp_Str Default;
-   boolean IsFile;
+void Set_EnvVar_Default(tp_EnvVar EnvVar, tp_Str Default, boolean IsFile)
 {
    FORBIDDEN(EnvVar == ERROR || Default == ERROR);
    FORBIDDEN(EnvVar->Default != NIL);
    EnvVar->Default = Default;
    EnvVar->IsFile = IsFile;
-   }/*Set_EnvVar_Default*/
+}
 
-
-tp_EnvVarLst
-EnvVarLst_Next(EnvVarLst)
-   tp_EnvVarLst EnvVarLst;
+tp_EnvVarLst EnvVarLst_Next(tp_EnvVarLst EnvVarLst)
 {
    return EnvVarLst->Next;
-   }/*EnvVarLst_Next*/
+}
 
-
-static tp_EnvVarLst
-Add_EnvVar(EnvVarLst, EnvVar)
-   tp_EnvVarLst EnvVarLst;
-   tp_EnvVar EnvVar;
+static tp_EnvVarLst Add_EnvVar(tp_EnvVarLst EnvVarLst, tp_EnvVar EnvVar)
 {
    tp_EnvVarLst SonEnvVarLst;
 
    for (SonEnvVarLst = EnvVarLst->Son;
-	SonEnvVarLst != 0;
-	SonEnvVarLst = SonEnvVarLst->Brother) {
+        SonEnvVarLst != 0; SonEnvVarLst = SonEnvVarLst->Brother) {
       if (EnvVar == SonEnvVarLst->EnvVar) {
-	 return SonEnvVarLst; }/*if*/; }/*for*/;
+         return SonEnvVarLst;
+      }
+   }
    SonEnvVarLst = New_EnvVarLst();
    SonEnvVarLst->EnvVar = EnvVar;
    SonEnvVarLst->Next = EnvVarLst;
    SonEnvVarLst->Brother = EnvVarLst->Son;
    EnvVarLst->Son = SonEnvVarLst;
    return SonEnvVarLst;
-   }/*Add_EnvVar*/
+}
 
-
-tp_EnvVarLst
-Make_EnvVarLst(EnvVar)
-   tp_EnvVar EnvVar;
+tp_EnvVarLst Make_EnvVarLst(tp_EnvVar EnvVar)
 {
    return Add_EnvVar(DfltEnvVarLst, EnvVar);
-   }/*Make_EnvVarLst*/
+}
 
-
-tp_EnvVarLst
-Union_EnvVarLst(EnvVarLst1, EnvVarLst2)
-   tp_EnvVarLst EnvVarLst1, EnvVarLst2;
+tp_EnvVarLst Union_EnvVarLst(EnvVarLst1, EnvVarLst2)
+tp_EnvVarLst EnvVarLst1, EnvVarLst2;
 {
    tp_EnvVarLst EnvVarLst;
    tp_EnvVar EnvVar;
 
    FORBIDDEN(EnvVarLst1 == ERROR || EnvVarLst2 == ERROR);
-   if (EnvVarLst1 == DfltEnvVarLst) return EnvVarLst2;
-   if (EnvVarLst2 == DfltEnvVarLst) return EnvVarLst1;
-   /*select*/{
+   if (EnvVarLst1 == DfltEnvVarLst)
+      return EnvVarLst2;
+   if (EnvVarLst2 == DfltEnvVarLst)
+      return EnvVarLst1;
+   {
       if (EnvVarLst1->EnvVar == EnvVarLst2->EnvVar) {
-	 EnvVarLst = Union_EnvVarLst(EnvVarLst1->Next, EnvVarLst2->Next);
-	 EnvVar = EnvVarLst1->EnvVar;
-      }else if (EnvVarLst1->EnvVar->Index < EnvVarLst2->EnvVar->Index) {
-	 EnvVarLst = Union_EnvVarLst(EnvVarLst1->Next, EnvVarLst2);
-	 EnvVar = EnvVarLst1->EnvVar;
-      }else{
-	 EnvVarLst = Union_EnvVarLst(EnvVarLst1, EnvVarLst2->Next);
-	 EnvVar = EnvVarLst2->EnvVar; };}/*select*/;
+         EnvVarLst = Union_EnvVarLst(EnvVarLst1->Next, EnvVarLst2->Next);
+         EnvVar = EnvVarLst1->EnvVar;
+      } else if (EnvVarLst1->EnvVar->Index < EnvVarLst2->EnvVar->Index) {
+         EnvVarLst = Union_EnvVarLst(EnvVarLst1->Next, EnvVarLst2);
+         EnvVar = EnvVarLst1->EnvVar;
+      } else {
+         EnvVarLst = Union_EnvVarLst(EnvVarLst1, EnvVarLst2->Next);
+         EnvVar = EnvVarLst2->EnvVar;
+      }
+   }
    return Add_EnvVar(EnvVarLst, EnvVar);
-   }/*Union_EnvVarLst*/
+}
 
-
-void
-Print_EnvVarLst(FilDsc, EnvVarLst)
-   tp_FilDsc FilDsc;
-   tp_EnvVarLst EnvVarLst;
+void Print_EnvVarLst(tp_FilDsc FilDsc, tp_EnvVarLst EnvVarLst)
 {
    tp_EnvVarLst EnvVarElm;
 
-   for (EnvVarElm = EnvVarLst; EnvVarElm != DfltEnvVarLst; EnvVarElm = EnvVarElm->Next) {
+   for (EnvVarElm = EnvVarLst; EnvVarElm != DfltEnvVarLst;
+        EnvVarElm = EnvVarElm->Next) {
       Write(FilDsc, " $");
-      Write(FilDsc, EnvVarElm->EnvVar->Name); }/*for*/;
-   }/*Print_EnvVarLst*/
+      Write(FilDsc, EnvVarElm->EnvVar->Name);
+   }
+}
 
-
-void
-Write_EnvVars(DRVGRF_FILE, DG_C_FILE)
-   FILE *DRVGRF_FILE, *DG_C_FILE;
+void Write_EnvVars(FILE * DRVGRF_FILE, FILE * DG_C_FILE)
 {
    tp_EnvVar EnvVar;
    tp_EnvVarLst EnvVarLst;
@@ -236,28 +205,27 @@ Write_EnvVars(DRVGRF_FILE, DG_C_FILE)
    tps_EntryStr sEnvVar, sNext;
 
    DG_FOREACH(EnvVar)
-      DG_ENTRY_SEPARATOR();
-      (void)fprintf(DRVGRF_FILE, ".%s\1 .%s\1 %d .%s\1 %d\n",
-       EnvVar->Name, EnvVar->Desc, EnvVar->HelpLevel, EnvVar->Default,
-       EnvVar->IsFile);
-      (void)fprintf(DG_C_FILE, "{\"%s\", \"%s\", %d, \"%s\", %d}",
-       EnvVar->Name, EnvVar->Desc, EnvVar->HelpLevel, EnvVar->Default,
-       EnvVar->IsFile);
-      DG_END_FOREACH(EnvVar);
+       DG_ENTRY_SEPARATOR();
+   (void) fprintf(DRVGRF_FILE, ".%s\1 .%s\1 %d .%s\1 %d\n",
+                  EnvVar->Name, EnvVar->Desc, EnvVar->HelpLevel,
+                  EnvVar->Default, EnvVar->IsFile);
+   (void) fprintf(DG_C_FILE, "{\"%s\", \"%s\", %d, \"%s\", %d}",
+                  EnvVar->Name, EnvVar->Desc, EnvVar->HelpLevel,
+                  EnvVar->Default, EnvVar->IsFile);
+   DG_END_FOREACH(EnvVar);
 
    DG_FOREACH(EnvVarLst)
-      DG_ENTRY(EnvVarLst,EnvVar,EnvVar);
-      if (EnvVarLst->Next == DfltEnvVarLst) EnvVarLst->Next = 0;
-      DG_ENTRY(EnvVarLst,Next,EnvVarLst);
-      DG_ENTRY_SEPARATOR();
-      (void)fprintf(DRVGRF_FILE, "%d %d\n", iEnvVar, iNext);
-      (void)fprintf(DG_C_FILE, "{%s, %s}", sEnvVar, sNext);
+       DG_ENTRY(EnvVarLst, EnvVar, EnvVar);
+   if (EnvVarLst->Next == DfltEnvVarLst)
+      EnvVarLst->Next = 0;
+   DG_ENTRY(EnvVarLst, Next, EnvVarLst);
+   DG_ENTRY_SEPARATOR();
+   (void) fprintf(DRVGRF_FILE, "%d %d\n", iEnvVar, iNext);
+   (void) fprintf(DG_C_FILE, "{%s, %s}", sEnvVar, sNext);
    DG_END_FOREACH(EnvVarLst);
-   }/*Write_EnvVarLsts*/
+}
 
-
-void
-Write_ENV()
+void Write_ENV(void)
 {
    tp_FilDsc FilDsc;
    tp_Str Str;
@@ -266,32 +234,34 @@ Write_ENV()
    FilDsc = FileName_WFilDsc("ENV", FALSE);
    if (FilDsc == ERROR) {
       SystemError("Cannot open ENV file.\n");
-      exit(1); }/*if*/;
-   (void)fprintf((FILE *)FilDsc, "%d\n", num_EnvVarS);
+      exit(1);
+   }
+   (void) fprintf((FILE *) FilDsc, "%d\n", num_EnvVarS);
    for (EnvVar = EnvVarS; EnvVar != NIL; EnvVar = EnvVar->Link) {
       Str = GetEnv(EnvVar->Name);
-      if (Str == NIL) Str = EnvVar->Default;
-      (void)fprintf((FILE *)FilDsc, "%s=%s\1\n", EnvVar->Name, Str); }/*for*/;
+      if (Str == NIL)
+         Str = EnvVar->Default;
+      (void) fprintf((FILE *) FilDsc, "%s=%s\1\n", EnvVar->Name, Str);
+   }
    Close(FilDsc);
-   }/*Write_ENV*/
+}
 
+static tp_InpSpc InpSpcS = NIL;
+static tp_InpSpc LastInpSpc = NIL;
+int num_InpSpcS = 0;
 
-static tp_InpSpc		InpSpcS = NIL;
-static tp_InpSpc		LastInpSpc = NIL;
-int			num_InpSpcS = 0;
-
-
-tp_InpSpc
-New_InpSpc()
+tp_InpSpc New_InpSpc(void)
 {
    tp_InpSpc InpSpc;
 
-   InpSpc = (tp_InpSpc)malloc(sizeof(tps_InpSpc));
-   /*select*/{
+   InpSpc = (tp_InpSpc) malloc(sizeof(tps_InpSpc));
+   {
       if (LastInpSpc == NIL) {
-	 InpSpcS = InpSpc;
-      }else{
-	 LastInpSpc->Link = InpSpc; };}/*select*/;
+         InpSpcS = InpSpc;
+      } else {
+         LastInpSpc->Link = InpSpc;
+      }
+   }
    LastInpSpc = InpSpc;
    InpSpc->ISKind = NIL;
    InpSpc->FilTyp = NIL;
@@ -304,20 +274,14 @@ New_InpSpc()
    InpSpc->Link = NIL;
    num_InpSpcS++;
    return InpSpc;
-   }/*New_InpSpc*/
+}
 
-
-static tp_FilTyp
-InpSpc_FilTyp(InpSpc)
-   tp_InpSpc InpSpc;
+static tp_FilTyp InpSpc_FilTyp(tp_InpSpc InpSpc)
 {
    return InpSpc->FilTyp;
-   }/*InpSpc_FilTyp*/
+}
 
-
-void
-Write_InpSpcs(DRVGRF_FILE, DG_C_FILE)
-   FILE *DRVGRF_FILE, *DG_C_FILE;
+void Write_InpSpcs(FILE * DRVGRF_FILE, FILE * DG_C_FILE)
 {
    tp_InpSpc InpSpc;
    int iFilTyp, iPrmTyp, iInpSpc, iNext;
@@ -325,21 +289,19 @@ Write_InpSpcs(DRVGRF_FILE, DG_C_FILE)
    tps_Str sStr;
 
    DG_FOREACH(InpSpc)
-      DG_ENTRY(InpSpc,FilTyp,FilTyp);
-      DG_ENTRY(InpSpc,PrmTyp,PrmTyp);
-      (void)strcpy(sStr, ((InpSpc->Str == NIL) ? "\2" : InpSpc->Str));
-      DG_ENTRY(InpSpc,InpSpc,InpSpc);
-      DG_ENTRY(InpSpc,Next,InpSpc);
-      DG_ENTRY_SEPARATOR();
-      (void)fprintf(DRVGRF_FILE, "%d %d %d .%s\1 %d %d %d\n",
-       InpSpc->ISKind, iFilTyp, iPrmTyp, sStr, InpSpc->IsEnvVar,
-       iInpSpc, iNext);
-      (void)sprintf(sStr, ((InpSpc->Str == NIL) ? "0" : "\"%s\""),
-		    InpSpc->Str);
-      (void)fprintf(DG_C_FILE, "{%d, %s, %s, %s, %d, %s, %s}",
-       InpSpc->ISKind, sFilTyp, sPrmTyp, sStr, InpSpc->IsEnvVar,
-       sInpSpc, sNext);
-      DG_END_FOREACH(InpSpc);
-   }/*Write_InpSpcs*/
-
-
+       DG_ENTRY(InpSpc, FilTyp, FilTyp);
+   DG_ENTRY(InpSpc, PrmTyp, PrmTyp);
+   (void) strcpy(sStr, ((InpSpc->Str == NIL) ? "\2" : InpSpc->Str));
+   DG_ENTRY(InpSpc, InpSpc, InpSpc);
+   DG_ENTRY(InpSpc, Next, InpSpc);
+   DG_ENTRY_SEPARATOR();
+   (void) fprintf(DRVGRF_FILE, "%d %d %d .%s\1 %d %d %d\n",
+                  InpSpc->ISKind, iFilTyp, iPrmTyp, sStr, InpSpc->IsEnvVar,
+                  iInpSpc, iNext);
+   (void) sprintf(sStr, ((InpSpc->Str == NIL) ? "0" : "\"%s\""),
+                  InpSpc->Str);
+   (void) fprintf(DG_C_FILE, "{%d, %s, %s, %s, %d, %s, %s}",
+                  InpSpc->ISKind, sFilTyp, sPrmTyp, sStr, InpSpc->IsEnvVar,
+                  sInpSpc, sNext);
+   DG_END_FOREACH(InpSpc);
+}

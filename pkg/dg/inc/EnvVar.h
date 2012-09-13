@@ -9,6 +9,6 @@ typedef struct _tps_EnvVar {
    boolean IsFile;
    int Index;
    tp_EnvVar Link;
-   }				tps_EnvVar;
+} tps_EnvVar;
 
 #endif

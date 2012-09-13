@@ -12,6 +12,6 @@ typedef struct _tps_ExecSpc {
    tps_InpFilHdrs InpFilHdrs;
    int NumOuts;
    tps_OutFilHdrs OutFilHdrs;
-   }				tps_ExecSpc;
+} tps_ExecSpc;
 
 #endif

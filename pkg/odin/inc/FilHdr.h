@@ -26,6 +26,6 @@ typedef struct _tps_FilHdr {
    tp_Status DepStatus;
    tp_Date DepModDate;
    boolean PndFlag, ElmNamePndFlag, ElmPndFlag;
-   }				tps_FilHdr;
+} tps_FilHdr;
 
 #endif
