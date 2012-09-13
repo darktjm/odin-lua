@@ -71,7 +71,8 @@ int Gen_InStub(tp_FilDsc FilDsc, tp_Nod Root)
       Writeln(FilDsc, "         break; }");
    }
    Writeln(FilDsc, "      default: {");
-   Writeln(FilDsc, "         FATALERROR(\"Unexpected message type\"); }}");
+   Writeln(FilDsc,
+           "         FATALERROR(\"Unexpected message type\"); }}");
    Writeln(FilDsc, "   }");
 }
 
@@ -255,6 +256,7 @@ int Write_SplitInMsg(tp_FilDsc FilDsc, tp_Nod MsgNod)
             Write(FilDsc, ",");
          IsFirst = FALSE;
          Writeln(FilDsc, "");
+         Write(FilDsc, "   ");
          ArgTypeNod = Nod_Son(3, ArgDclNod);
          {
             if (Nod_NodTyp(ArgTypeNod) == NOD_pointer) {
@@ -263,6 +265,7 @@ int Write_SplitInMsg(tp_FilDsc FilDsc, tp_Nod MsgNod)
                Write_NodSym(FilDsc, ArgTypeNod);
             }
          }
+         Write(FilDsc, " ");
          Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
       }
    }
@@ -352,14 +355,17 @@ int Write_OutMsg(tp_FilDsc FilDsc, tp_Nod MsgNod, int MsgNum,
          Write(FilDsc, ",");
       IsFirst = FALSE;
       Writeln(FilDsc, "");
+      Write(FilDsc, "   ");
       ArgTypeNod = Nod_Son(3, ArgDclNod);
       {
          if (Nod_NodTyp(ArgTypeNod) == NOD_pointer) {
             Write_NodSym(FilDsc, Nod_Son(1, ArgTypeNod));
+            Write(FilDsc, "*");
          } else {
             Write_NodSym(FilDsc, ArgTypeNod);
          }
       }
+      Write(FilDsc, " ");
       Write_NodSym(FilDsc, Nod_Son(4, ArgDclNod));
    }
    {

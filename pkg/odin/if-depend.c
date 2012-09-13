@@ -20,8 +20,7 @@ geoff@boulder.colorado.edu
 #include "inc/Status_.h"
 #include "inc/Str.h"
 
-static void Get_ElmReport(GMC_P1(tp_FilDsc) GMC_PN(tp_FilHdr)
-                          GMC_PN(boolean) GMC_PN(tp_Status));
+static void Get_ElmReport(tp_FilDsc, tp_FilHdr, boolean, tp_Status);
 
 static void
 Do_Report(tp_FilDsc ReportFD,

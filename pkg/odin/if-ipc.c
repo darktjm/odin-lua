@@ -45,7 +45,7 @@ boolean IsClient = FALSE;
 boolean IPC_Do_Return = FALSE;
 static int IPC_Nesting = 0;
 
-void (*IPC_Action) (GMC_P1(int *)GMC_PN(char *));
+void (*IPC_Action) (int *, char *);
 
 static int ListenFD = -1;
 static int ServerFD = -1;

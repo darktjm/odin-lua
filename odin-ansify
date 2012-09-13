@@ -3,9 +3,13 @@
 #       until no more changes are made
 # note: uses GNU indent and GNU sed (-i)
 find pkg -type f \( -name '*.[ch]' -o -name \*.hh \) -print | while read x; do
+  # following 2 are not really C; they just look like it.
+  test "$x" = pkg/odin/if-stub.c && continue
+  test "$x" = pkg/odin/scan.h && continue
   sed -i '# get rid of pre-c89 function def support
           s/GMC_DCL *([^()"]*)//g;
           s/GMC_ARG *(\([^(),"]*\),\([^(),"]*\))/\1 \2/g;
+	  s/GMC_P1(\([^)]*\))/\1/g;s/GMC_PN(\([^)]*\))/,\1/g;
 	  s/GMC_ARG_VOID/void/g;
 	  # texscan.c uses a different syntax
 	  s/(T\(([^)]*\))/\1/;s/ D(.*//;
@@ -19,7 +23,7 @@ find pkg -type f \( -name '*.[ch]' -o -name \*.hh \) -print | while read x; do
   # Odin source.  -kr isn't really my style either, but at least it's
   # a "standard".  As a compromise, I'll keep the 3-space indentation.
   # note: if-stub.c needs to remain formatted as is for ipcgen
-  test "$x" = pkg/odin/if-stub.c || indent -kr -sob -i3 -nut "$x"
+  indent -kr -sob -i3 -nut "$x"
   # some post-processing
   sed -i '# get rid of superfluous ;
           # these are OK only after struct defs and compound initializer,
@@ -34,7 +38,7 @@ done
 find -name '*~' -exec rm {} \;
 # One last little bit of cleanup for removing non-ANSI fun decls
 sed -i '/__STDC__/,/#endif/d' pkg/odin/inc/GMC.h pkg/tex/texscan.c
-sed -i '/GMC_ARG/,/")"/{/Write(/d;}' pkg/odin/ipcgen/ig-gen.c
+sed -i '/GMC_ARG/,/")"/{s/",/"/;s/\(" *\)[A-Z_()]*"/\1"/;/""/d;}' pkg/odin/ipcgen/ig-gen.c
 # technically, the entire loop should be removed.  Hopefully the optimizier
 # will take care of that.
 sed -i '/GMC_DCL/,/")"/d' pkg/odin/ipcgen/ig-gen.c
@@ -44,6 +48,7 @@ sed -i '/GMC_DCL/,/")"/d' pkg/odin/ipcgen/ig-gen.c
 # (at least for ansification)
 find pkg -name \*.c | while read x; do      
   test "$x" = pkg/odin/if-stub.c && continue
+  test "$x" = pkg/odin/scan.h && continue
   # this sed script cannot possibly work everywhere, but it will work
   # on odin sources
   scr='# find what looks like a function def: type name (...

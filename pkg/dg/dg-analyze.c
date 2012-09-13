@@ -51,8 +51,8 @@ static int num_BackOrdered_FilTypS = 0;
 
 static tp_PrmTypLst GenericMapPrmTypLst = NIL;
 
-static void Set_MapPrmTypLst(GMC_P1(boolean *) GMC_PN(tp_FilTyp));
-static void Set_DrvEdg_PrmTypLst(GMC_P1(boolean *) GMC_PN(tp_DrvEdg));
+static void Set_MapPrmTypLst(boolean *, tp_FilTyp);
+static void Set_DrvEdg_PrmTypLst(boolean *, tp_DrvEdg);
 
 static void Clear_Flags(void)
 {

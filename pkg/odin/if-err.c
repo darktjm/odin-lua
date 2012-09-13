@@ -25,7 +25,7 @@ geoff@boulder.colorado.edu
 #include "inc/GMC.h"
 #include "inc/Str.h"
 
-extern char *strerror(GMC_P1(int));
+extern char *strerror(int);
 
 extern tp_Str Author;
 

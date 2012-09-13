@@ -34,8 +34,7 @@ static tp_FilInp UsedFilInp = &_UsedFilInp;
 static tps_FilInp _FreeFilInp;
 static tp_FilInp FreeFilInp = &_FreeFilInp;
 
-static tp_FilHdr Do_InpSpc(GMC_P1(tp_FilHdr) GMC_PN(tp_FilPrm)
-                           GMC_PN(tp_InpSpc) GMC_PN(tp_Tool));
+static tp_FilHdr Do_InpSpc(tp_FilHdr, tp_FilPrm, tp_InpSpc, tp_Tool);
 
 void Init_FilInps(void)
 {

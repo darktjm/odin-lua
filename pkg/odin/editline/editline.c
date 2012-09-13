@@ -618,7 +618,7 @@ STATIC CHAR *search_hist(CHAR * search, MOVE move)
    static CHAR *old_search;
    int len;
    int pos;
-   int (*match) (GMC_P1(CONST char *)GMC_PN(CONST char *)GMC_PN(SIZE_T));
+   int (*match) (CONST char *, CONST char *, SIZE_T);
    char *pat;
 
    /* Save or get remembered search pattern. */

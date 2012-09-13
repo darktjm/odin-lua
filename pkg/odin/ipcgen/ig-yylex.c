@@ -56,6 +56,9 @@ int Init_Lex(void)
    Set_Sym_Att(Sym, TOK_int);
 }
 
+/*private*/ boolean
+ YY_IsWordChr(char Chr);
+
 int YY_Lex(void)
 {
    char Chr;
@@ -153,7 +156,7 @@ int YY_Lex(void)
 }
 
 /*private*/ boolean
-int YY_IsWordChr(char Chr)
+YY_IsWordChr(char Chr)
 {
    switch (Chr) {
    case '\0':

@@ -85,4 +85,4 @@ extern tp_Tool PntrHoTool;
 extern tp_Tool PntrElmTool;
 extern tp_Tool InternalPntrTool;
 extern tp_Tool TextDefTool;
-extern void (*IPC_Action) (GMC_P1(boolean *) GMC_PN(tp_Str));
+extern void (*IPC_Action) (boolean *, tp_Str);

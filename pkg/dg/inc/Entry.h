@@ -50,4 +50,4 @@ typedef char tps_EntryStr[20];
  if (!first_time) (void)fprintf(DG_C_FILE, ",\n  ")
 #define DG_END_FOREACH(x) \
  first_time = FALSE; } } \
- (void)fprintf(DG_C_FILE, " }\n")
+ (void)fprintf(DG_C_FILE, " };\n")

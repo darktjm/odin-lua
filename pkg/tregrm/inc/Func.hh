@@ -44,7 +44,7 @@ extern int GetChar(void);
 extern void Init_Lex(void);
 extern void EndLex(void);
 extern int YY_Lex(void);
-extern boolean IsNameChr(int);
+extern boolean IsNameChr(char);
 extern void ParseError(tp_Str);
 /* tregrm.yacc.c */
 extern tp_Nod YY_Parse(void);

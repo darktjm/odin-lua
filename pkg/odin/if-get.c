@@ -23,8 +23,7 @@ geoff@boulder.colorado.edu
 static int AnyOKDepth = 1;
 static int ElmDepth = 1;
 
-static void GetReqs(GMC_P1(tp_FilHdr) GMC_PN(boolean) GMC_PN(boolean)
-                    GMC_PN(int *));
+static void GetReqs(tp_FilHdr, boolean, boolean, int *);
 
 static boolean Is_CopyDone(tp_FilHdr FilHdr)
 {

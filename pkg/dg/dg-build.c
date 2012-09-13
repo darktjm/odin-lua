@@ -35,7 +35,7 @@ static tp_Str Banner = NIL;
 
 static tp_InpSpc NoInputInpSpc;
 
-static tp_InpSpc Nod_InpSpc(GMC_P1(tp_Nod) GMC_PN(tp_Tool));
+static tp_InpSpc Nod_InpSpc(tp_Nod, tp_Tool);
 
 void Init_InpSpcs(void)
 {
