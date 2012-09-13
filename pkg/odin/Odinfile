@@ -1,5 +1,5 @@
 %all! == <<
-   %install-rbs; ../tregrm%install; %install; %lint
+   %install-rbs; ../tregrm%install; %install
 
 %install! == <<
    %exe >$THORPKGS/odin/odin.exe
