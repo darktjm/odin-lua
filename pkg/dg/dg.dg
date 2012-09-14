@@ -25,9 +25,8 @@
 
 +pkg 'name of a package or a file containing package names'? => :cat;
 
-
 # Tools
 
-EXEC (dg_out.sh) (dg.exe) (:dg) (+pkg)
+EXEC (dg_out.lua) (dg.exe) (:dg :dir/..)@ (+pkg)
    => (:dg.log) (:c) (:dg.tab) (:dg.env);
 

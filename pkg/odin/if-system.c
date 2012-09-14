@@ -20,6 +20,8 @@ geoff@boulder.colorado.edu
 #include <errno.h>
 #include <signal.h>
 #include <pwd.h>
+#include "lualib.h"
+#include "lauxlib.h"
 
 #ifdef BSD_SIGNALS
 static int SigBlockMask;
@@ -177,11 +179,119 @@ void Lose_ControlTTY(void)
    (void) setsid();
 }
 
+static int lua_report(lua_State * L, int status)
+{
+   if (status && !lua_isnil(L, -1)) {
+      const char *msg = lua_tostring(L, -1);
+      if (msg == NULL)
+         msg = "(error object is not a string)";
+      fprintf((FILE *) StdOutFD, "%s\n", msg);
+      lua_pop(L, 1);
+   }
+   return status;
+}
+
+static int lua_dofile(lua_State * L, const char *name)
+{
+   int status = luaL_dofile(L, name);
+   return lua_report(L, status);
+}
+
+static int lua_dostring(lua_State * L, const char *s, const char *name)
+{
+   int status = luaL_loadbuffer(L, s, strlen(s), name)
+       || lua_pcall(L, 0, LUA_MULTRET, 0);
+
+   return lua_report(L, status);
+}
+
+static void lua_init_error(lua_State * L)
+{
+   lua_pushstring(L, "Lua initialization error");
+   lua_error(L);
+}
+
+static int lua_init(lua_State * L)
+{
+   lua_gc(L, LUA_GCSTOP, 0);    /* stop collector during init */
+   luaL_openlibs(L);
+   lua_gc(L, LUA_GCRESTART, 0);
+   {
+      const char *initv = "=ODIN_LUA_INIT", *init = GetEnv((tp_Str)initv + 1);
+
+      if (!init)
+         init = GetEnv((tp_Str)(initv = "=LUA_INIT") + 1);
+      if (init) {
+         if (init[0] == '@') {
+            if (lua_dofile(L, init + 1))
+               lua_init_error(L);
+         } else {
+            if (lua_dostring(L, init, initv))
+               lua_init_error(L);
+         }
+      }
+   }
+   /* easier than trying to locate an init file... */
+   lua_dostring(L,
+#include "inc/odin_builtin.lua.h"
+                "", "<odin_builtin>");
+   return 0;
+}
+
+static int lua_run(lua_State * L)
+{
+   char *const *ArgV = (char *const *) lua_touserdata(L, 1);
+   int narg;
+
+   for (narg = 0; ArgV[++narg];);
+   luaL_checkstack(L, narg + 3, "too many arguments to script");
+   for (narg = 0; ArgV[++narg];)
+      lua_pushstring(L, ArgV[narg]);
+   lua_createtable(L, narg + 1, 0);
+   for (narg = 0; ArgV[narg]; narg++) {
+      lua_pushstring(L, ArgV[narg]);
+      lua_rawseti(L, -2, narg);
+   }
+   lua_setglobal(L, "arg");
+   lua_dofile(L, ArgV[0]);
+   return 0;
+}
+
 int
 SystemExec(const char *Tool, char *const *ArgV, const char *LogFileName)
 {
    int pid, fd, status;
 
+   /* try to run as lua if non-executable and ends with .lua */
+   /* only do initialization once; fork() will take care of separation */
+   int run_lua = !IsExecutable((tp_FileName)Tool);
+   if (run_lua) {
+      int len = strlen(Tool);
+      if (len < 4 || strcmp(Tool + len - 4, ".lua"))
+         run_lua = 0;
+   }
+   static lua_State *L = NULL;
+   if (run_lua) {
+      /* if(LogLevel >= LOGLEVEL_ExecLine)
+         fprintf((FILE *)StdOutFD, "*** Running \"%s\" as Lua\n", Tool); */
+      if (!L) {
+         L = lua_open();
+         if (!L) {
+            SysCallError(StdOutFD, "lua_open");
+            return -1;
+         }
+         if (lua_cpcall(L, &lua_init, NULL)) {
+            if (!lua_isnil(L, -1)) {
+               const char *msg = lua_tostring(L, -1);
+               if (msg)
+                  fprintf((FILE *) StdOutFD, "*** %s\n", msg);
+            }
+            lua_close(L);
+            L = NULL;
+            return -1;
+         }
+      }
+   }
    pid = fork();
    if (pid == 0) {
       if (LogFileName != NIL) {
@@ -196,6 +306,19 @@ SystemExec(const char *Tool, char *const *ArgV, const char *LogFileName)
       }
       if (SigBlocked)
          Unblock_Signals();
+      /* try to run as lua if non-executable and ends with .lua */
+      /* otherwise, let execv report the error */
+      if (run_lua) {
+         int ret;
+         if ((ret = lua_cpcall(L, &lua_run, (void *) ArgV))
+             && !lua_isnil(L, -1)) {
+            const char *msg = lua_tostring(L, -1);
+            if (msg)
+               fprintf((FILE *) StdOutFD, "*** %s\n", msg);
+         }
+         lua_close(L);
+         exit(ret);
+      }
       (void) execv(Tool, ArgV);
       SysCallError(StdOutFD, "execv");
       _exit(1);

@@ -190,6 +190,8 @@ Local_Do_Build(tp_JobID JobID,
    ClearDir(JobDirName);
    FileName = (MaxBuilds > 1 ? LogFileName : NIL);
    Build->BuildID = SystemExec(BuildArgV[0], BuildArgV, FileName);
+   if (Build->BuildID <= 0)
+      Build_Done(Build, TRUE);
    ChangeDir(&Abort, OldCWD);
    FORBIDDEN(Abort);
 }

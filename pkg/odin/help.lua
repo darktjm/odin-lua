@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env lua
 
-cat << EOF
+io.write [[
    !:quit
    OdinExpr
       HostFile
@@ -23,6 +23,4 @@ cat << EOF
    Variable =
    Variable = Value
    Variable = !Value
-EOF
-
-exit 0
+]]

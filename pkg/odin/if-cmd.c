@@ -43,6 +43,7 @@ Execute(boolean * AbortPtr,
       return;
    }
 
+   /* no point in trying Lua here; the user can just use the lua cmd directly */
    InFD = FileName_RFilDsc(FileName, FALSE);
    if (InFD == ERROR) {
       SystemError("\"%s\": cannot read.\n", FileName);

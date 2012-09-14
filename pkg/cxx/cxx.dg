@@ -98,7 +98,7 @@ COLLECT (:cxx)
 READ-LIST (:cxx.sm)
    => (:cxx.sm.list);
 
-EXEC (cxx_inc.sh) (:FILE) (:FILE :dir)@ (+home)@ (+inc_sp) (+ignore)
+EXEC (cxx_inc.lua) (:FILE) (:FILE :dir)@ (+home)@ (+inc_sp) (+ignore)
    => (:cxx_inc.view_desc);
 
 COLLECT (:cxx_inc.view_desc :view)
@@ -107,12 +107,12 @@ COLLECT (:cxx_inc.view_desc :view)
 COLLECT (:cxx_inc :map=:all_cxx_inc) (:cxx_inc)
    => (:all_cxx_inc);
 
-EXEC (CC.sh) (:cxx) (ptr_of :vir_dir) (:cxx :dir)@ (+inc_sp)
- (+gnu) (+debug) (+prof) (+optimize) (+define) (+cxx) (+cxx_flags) (abort_msgs)
+EXEC (CC.lua) (:cxx) (ptr_of :vir_dir) (:cxx :dir)@ (+inc_sp)
+ (+gnu) (+debug) (+prof) (+optimize) (+define) (+cxx) (+cxx_flags)
  NEEDS (:cxx +home=(:cxx :dir) :lookup=:all_cxx_inc)
    => (:o);
 
-EXEC (ld.sh) (:o_of :vir_dir) (:library_flags) (ptr_of :vir_dir)
+EXEC (ld.lua) (:o_of :vir_dir) (:library_flags) (ptr_of :vir_dir)
  (+define) (+inc_sp) (+gnu) (+purify) (+debug) (+prof) (+eprof)
  (+cxx) (+ld_flags)
  NEEDS (:o_of :vir_tgt.list) (:libraries) (:cxx.exe.list)@

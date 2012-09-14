@@ -58,13 +58,13 @@ READ-LIST (:sm)
 COLLECT (:sm.list :recurse=:sm.list)
    => (:code.list);
 
-EXEC (o_of.sh) (:code.list :map=:o_src :ls) (:code.list :map=:o :ls)
+EXEC (o_of.lua) (:code.list :map=:o_src :ls) (:code.list :map=:o :ls)
    => (:o_of);
 
-EXEC (ar.sh) (:o_of :vir_dir) NEEDS (:o_of :vir_tgt.list)
+EXEC (ar.lua) (:o_of :vir_dir) NEEDS (:o_of :vir_tgt.list)
    => (:a);
 
-EXEC (libraries.sh) (+lib) (+lib_sp) NEEDS (:libraries.view_desc :libraries)&
+EXEC (libraries.lua) (+lib) (+lib_sp) NEEDS (:libraries.view_desc :libraries)&
    => (:libraries.view_desc) (:library_flags);
 
 COLLECT (:libraries.view_desc :view)

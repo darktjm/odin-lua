@@ -210,7 +210,7 @@ COMPUTE-VIEW (:view_spec)
 APPLY (:OBJECT) (+apply)
    => (:apply);
 
-EXEC '/bin/cp' (help.sh) odin_help
+EXEC '/bin/cp' (help.lua) odin_help
    => (:odin_help);
 
 PREFIXHELP (:OBJECT)

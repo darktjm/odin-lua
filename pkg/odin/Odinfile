@@ -22,9 +22,9 @@
 
 %src-files == %exe :depend :ls +cmd=egrep -v "ODIN|os9|boot|dg\/if|h\$" :stdout
 
-%exe == %odin.c.sm +ignore=\\.hh\$ +(%extra-lib) :exe
+%exe == %odin.c.sm +ignore=\\.hh\$ +lib=lua +(%extra-lib) :exe
 
-%rbs-exe == %rbs.c.sm +ignore=\\.hh\$ +(%extra-lib) :exe
+%rbs-exe == %rbs.c.sm +ignore=\\.hh\$ +lib=lua +(%extra-lib) :exe
 
 %extra-lib == %el-script +cmd=sh :stdout
 
@@ -53,3 +53,6 @@
 
 version == \
    inc/Version.h  +cmd='sed \'s/^.*VERSION_STR "\\(.*\\)"/\\1/\'' :stdout
+
+odin_builtin.lua.h == \
+   odin_builtin.lua +cmd='sed \'s/["\\]/\\\\&/g;s/^/"/;s/$/\\\\n"/\'' :stdout

@@ -25,6 +25,6 @@
 
 # Tools
 
-EXEC (f_obj.sh) (:f) (+debug) (+prof) (+f77_home) (+f77) (+f77_flags)
+EXEC (f_obj.lua) (:f) (+debug) (+prof) (+f77_home) (+f77) (+f77_flags)
    => (:o);
 

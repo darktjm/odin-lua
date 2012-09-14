@@ -13,5 +13,5 @@
 
 # Tools
 
-EXEC (dbx.sh) (:exe) (+core) (+gnu) 
+EXEC (dbx.lua) (:exe) (+core) (+gnu) 
    => (:dbx);

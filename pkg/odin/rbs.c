@@ -275,6 +275,11 @@ int main(int argc, char **argv)
                ClearDir(JobDirName);
                Build->BuildID =
                    SystemExec(BuildArgV[0], BuildArgV, LogFileName);
+	       if(Build->BuildID <= 0) {
+		  RBS_Write_Int(JobID);
+		  RBS_Write_Int(1);
+		  Build->BuildID = Build->JobID = 0;
+	       }
                break;
             }
          case 4:{
