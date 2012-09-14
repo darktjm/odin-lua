@@ -1,0 +1,10 @@
+#!/bin/sh
+
+test -f configure || autoconf
+odin pkg/odin/inc/{Nod,Tok,OC_Nod}Typ_.h
+odin pkg/{odin/ipcgen,dg,tregrm}/inc/{Nod,Tok}Typ_.h
+for x in dg odin odin/ipcgen; do
+  test -f pkg/$x/inc/Func.hh || touch pkg/$x/inc/Func.hh
+done
+test -f pkg/tregrm/tregrm-yacc.c.dflt || touch pkg/tregrm/tregrm-yacc.c.dflt
+odin pkg/tregrm/tregrm-yacc.c && cp -f pkg/tregrm/tregrm-yacc.c{,.dflt}

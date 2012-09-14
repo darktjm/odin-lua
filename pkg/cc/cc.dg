@@ -106,6 +106,5 @@ EXEC (ld.sh) (:o_of :vir_dir) (:library_flags)
 EXEC (fmt.c.sh) (:c)
    => (:fmt);
 
-EXEC (c.h.sh) (:c) (:c :dir)@ (header_c.sed)
+EXEC (c.h.sh) (:c) (:c :dir)@ (+inc_sp) (+define)
    => (:c.h);
-

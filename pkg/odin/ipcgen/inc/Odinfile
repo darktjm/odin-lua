@@ -4,3 +4,7 @@ TokTyp_.h == ../ipcgen.ygi :tok.h
 
 NodTyp_.h == ../ipcgen.ygi :nod.h
 
+Func.hh == \
+() +cmd=sed -e '/tp_SKind/d' (\
+   () +cmd=sed -e 's/$/:c.h/' (..%ipcgen.c.sm :code.list :ls) :stdout\
+      :list :cat) :stdout

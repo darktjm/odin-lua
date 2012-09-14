@@ -1,3 +1,6 @@
+Func.hh == \
+   () +cmd=sed -e 's/$/:c.h/' (..%odin.c.sm :code.list :ls) :stdout :list :cat
+
 TokTyp_.h == ../fsys.ygi,c :tok.h
 
 NodTyp_.h == ../fsys.ygi,c :nod.h
