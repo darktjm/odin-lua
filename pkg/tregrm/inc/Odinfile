@@ -2,3 +2,7 @@
 
 TokTyp_.h == ../tregrm.ygi :tok.h +default=(TokTyp_.h.dflt) :boot
 NodTyp_.h == ../tregrm.ygi :nod.h +default=(NodTyp_.h.dflt) :boot
+Func.hh == \
+() +cmd=sed -e '/tp_SKind/d' (\
+   () +cmd=sed -e 's/$/:c.h/' (..%tregrm.c.sm :code.list :ls) :stdout\
+      :list :cat) :stdout
