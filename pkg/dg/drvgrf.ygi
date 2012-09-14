@@ -116,7 +116,7 @@ Root
 
 Operation
    -> ParameterType ParameterValues?		=> "NOD_PrmOpr"
-   -> ParameterType FileArg			=> "NOD_AplOpr"
+   -> '+' FileArg				=> "NOD_AplOpr"
    -> ObjectType				=> "NOD_DrvOpr"
    -> ObjectType '=' ObjectType			=> "NOD_SecOrdDrvOpr"
    -> '/' VarWord				=> "NOD_SelOpr"
