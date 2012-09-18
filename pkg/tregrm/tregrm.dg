@@ -28,5 +28,5 @@
 
 # Tools
 
-EXEC (ygt.sh) (:ygi) (+yaccid) (tregrm.exe)
+EXEC (ygt.lua) (:ygi) (+yaccid) (tregrm.exe)
    => (:y) (:nod.h) (:tok.h) (:ygi.log);

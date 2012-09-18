@@ -23,10 +23,6 @@ end
 flags=flags .. " " .. getenv("ODIN_CPP_FLAGS")
 
 ODIN_CPP = getenv("ODIN_CPP")
-if getenv("ODINVERBOSE") ~= "" then
-   print(getenv("ODINRBSHOST") .. ODIN_CPP .. flags .. ' ' .. apr.filepath_name(ODIN_FILE))
-end
+odin_log(ODIN_CPP .. flags .. ' ' .. apr.filepath_name(ODIN_FILE))
 
-runcmd(ODIN_CPP .. flags, {ODIN_FILE, stdout = true})
-
-apr.file_rename("MESSAGES", ODIN_cpp)
+runcmd(ODIN_CPP .. flags, {ODIN_FILE, stdout = ODIN_cpp})

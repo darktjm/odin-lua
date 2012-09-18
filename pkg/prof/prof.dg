@@ -12,5 +12,5 @@
 
 # Tools
 
-EXEC (profile.sh) (:exe) (+prof_data :ls) (+prof_flags) NEEDS (+prof_data)
+EXEC (profile.lua) (:exe) (+prof_data :ls) (+prof_flags) NEEDS (+prof_data)
    => (:profile);

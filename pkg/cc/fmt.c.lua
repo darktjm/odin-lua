@@ -5,9 +5,7 @@ if not runcmd then
    dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
 
-if getenv("ODINVERBOSE") ~= "" then
-   print(getenv("ODINRBSHOST") .. "indent " .. apr.filepath_name(arg[1]))
-end
+odin_log("indent " .. apr.filepath_name(arg[1]))
 
 -- indent is brain-damaged. always returns non-zero status
 -- tjm: original version did not have -o, but GNU indent requires it

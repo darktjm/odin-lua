@@ -14,11 +14,18 @@
 %lint! == <<
    %odin.c.sm +debug +ignore=\\.hh\$ +stub=(extra.c) :lint >
 
-%etags! == !<<
-#!/bin/csh
-   etags ipcgen/ig-gen.c *.c ../dg/*.c {inc,../dg/inc}/*.{h,hh}
+%ctags! == !<<
+#!/bin/sh
+   ctags ipcgen/ig-gen.c *.c ../dg/*.c {inc,../dg/inc}/*.{h,hh}
 
-%size == () +cmd= wc `cat (%src-files)` :stdout
+%size == () +cmd='args={}\
+                  for f in io.lines(trim([['(%src-files)']])) do \
+                     if apr.stat(f, "type") == "file" then\
+		        table.insert(args, f)\
+		     end\
+		  end\
+		  args.stdout = "stdout"\
+		  runcmd("wc", args)' :lua_output/stdout
 
 %src-files == %exe :depend :ls +match='ODIN|os9|boot|dg/if|h$' +hide_match :regsub
 
@@ -26,12 +33,17 @@
 
 %rbs-exe == %rbs.c.sm +ignore=\\.hh\$ +lib=lua +(%extra-lib) :exe
 
-%extra-lib == %el-script +cmd=sh :stdout
+%extra-lib == () +cmdfile=(%el-script) :lua_stdout
 
 %el-script == <<
-   if [ $ODINBOOT_CONFIG ] ; then echo $ODINBOOT_SOCKET_LIBS_PRM;
-      elif [ -f /usr/lib/libsocket.* ] ; then echo '+lib=socket +lib=nsl';
-      else true; fi
+   if getenv("ODINBOOT_CONFIG") ~= "" then
+      io.write(getenv("ODINBOOT_SOCKET_LIBS_PRM"))
+   else
+      for f in apr.glob("/usr/lib/libsocket.*") do
+         io.write("+lib=socket +lib=nsl")
+	 break
+      end
+   end
 
 %odin.c.sm == <<
    if-bcast.c; if-candrv.c; if-build.c; if-client.c; if-cmd.c;

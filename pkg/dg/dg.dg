@@ -28,5 +28,6 @@
 # Tools
 
 EXEC (dg_out.lua) (dg.exe) (:dg :dir/..)@ (+pkg)
+     NEEDS (+pkg +prefix=(:dg :dir/..) +subst='.*/\\/&\\/&.dg' :regsub :list)
    => (:dg.log) (:c) (:dg.tab) (:dg.env);
 

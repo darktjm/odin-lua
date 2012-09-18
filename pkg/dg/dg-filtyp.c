@@ -481,7 +481,7 @@ void Write_FilTyps(FILE * DRVGRF_FILE, FILE * DG_C_FILE)
    (void) fprintf(DRVGRF_FILE, ".%s\1 %d %d\n",
                   SrcTyp->Pattern, SrcTyp->IsPrefix, iFilTyp);
    (void) fprintf(DG_C_FILE, "{\"%s\", %d, %s}",
-                  SrcTyp->Pattern, SrcTyp->IsPrefix, sFilTyp);
+                  C_Esc(SrcTyp->Pattern), SrcTyp->IsPrefix, sFilTyp);
    DG_END_FOREACH(SrcTyp);
 
    DG_FOREACH(FilTyp)
@@ -503,7 +503,7 @@ void Write_FilTyps(FILE * DRVGRF_FILE, FILE * DG_C_FILE)
                   FilTyp->IsGrouping, FilTyp->IsGroupingInput);
    (void) fprintf(DG_C_FILE,
                   "{%d, \"%s\", \"%s\", %d, %s, %s, %s, %s, %s, %s, %s, %d, %d, %d, 0, 0, 0, %d}",
-                  FilTyp->FTClass, FilTyp->FTName, FilTyp->Desc,
+                  FilTyp->FTClass, C_Esc(FilTyp->FTName), C_Esc(FilTyp->Desc),
                   FilTyp->HelpLevel, sArgFilTyp, sTool, sMemEdg, sEqvEdg,
                   sCastEdg, sDrvEdg, sMapPrmTypLst, FilTyp->IsCopy,
                   FilTyp->IsGrouping, FilTyp->IsGroupingInput,

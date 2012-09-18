@@ -210,8 +210,8 @@ void Write_EnvVars(FILE * DRVGRF_FILE, FILE * DG_C_FILE)
                   EnvVar->Name, EnvVar->Desc, EnvVar->HelpLevel,
                   EnvVar->Default, EnvVar->IsFile);
    (void) fprintf(DG_C_FILE, "{\"%s\", \"%s\", %d, \"%s\", %d}",
-                  EnvVar->Name, EnvVar->Desc, EnvVar->HelpLevel,
-                  EnvVar->Default, EnvVar->IsFile);
+                  C_Esc(EnvVar->Name), C_Esc(EnvVar->Desc), EnvVar->HelpLevel,
+                  C_Esc(EnvVar->Default), EnvVar->IsFile);
    DG_END_FOREACH(EnvVar);
 
    DG_FOREACH(EnvVarLst)
@@ -299,7 +299,7 @@ void Write_InpSpcs(FILE * DRVGRF_FILE, FILE * DG_C_FILE)
                   InpSpc->ISKind, iFilTyp, iPrmTyp, sStr, InpSpc->IsEnvVar,
                   iInpSpc, iNext);
    (void) sprintf(sStr, ((InpSpc->Str == NIL) ? "0" : "\"%s\""),
-                  InpSpc->Str);
+                  C_Esc(InpSpc->Str));
    (void) fprintf(DG_C_FILE, "{%d, %s, %s, %s, %d, %s, %s}",
                   InpSpc->ISKind, sFilTyp, sPrmTyp, sStr, InpSpc->IsEnvVar,
                   sInpSpc, sNext);

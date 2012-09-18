@@ -6,9 +6,9 @@
 %lint! == <<
    %dg-lint.c.sm +debug +ignore=\\.hh\$ :lint >
 
-%etags! == !<<
+%ctags! == !<<
 #!/bin/sh
-   etags ../odin/if-err.c ../odin/if-file.c ../odin/if-io.c \
+   ctags ../odin/if-err.c ../odin/if-file.c ../odin/if-io.c \
      ../odin/if-nod.c ../odin/if-symbol.c if-*.c dg-*.c 
 
 %odin-install! == <<
@@ -26,9 +26,9 @@
    dg-main.c; dg-prmtyp.c; dg-tool.c; dg-valid.c; dg-yylex.c
    dg-yacc.c; if-drvpth.c; if-ft.c; if-lvl.c
 
-   == () +cmd='if [ "$ODINBOOT" = "" ] ; then echo "\
+   == () +cmd='if getenv("ODINBOOT") == "" then io.write([[\
 dg-yacc.c == drvgrf.ygi :c \
-   "; fi' :stdout
+   ]]) end' :lua_stdout
 
 version == \
    inc/DG_Version.h  +subst='^.*VERSION_STR "(.*)"/\\1' :regsub

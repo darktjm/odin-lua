@@ -1,12 +1,11 @@
 #!/usr/bin/env lua
 
-ODIN_src, ODIN_o = unpack(arg)
-
 -- in case run from cmd line, grab built-ins
 if not runcmd then
    dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
 
+ODIN_src, ODIN_o = unpack(arg)
 
 cmdargs = { }
 objs =
@@ -17,11 +16,9 @@ for f in d:entries("name") do
 end
 d:close()
 
-if getenv("ODINVERBOSE") ~= "" then
-   print(getenv("ODINRBSHOST") .. 'ar qcv out.a' .. objs)
-end
+odin_log('ar qcv out.a' .. objs)
 
-cmdargs.stdout = true
+cmdargs.stdout = 'MESSAGES'
 goterr = not runcmd('ar qcv a', cmdargs)
 
 if not goterr then

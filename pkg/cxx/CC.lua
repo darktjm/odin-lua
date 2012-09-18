@@ -1,15 +1,15 @@
 #!/usr/bin/env lua
 
+-- in case run from cmd line, grab built-ins
+if not runcmd then
+   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+end
+
 ODIN_source, ODIN_ptr,
 ODIN_dir, ODIN_incsp, ODIN_gnu,
 ODIN_debug, ODIN_prof, ODIN_optimize,
 ODIN_define, ODIN_cxx, ODIN_flags,
 ODIN_abort = unpack(arg)
-
--- in case run from cmd line, grab built-ins
-if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
-end
 
 path = apr.filepath_list_split(getenv("PATH"));
 if getenv("ODIN_CXX_HOME") ~= "" then
@@ -50,9 +50,7 @@ end
 if ODIN_flags ~= "" then flags = flags .. " " .. wholefile(ODIN_flags) end
 flags=flags .. " " .. getenv("ODIN_CXX_FLAGS")
 
-if getenv("ODINVERBOSE") ~= "" then
-   print(getenv("ODINRBSHOST") .. compiler .. flags .. " -c " .. apr.filepath_name(ODIN_source))
-end
+odin_log(compiler .. flags .. " -c " .. apr.filepath_name(ODIN_source))
 
 -- emulate old unsafe behavior for cmd line options, but quote ODIN_source
 if not runcmd(compiler .. flags , {'-c', ODIN_source}) then

@@ -1,13 +1,13 @@
 #!/usr/bin/env lua
 
-ODIN_o, ODIN_lib, ODIN_home,
-ODIN_gnu, ODIN_purify, ODIN_debug,
-ODIN_prof, ODIN_eprof, ODIN_cc, ODIN_flags = unpack(arg)
-
 -- in case run from cmd line, grab built-ins
 if not runcmd then
    dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
+
+ODIN_o, ODIN_lib, ODIN_home,
+ODIN_gnu, ODIN_purify, ODIN_debug,
+ODIN_prof, ODIN_eprof, ODIN_cc, ODIN_flags = unpack(arg)
 
 path = apr.filepath_list_split(getenv("PATH"));
 if getenv("ODIN_CC_HOME") ~= "" then
@@ -43,19 +43,17 @@ flags=flags .. " " .. getenv("ODIN_CC_FLAGS")
 libs=""
 if ODIN_lib ~= "" then libs=wholefile(ODIN_lib) end
 
-if getenv("ODINVERBOSE") ~= "" then
-   print(getenv("ODINRBSHOST") .. compiler .. flags .. " " .. objs .. " " .. libs .. " -o exe\n")
-end
+odin_log(compiler .. flags .. " " .. objs .. " " .. libs .. " -o exe")
 
 cwd = apr.filepath_get(1)
 exe=apr.filepath_merge(cwd, "exe", 'native')
 table.insert(args, '-o')
 table.insert(args, exe)
-args.stdout = 1
+args.stdout = 'MESSAGES'
 args.chdir = ODIN_o
 runcmd(compiler .. flags .. libs, args)
 msg = io.open("MESSAGES")
-if msg then io.write(msg:read('*a')) end
+if msg then io.write(msg:read('*a')); msg:close() end
 
 if ODIN_purify ~= "" then
    odir = apr.dir_open(ODIN_o)

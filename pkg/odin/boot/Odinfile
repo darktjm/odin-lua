@@ -4,12 +4,10 @@
 client-yacc.c == ../client.ygi,c +yaccid=oc :c \
    +match='extern char' '^# *line' +hide_match :regsub
 
-default-dg.c == () +cmd=(../../dg%exe) (../../PKGLST) (../..) 0 \
-   +need=(../../PKGLST +subst='.*/&\\/&.dg' :regsub:list) \
-   :output/DG.c
+default-dg.c == (../odin.dg) +pkg=(../../PKGLST) :c
 
 fsys-yacc.c == ../fsys.ygi,c :c \
-   +match='extern char' '^# *line' +hide_match :regsub :stdout
+   +match='extern char' '^# *line' +hide_match :regsub
 
 stub-in.c == ../if-stub.c +cmd=(../ipcgen%exe) :output/IN.c
 

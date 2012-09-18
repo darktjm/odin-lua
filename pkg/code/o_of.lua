@@ -1,11 +1,11 @@
 #!/usr/bin/env lua
 
-ODIN_src, ODIN_o = unpack(arg)
-
 -- in case run from cmd line, grab built-ins
 if not runcmd then
    dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
+
+ODIN_src, ODIN_o = unpack(arg)
 
 o_f = io.open(ODIN_o)
 o_of = io.open("o_of", "w")

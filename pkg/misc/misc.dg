@@ -31,21 +31,21 @@
 READ-LIST (:FILE)
    => (:list);
 
-EXEC (redo.sh) (:OBJECT :name)
+EXEC (redo.lua) (:OBJECT :name)
    => (:redo);
 
-EXEC (redo_errs.sh) (:err)
+EXEC (redo_errs.lua) (:err)
    => (:redo_errs);
 
-EXEC (boot.sh) (:FILE)& (+default)
+EXEC (boot.lua) (:FILE)& (+default)
    => (:boot_name);
 
 READ-LIST (:boot_name)
    => (:boot);
 
-EXEC (diff.sh) (:FILE) (+other)
+EXEC (diff.lua) (:FILE) (+other)
    => (:diff);
 
-EXEC (rcp.sh) (:FILE) (+f_dest) (+d_dest)
+EXEC (rcp.lua) (:FILE) (+f_dest) (+d_dest)
    => (:rcp);
 

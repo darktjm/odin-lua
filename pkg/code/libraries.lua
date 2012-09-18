@@ -1,11 +1,11 @@
 #!/usr/bin/env lua
 
-ODIN_lib, ODIN_libsp = unpack(arg)
-
 -- in case run from cmd line, grab built-ins
 if not runcmd then
     dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
+
+ODIN_lib, ODIN_libsp = unpack(arg)
 
 lib_names = ''
 if ODIN_lib ~= "" then lib_names=wholefile(ODIN_lib) end
@@ -15,9 +15,7 @@ if ODIN_libsp ~= "" then
    bases=bases .. wholefile(ODIN_libsp)
 end
 
-if getenv("ODINVERBOSE") ~= "" and lib_names ~= "" then
-   print(getenv("ODINRBSHOST") .. 'scan_for_libraries (' .. lib_names .. ") in (" .. bases .. ")")
-end
+odin_log('scan_for_libraries (' .. lib_names .. ") in (" .. bases .. ")")
 
 vd = io.open("libraries.view_desc", "w")
     

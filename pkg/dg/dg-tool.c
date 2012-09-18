@@ -143,7 +143,7 @@ void Write_Tools(FILE * DRVGRF_FILE, FILE * DG_C_FILE)
                   Tool->TClass, iInpEdg, iBasePrmTypLst, iEnvVarLst,
                   Tool->Package);
    (void) fprintf(DG_C_FILE, "{%d, %s, %s, %s, \"%s\"}", Tool->TClass,
-                  sInpEdg, sBasePrmTypLst, sEnvVarLst, Tool->Package);
+                  sInpEdg, sBasePrmTypLst, sEnvVarLst, C_Esc(Tool->Package));
    DG_END_FOREACH(Tool);
 
    DG_CONST(SourceTool, Tool);

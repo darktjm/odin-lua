@@ -640,6 +640,45 @@ void Build_DerivationGraph(tp_FileName ToolDirName, tp_Package Package)
    Close(ParseFD);
 }
 
+/* this is a hack to quickly support escaping C strings properly */
+/* only up to 5 randomly ordered calls allowed (actual max: 3) */
+static int cur_obuf = -1;
+static char *obuf[5];
+static int obuf_len[5] = {0};
+
+char *C_Esc(const char *in)
+{
+   if(!in)
+      return NULL;
+   int len = strlen(in) * 2 + 1;
+   char *out;
+   cur_obuf = ++cur_obuf % 5;
+   if(!obuf_len[cur_obuf]) {
+      obuf_len[cur_obuf] = 128;
+      obuf[cur_obuf] = malloc(128);
+   }
+   while(obuf_len[cur_obuf] < len) {
+      int nlen = obuf_len[cur_obuf];
+      nlen *= 2;
+      obuf[cur_obuf] = realloc(obuf[cur_obuf], nlen);
+      obuf_len[cur_obuf] = nlen;
+   }
+   for(out = obuf[cur_obuf]; *in; in++, out++) {
+      if(*in == '\\' || *in == '"')
+	 *out++ = '\\';
+      if(*in == '\t') {
+	 *out++ = '\\';
+	 *out = 't';
+      } else if(*in == '\n') {
+	 *out++ = '\\';
+	 *out = 'n';
+      } else
+	 *out = *in;
+   }
+   *out = 0;
+   return obuf[cur_obuf];
+}
+
 void Write_DerivationGraph(void)
 {
    FILE *DRVGRF_FILE, *DG_C_FILE;

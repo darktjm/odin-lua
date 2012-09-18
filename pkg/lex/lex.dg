@@ -20,7 +20,7 @@
 
 # Tools
 
-EXEC (lex.sh) (:l) (+yaccid)
+EXEC (lex.lua) (:l) (+yaccid)
    => (:c);
 
 

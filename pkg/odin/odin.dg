@@ -2,7 +2,7 @@
 
 :targets_ptr 'pointer to the targets file' => :FILE :REFERENCE;
 
-:targets_inc 'directed nested target definitions' => :LIST;
+:targets_inc 'directly nested target definitions' => :LIST;
 
 :all_targets_inc 'all nested target definitions' => :LIST;
 
@@ -138,7 +138,7 @@ VIRTARGETS (:targets_ptr)
 VIRDIR (:vir_tgt.list)@
    => (:vir_dir);
 
-EXEC (copy.sh) (:OBJECT) (+copy_dest)&
+EXEC (copy.lua) (:OBJECT) (+copy_dest)&
    => (:copy);
 
 COPYCMD (:OBJECT) (+copy_dest_desc)&
@@ -210,7 +210,7 @@ COMPUTE-VIEW (:view_spec)
 APPLY (:OBJECT) (+apply)
    => (:apply);
 
-EXEC '/bin/cp' (help.lua) odin_help
+EXEC (help.lua)
    => (:odin_help);
 
 PREFIXHELP (:OBJECT)

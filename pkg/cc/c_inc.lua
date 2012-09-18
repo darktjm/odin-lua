@@ -10,9 +10,7 @@ if not runcmd then
    dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
 
-if getenv("ODINVERBOSE") ~= "" then
-   print(getenv("ODINRBSHOST") .. 'scan_for_includes ' .. apr.filepath_name(ODIN_FILE))
-end
+odin_log('scan_for_includes ' .. apr.filepath_name(ODIN_FILE))
 
 incsp=ODIN_home
 if ODIN_incsp ~= "" then incsp=incsp .. ' ' .. wholefile(ODIN_incsp) end
@@ -42,6 +40,7 @@ if ODIN_ignore ~= "" then
       end
       if re == "" then re = l else re = re .. "|" .. l end
    end
+   ODIN_ignore = re
    ok, msg = pcall(rex.new, re, nosub)
    if ok then
       ignore_re = msg

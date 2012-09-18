@@ -1,18 +1,16 @@
 #!/usr/bin/env lua
 
-rex = require 'rex_posix'
-
-ODIN_regsub, ODIN_FILE, ODIN_match, ODIN_hide, ODIN_subst,
-ODIN_substonly = unpack(arg)
-
 -- in case run from cmd line, grab built-ins
 if not runcmd then
    dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
 
-if getenv("ODINVERBOSE") ~= "" then
-   print(getenv("ODINRBSHOST") .. ODIN_regsub .. ' ' .. apr.filepath_name(ODIN_FILE))
-end
+rex = require 'rex_posix'
+
+ODIN_regsub, ODIN_FILE, ODIN_match, ODIN_hide, ODIN_subst, ODIN_substonly,
+ODIN_prefix, ODIN_suffix = unpack(arg)
+
+odin_log(ODIN_regsub .. ' ' .. apr.filepath_name(ODIN_FILE))
 
 -- refl = rex.flags()
 -- nosub = refl['NOSUB'] + refl['EXTENDED']
@@ -25,8 +23,7 @@ if ODIN_match ~= "" then
    for l in io.lines(ODIN_match) do
       ok, msg = pcall(rex.new, l, nosub)
       if not ok then
-	 io.open('ERRORS', 'a'):write("Error in match pattern '" .. l .. "': " .. msg .. "\n")
-	 os.exit(0)
+	 odin_error("Error in match pattern '" .. l .. "': " .. msg, 0)
       end
       if re == "" then re = l else re = re .. "|" .. l end
    end
@@ -34,8 +31,7 @@ if ODIN_match ~= "" then
    if ok then
       match_re = msg
    else
-      io.open('ERRORS', 'a'):write("Error in match pattern '" .. re .. "': " .. msg .. "\n")
-      os.exit(0)
+      odin_error("Error in match pattern '" .. re .. "': " .. msg, 0)
    end
 end
 
@@ -56,21 +52,18 @@ if ODIN_subst ~= "" then
    for l in io.lines(ODIN_subst) do
       p, ign, ign, s = split_re:match(l)
       if not p then
-	 io.open('ERRORS', 'a'):write("Bad substitution pattern '" .. l .. "'\n")
-	 os.exit(0)
+	 odin_error("Bad substitution pattern '" .. l .. "'", 0)
       end
       ign = nil
       ok, msg = pcall(rex.new, "(" .. p .. ")", nosub)
       if not ok then
-	 io.open('ERRORS', 'a'):write("Error in substitution pattern '" .. l .. "': " .. msg .. "\n")
-	 os.exit(0)
+	 odin_error("Error in substitution pattern '" .. l .. "': " .. msg, 0)
       end
       sub = {}
       if s then
 	 flag, ign, ign, ign, ign, suf = repl_re:match(s)
 	 if not flag then
-	    io.open('ERRORS', 'a'):write("Error in substitution value '" .. l .. "'\n")
-	    os.exit(0)
+	    odin_error("Error in substitution value '" .. l .. "'", 0)
 	 end
 	 suf = string.gsub(suf, "\\(.)", "%1")
 	 for prefix, ign, repl in rex.gmatch(s, one_repl_re) do
@@ -79,11 +72,11 @@ if ODIN_subst ~= "" then
 	    -- instead, it's done at subst time
 	    -- so no subst means no error message <sigh>
 	    if repl == "&" then
-	       table.insert(sub, {prefix, 0})
+	       table.insert(sub, {prefix, 1})
 	    elseif #repl == 2 then
-	       table.insert(sub, {prefix, tonumber(string.sub(repl, 2))})
+	       table.insert(sub, {prefix, tonumber(string.sub(repl, 2)) + 1})
 	    else
-	       table.insert(sub, {prefix, tonumber(string.sub(repl, 3, -2))})
+	       table.insert(sub, {prefix, tonumber(string.sub(repl, 3, -2)) + 1})
 	    end
 	 end
       else
@@ -98,17 +91,18 @@ for l in io.lines(ODIN_FILE) do
    if not match_re or (match_re:match(l) == nil) == ODIN_hide then
       printit = not ODIN_substonly
       for i, v in ipairs(re_sub) do
-	 -- n is a workaround for a bug in Lrexlib: $ is replaced twice
-	 -- so, if a null replacement is done at the same location twice
-	 -- in a row, it is ignored
+	 -- n is a workaround for a bug in Lrexlib: null matches at end
+	 -- match twice.  so, if a null replacement is done at the same
+	 -- location as the last end-of-replacment, ignore it.  This is
+	 -- still not perfect, but handles most cases I use ($ and .*)
 	 lastn = -1
 	 function n(s, e, o)
 	    if s > e then
-	       if s == lastn then
+	       if e == lastn then
 		  return false
 	       end
-	       lastn = s
 	    end
+	    lastn = e
 	    return true
 	 end
 	 function do_repl(...)
@@ -116,10 +110,9 @@ for l in io.lines(ODIN_FILE) do
 	    local rs = ""
 	    local i, sv
 	    for i, sv in ipairs(v.sub) do
-	       local ns = ss[sv[2] + 1]
+	       local ns = ss[sv[2]]
 	       if ns == nil then
-		  io.open('ERRORS', 'a'):write("Bad subexpression reference in '" .. v.l .. "'\n")
-		  os.exit(0)
+		  odin_error("Bad subexpression reference in '" .. v.l .. "'", 0)
 	       end
 	       -- ns may be false if ()?, ()*, or similar
 	       if not ns then ns = "" end
@@ -130,6 +123,6 @@ for l in io.lines(ODIN_FILE) do
 	 l, nsub = rex.gsub(l, v.re, do_repl, n)
 	 if nsub > 0 then printit = true end
       end
-      if printit then of:write(l .. "\n") end
+      if printit then of:write(ODIN_prefix .. l .. ODIN_suffix .. "\n") end
    end
 end

@@ -28,10 +28,18 @@
 
 +subst_only 'only include lines where substitutions were made' => :first;
 
++prefix 'prefix to apply to all lines' => :first;
+
++suffix 'suffix to apply to all lines' => :first;
+
 # Tools
 
-EXEC (regsub.lua) regsub (:FILE) (+match) (+hide_match) (+subst) (+subst_only)
+# Run pseudo egrep/egrep -v and then sed (s///g only) on a file
+
+EXEC (regsub.lua) regsub (:FILE)
+        (+match) (+hide_match) (+subst) (+subst_only) (+prefix) (+suffix)
    => (:regsub);
 
-EXEC (regsub.lua) gnc.regsub (:regsub_in) (+match) (+hide_match) (+subst) (+subst_only)
+EXEC (regsub.lua) gnc.regsub (:regsub_in)
+        (+match) (+hide_match) (+subst) (+subst_only) (+prefix) (+suffix)
    => (:gnc.regsub);

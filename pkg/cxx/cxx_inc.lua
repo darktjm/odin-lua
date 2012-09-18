@@ -1,25 +1,23 @@
 #!/usr/bin/env lua
 
-rex = require 'rex_posix'
-
-ODIN_FILE, ODIN_dir,
-ODIN_home, ODIN_incsp, ODIN_ignore = unpack(arg)
-
 -- in case run from cmd line, grab built-ins
 if not runcmd then
    dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
 
-if getenv("ODINVERBOSE") ~= "" then
-   print(getenv("ODINRBSHOST") .. 'scan_for_includes ' .. apr.filepath_name(ODIN_FILE))
-end
+rex = require 'rex_posix'
+
+ODIN_FILE, ODIN_dir,
+ODIN_home, ODIN_incsp, ODIN_ignore = unpack(arg)
+
+odin_log('scan_for_includes ' .. apr.filepath_name(ODIN_FILE))
 
 incsp=ODIN_home
 if ODIN_incsp ~= "" then incsp=incsp .. ' ' .. wholefile(ODIN_incsp) end
 incsp=incsp .. ' ' .. getenv("ODIN_CXX_I")
 for header in string.gmatch(incsp, '%S+') do
    if not apr.filepath_root(header, 'native') then
-      io.open('ERRORS', 'a'):write("Search path entry must be absolute: " .. header .. "\n")
+      odin_error("Search path entry must be absolute: " .. header, 0)
    end
 end
 
@@ -33,11 +31,22 @@ nosub = nil
 
 ignore_re = nil
 if ODIN_ignore ~= "" then
-   ok, msg = pcall(rex.new, ODIN_ignore, nosub)
+   re = ""
+   for l in io.lines(ODIN_ignore) do
+      ok, msg = pcall(rex.new, l, nosub)
+      if not ok then
+	 io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. l .. "': " .. msg .. "\n")
+	 os.exit(0)
+      end
+      if re == "" then re = l else re = re .. "|" .. l end
+   end
+   ODIN_ignore = re
+   ok, msg = pcall(rex.new, re, nosub)
    if ok then
       ignore_re = msg
    else
-      io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. ODIN_ignore .. "': " .. msg)
+      io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. re .. "': " .. msg .. "\n")
+      os.exit(0)
    end
 end
 
@@ -45,14 +54,16 @@ ODIN_IGNORE = getenv("ODIN_IGNORE")
 if ODIN_IGNORE ~= "" then
    ok, msg = pcall(rex.new, ODIN_IGNORE, nosub)
    if not ok then
-      io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. ODIN_IGNORE .. "': " .. msg)
+      io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. ODIN_IGNORE .. "': " .. msg .. "\n")
+      os.exit(0)
    elseif ignore_re then
       ODIN_ignore = ODIN_ignore .. '|' .. ODIN_IGNORE
       ok, msg = pcall(rex.new, ODIN_ignore, nosub)
       if ok then
 	 ignore_re = msg
       else
-	 io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. ODIN_ignore .. "': " .. msg)
+	 io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. ODIN_ignore .. "': " .. msg .. "\n")
+	 os.exit(0)
       end
    else
       ignore_re = msg

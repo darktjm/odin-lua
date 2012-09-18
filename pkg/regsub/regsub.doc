@@ -12,12 +12,19 @@ regsub:
   backslash followed by a curly-brace enclosed decimal number,
   represents that parenthesis-enclosed subexpression.  Subexpression
   zero is the entire matching text, and the rest numbered by the order
-  of the opening parenthesis.
+  of the opening parenthesis.  All +subst parameters are applied in the
+  order they are given, so an earlier one may affect a later one.
   
   If the +subst_only parameter is given, any line which does not cause
   a substitution will be filtered out as well.  This is a shortcut for
   adding the +subst patterns as +match arguments.  Note that actual
   filtering using +match takes place before +subst substitution.
+  
+  The +prefix parameter text is prepended to each line, and the +suffix
+  parameter is appended to each line.  They are shortcuts to +subst
+  \^/$<$text$>$ and +subst \$/$<$text$>$, respectively, except that
+  they do not count towards +subst_only, and only one of each may be
+  given.
 :cpp_in->:gnc.regsub
   Filters a file, showing (or hiding, if +hide_match is given) only
   lines that match the extended regular expression in +match (if given).
@@ -32,9 +39,16 @@ regsub:
   backslash followed by a curly-brace enclosed decimal number,
   represents that parenthesis-enclosed subexpression.  Subexpression
   zero is the entire matching text, and the rest numbered by the order
-  of the opening parenthesis.
+  of the opening parenthesis.  All +subst parameters are applied in the
+  order they are given, so an earlier one may affect a later one.
 
   If the +subst_only parameter is given, any line which does not cause
   a substitution will be filtered out as well.  This is a shortcut for
   adding the +subst patterns as +match arguments.  Note that actual
   filtering using +match takes place before +subst substitution.
+  
+  The +prefix parameter text is prepended to each line, and the +suffix
+  parameter is appended to each line.  They are shortcuts to +subst
+  \^/$<$text$>$ and +subst \$/$<$text$>$, respectively, except that
+  they do not count towards +subst_only, and only one of each may be
+  given.

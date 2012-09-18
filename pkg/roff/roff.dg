@@ -45,7 +45,7 @@
 
 # Tools
 
-EXEC (so_inc.sh) (:FILE) (+home)@
+EXEC (so_inc.lua) (:FILE) (+home)@
    => (:so_inc_spec);
 
 READ-LIST (:so_inc_spec)
@@ -54,15 +54,15 @@ READ-LIST (:so_inc_spec)
 COLLECT (:so_inc :map=:all_so_inc) (:so_inc)
    => (:all_so_inc);
 
-EXEC (eqn.sh) eqn (:FILE)
+EXEC (eqn.lua) eqn (:FILE)
    => (:eqn);
 
-EXEC (eqn.sh) gnc.eqn (:eqn_in)
+EXEC (eqn.lua) gnc.eqn (:eqn_in)
    => (:gnc.eqn);
 
-EXEC (tbl.sh) (:tbl_in)
+EXEC (tbl.lua) (:tbl_in)
    => (:tbl);
 
-EXEC (nroff.sh) (:roff) (:roff :dir)@ (+mp)
+EXEC (nroff.lua) (:roff) (:roff :dir)@ (+mp)
  NEEDS (:roff +home=(:roff :dir) :lookup=:all_so_inc)
    => (:nroff);

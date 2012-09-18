@@ -243,7 +243,7 @@ void Write_PrmTyps(FILE * DRVGRF_FILE, FILE * DG_C_FILE)
                   PrmTyp->PTName, PrmTyp->Desc, PrmTyp->HelpLevel,
                   iFilTyp);
    (void) fprintf(DG_C_FILE, "{\"%s\", \"%s\", %d, %s, 0, 0, 0, %d}",
-                  PrmTyp->PTName, PrmTyp->Desc, PrmTyp->HelpLevel, sFilTyp,
+                  C_Esc(PrmTyp->PTName), C_Esc(PrmTyp->Desc), PrmTyp->HelpLevel, sFilTyp,
                   PrmTyp->Index);
    DG_END_FOREACH(PrmTyp);
 
