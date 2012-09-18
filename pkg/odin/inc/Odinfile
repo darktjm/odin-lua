@@ -1,8 +1,8 @@
 odin_builtin.lua.h == \
-   ../odin_builtin.lua +cmd='sed \'s/["\\]/\\\\&/g;s/^/"/;s/$/\\\\n"/\'' :stdout
+   ../odin_builtin.lua +subst='["\\\\]/\\\\&' '^/"' '$/\\\\n"' :regex
 
 Func.hh == \
-   () +cmd=sed -e 's/$/:c.h/' (..%odin.c.sm :code.list :ls) :stdout :list :cat
+   (..%odin.c.sm :code.list :ls) +subst='$/:c.h' :regex :list :cat
 
 TokTyp_.h == ../fsys.ygi,c :tok.h
 

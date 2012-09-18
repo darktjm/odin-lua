@@ -7,9 +7,11 @@ if not runcmd then
    dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
 
-src_f = io.open(ODIN_src); o_f = io.open(ODIN_o)
+o_f = io.open(ODIN_o)
 o_of = io.open("o_of", "w")
-for src in src_f:lines() do
+for src in io.lines(ODIN_src) do
    o = o_f:read();
    o_of:write('%' .. apr.filepath_name(src, true) .. '.o == '..o..'\n')
 end
+o_f:close()
+o_of:close()

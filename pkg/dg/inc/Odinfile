@@ -3,6 +3,5 @@
 TokTyp_.h == ../drvgrf.ygi :tok.h
 NodTyp_.h == ../drvgrf.ygi :nod.h
 Func.hh == \
-() +cmd=sed -e '/tp_SKind/d' (\
-   () +cmd=sed -e 's/$/:c.h/' (..%dg.c.sm :code.list :ls) :stdout\
-      :list :cat) :stdout
+  ((..%tregrm.c.sm :code.list :ls) +subst='$/:c.h' :regex :list :cat) \
+  +match='tp_SKind' +hide_match :regex

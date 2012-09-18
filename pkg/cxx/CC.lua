@@ -57,12 +57,10 @@ end
 -- emulate old unsafe behavior for cmd line options, but quote ODIN_source
 if not runcmd(compiler .. flags , {'-c', ODIN_source}) then
    -- old code did some message mangling that's highly compiler dependent
-   errs = io.open("ERRORS")
    -- old code used abort_msgs file; I'm just doing it in-line
-   for l in errs:lines() do
+   for l in io.lines("ERRORS") do
       if string.find(l, "Out of virtual memory") or
          string.find(l, "virtual memory exhausted") then
-	 errs:close()
 	 errs = io.open("ERRORS")
 	 io.write(errs:read('*a'))
 	 errs:close()
@@ -74,8 +72,7 @@ else
    -- yet more message mangling that's highly compiler dependent
    apr.file_rename("WARNINGS", "MSGS")
    wrn = io.open("WARNINGS", "w")
-   msgs = io.open("MSGS")
-   for l in msgs:lines() do
+   for l in io.lines("MSGS") do
       if string.find(l, "arning") then
 	 if not string.find(l, "& before array or function: ignored") then
 	    wrn:write(l)

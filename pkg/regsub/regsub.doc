@@ -1,0 +1,30 @@
+regsub:
+  This package provides a simple egrep and sed replacement.
+:FILE->:regsub
+  Filters a file, showing (or hiding, if +hide_match is given) only
+  lines that match the extended regular expression in +match (if given).
+  On each line, a global substitution is made for each +subst parameter.
+  This parameter consists of the search string, followed by a / that is
+  not escaped, followed by the replacement string.  In the replacement
+  string, a backslash escapes any character but the digits 0-9 and
+  open curly braces.  An unescaped ampersand (&) represents the entire
+  matching text.  A backslash followed by a single digit, or a
+  backslash followed by a curly-brace enclosed decimal number,
+  represents that parenthesis-enclosed subexpression.  Subexpression
+  zero is the entire matching text, and the rest numbered by the order
+  of the opening parenthesis.
+:cpp_in->:gnc.regsub
+  Filters a file, showing (or hiding, if +hide_match is given) only
+  lines that match the extended regular expression in +match (if given).
+  The type of the file is based on source file name matching after
+  stripping the trailing ,re.
+  On each line, a global substitution is made for each +subst parameter.
+  This parameter consists of the search string, followed by a / that is
+  not escaped, followed by the replacement string.  In the replacement
+  string, a backslash escapes any character but the digits 0-9 and
+  open curly braces.  An unescaped ampersand (&) represents the entire
+  matching text.  A backslash followed by a single digit, or a
+  backslash followed by a curly-brace enclosed decimal number,
+  represents that parenthesis-enclosed subexpression.  Subexpression
+  zero is the entire matching text, and the rest numbered by the order
+  of the opening parenthesis.

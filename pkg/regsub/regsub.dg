@@ -1,0 +1,37 @@
+# Source Types
+
+*,re => :regsub_in;
+
+
+# Environment Variables
+
+
+# Input Object Types
+
+:regsub_in 'regsub substitution input'? => :FILE;
+
+
+# Output Object Types
+
+:regsub 'output from regsub substitution' => :PIPE;
+
+:gnc.regsub 'output from regsub substitution' => :GENERIC;
+
+
+# Parameter Types
+
++match 'regular expression to match' => :cat;
+
++hide_match 'instead of showing matches, hide them' => :first;
+
++subst 'regular expression substitution' => :cat;
+
++subst_only 'only include lines where substitutions were made' => :first
+
+# Tools
+
+EXEC (regsub.lua) regsub (:FILE) (+match) (+hide_match) (+subst) (+subst_only)
+   => (:regsub);
+
+EXEC (regsub.lua) gnc.regsub (:regsub_in) (+match) (+hide_match) (+subst) (+subst_only)
+   => (:gnc.regsub);

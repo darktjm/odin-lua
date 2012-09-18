@@ -20,7 +20,7 @@
 
 %size == () +cmd= wc `cat (%src-files)` :stdout
 
-%src-files == %exe :depend :ls +cmd=egrep -v "ODIN|os9|boot|dg\/if|h\$" :stdout
+%src-files == %exe :depend :ls +match='ODIN|os9|boot|dg/if|h$' +hide_match :regex
 
 %exe == %odin.c.sm +ignore=\\.hh\$ +lib=lua +(%extra-lib) :exe
 
@@ -52,7 +52,4 @@
    if-symbol.c; if-sysdep.c; if-system.c;
 
 version == \
-   inc/Version.h  +cmd='sed \'s/^.*VERSION_STR "\\(.*\\)"/\\1/\'' :stdout
-
-odin_builtin.lua.h == \
-   odin_builtin.lua +cmd='sed \'s/["\\]/\\\\&/g;s/^/"/;s/$/\\\\n"/\'' :stdout
+   inc/Version.h  +subst='^.*VERSION_STR "(.*)"/\\1' :regex

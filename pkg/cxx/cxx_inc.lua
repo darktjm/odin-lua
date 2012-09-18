@@ -69,7 +69,7 @@ for d in rex.split(incsp, '[ \t\n]') do table.insert(dirs, d) end
 
 vd = io.open("cxx_inc.view_desc", "w")
 
-for l in io.open(ODIN_FILE):lines() do
+for l in io.lines(ODIN_FILE) do
    s, e, m = include_re:tfind(l)
    if s then
       name = nil

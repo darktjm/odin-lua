@@ -78,7 +78,7 @@ if not runcmd(compiler .. flags .. libs, args) then
    if ignerr ~= "" then
       ok, msg = pcall(rex.new, ignerr)
       if ok then
-	 for l in io.open("ERRORS"):lines() do
+	 for l in io.lines("ERRORS") do
 	    if msg:exec(l) then
 	       apr.file_rename("ERRORS", "WARNINGS")
 	       break

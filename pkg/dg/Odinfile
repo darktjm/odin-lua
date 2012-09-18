@@ -31,4 +31,4 @@ dg-yacc.c == drvgrf.ygi :c \
    "; fi' :stdout
 
 version == \
-   inc/DG_Version.h +cmd='sed \'s/^.*VERSION_STR "\\(.*\\)"/\\1/\'' :stdout
+   inc/DG_Version.h  +subst='^.*VERSION_STR "(.*)"/\\1' :regex

@@ -33,11 +33,21 @@ nosub = nil
 
 ignore_re = nil
 if ODIN_ignore ~= "" then
-   ok, msg = pcall(rex.new, ODIN_ignore, nosub)
+   re = ""
+   for l in io.lines(ODIN_ignore) do
+      ok, msg = pcall(rex.new, l, nosub)
+      if not ok then
+	 io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. l .. "': " .. msg .. "\n")
+	 os.exit(0)
+      end
+      if re == "" then re = l else re = re .. "|" .. l end
+   end
+   ok, msg = pcall(rex.new, re, nosub)
    if ok then
       ignore_re = msg
    else
-      io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. ODIN_ignore .. "': " .. msg)
+      io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. re .. "': " .. msg .. "\n")
+      os.exit(0)
    end
 end
 
@@ -45,14 +55,16 @@ ODIN_IGNORE = getenv("ODIN_IGNORE")
 if ODIN_IGNORE ~= "" then
    ok, msg = pcall(rex.new, ODIN_IGNORE, nosub)
    if not ok then
-      io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. ODIN_IGNORE .. "': " .. msg)
+      io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. ODIN_IGNORE .. "': " .. msg .. "\n")
+      os.exit(0)
    elseif ignore_re then
       ODIN_ignore = ODIN_ignore .. '|' .. ODIN_IGNORE
       ok, msg = pcall(rex.new, ODIN_ignore, nosub)
       if ok then
 	 ignore_re = msg
       else
-	 io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. ODIN_ignore .. "': " .. msg)
+	 io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. ODIN_ignore .. "': " .. msg .. "\n")
+	 os.exit(0)
       end
    else
       ignore_re = msg
@@ -69,7 +81,7 @@ for d in rex.split(incsp, '[ \t\n]') do table.insert(dirs, d) end
 
 vd = io.open("c_inc.view_desc", "w")
 
-for l in io.open(ODIN_FILE):lines() do
+for l in io.lines(ODIN_FILE) do
    s, e, m = include_re:tfind(l)
    if s then
       name = nil

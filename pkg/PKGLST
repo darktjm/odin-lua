@@ -19,3 +19,4 @@ roff
 tex
 dbx
 run
+regsub
