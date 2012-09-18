@@ -13,6 +13,11 @@ regsub:
   represents that parenthesis-enclosed subexpression.  Subexpression
   zero is the entire matching text, and the rest numbered by the order
   of the opening parenthesis.
+  
+  If the +subst_only parameter is given, any line which does not cause
+  a substitution will be filtered out as well.  This is a shortcut for
+  adding the +subst patterns as +match arguments.  Note that actual
+  filtering using +match takes place before +subst substitution.
 :cpp_in->:gnc.regsub
   Filters a file, showing (or hiding, if +hide_match is given) only
   lines that match the extended regular expression in +match (if given).
@@ -28,3 +33,8 @@ regsub:
   represents that parenthesis-enclosed subexpression.  Subexpression
   zero is the entire matching text, and the rest numbered by the order
   of the opening parenthesis.
+
+  If the +subst_only parameter is given, any line which does not cause
+  a substitution will be filtered out as well.  This is a shortcut for
+  adding the +subst patterns as +match arguments.  Note that actual
+  filtering using +match takes place before +subst substitution.

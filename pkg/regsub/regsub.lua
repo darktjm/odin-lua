@@ -2,7 +2,8 @@
 
 rex = require 'rex_posix'
 
-ODIN_regsub, ODIN_FILE, ODIN_match, ODIN_hide, ODIN_subst = unpack(arg)
+ODIN_regsub, ODIN_FILE, ODIN_match, ODIN_hide, ODIN_subst,
+ODIN_substonly = unpack(arg)
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then
@@ -39,6 +40,7 @@ if ODIN_match ~= "" then
 end
 
 ODIN_hide = ODIN_hide ~= ""
+ODIN_substonly = ODIN_substonly ~= ""
 
 re_sub = {}
 -- \1 == re, \4 == replacement text (if present)
@@ -94,6 +96,7 @@ end
 of = io.open(ODIN_regsub, "w")
 for l in io.lines(ODIN_FILE) do
    if not match_re or (match_re:match(l) == nil) == ODIN_hide then
+      printit = not ODIN_substonly
       for i, v in ipairs(re_sub) do
 	 -- n is a workaround for a bug in Lrexlib: $ is replaced twice
 	 -- so, if a null replacement is done at the same location twice
@@ -124,8 +127,9 @@ for l in io.lines(ODIN_FILE) do
 	    end
 	    return rs .. v.suf
 	 end
-	 l = rex.gsub(l, v.re, do_repl, n)
+	 l, nsub = rex.gsub(l, v.re, do_repl, n)
+	 if nsub > 0 then printit = true end
       end
-      of:write(l .. "\n")
+      if printit then of:write(l .. "\n") end
    end
 end

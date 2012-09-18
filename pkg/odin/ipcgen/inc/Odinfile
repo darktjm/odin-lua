@@ -5,5 +5,5 @@ TokTyp_.h == ../ipcgen.ygi :tok.h
 NodTyp_.h == ../ipcgen.ygi :nod.h
 
 Func.hh == \
-  ((..%tregrm.c.sm :code.list :ls) +subst='$/:c.h' :regex :list :cat) \
-  +match='tp_SKind' +hide_match :regex
+  ((..%tregrm.c.sm :code.list :ls) +subst='$/:c.h' :regsub :list :cat) \
+  +match='tp_SKind' +hide_match :regsub

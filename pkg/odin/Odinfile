@@ -20,7 +20,7 @@
 
 %size == () +cmd= wc `cat (%src-files)` :stdout
 
-%src-files == %exe :depend :ls +match='ODIN|os9|boot|dg/if|h$' +hide_match :regex
+%src-files == %exe :depend :ls +match='ODIN|os9|boot|dg/if|h$' +hide_match :regsub
 
 %exe == %odin.c.sm +ignore=\\.hh\$ +lib=lua +(%extra-lib) :exe
 
@@ -52,4 +52,4 @@
    if-symbol.c; if-sysdep.c; if-system.c;
 
 version == \
-   inc/Version.h  +subst='^.*VERSION_STR "(.*)"/\\1' :regex
+   inc/Version.h  +subst='^.*VERSION_STR "(.*)"/\\1' :regsub

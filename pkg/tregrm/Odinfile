@@ -2,7 +2,7 @@
    %exe > $THORPKGS/tregrm/tregrm.exe
 
 %boot! == <<
-   tregrm-yacc.c +match='extern char' +hide_match :regex >tregrm-yacc.c.dflt
+   tregrm-yacc.c +match='extern char' +hide_match :regsub >tregrm-yacc.c.dflt
 
 %odin-install! == <<
    %exe > $ODINPKG/tregrm.exe

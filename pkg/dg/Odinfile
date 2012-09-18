@@ -31,4 +31,4 @@ dg-yacc.c == drvgrf.ygi :c \
    "; fi' :stdout
 
 version == \
-   inc/DG_Version.h  +subst='^.*VERSION_STR "(.*)"/\\1' :regex
+   inc/DG_Version.h  +subst='^.*VERSION_STR "(.*)"/\\1' :regsub

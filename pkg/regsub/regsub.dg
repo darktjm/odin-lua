@@ -26,7 +26,7 @@
 
 +subst 'regular expression substitution' => :cat;
 
-+subst_only 'only include lines where substitutions were made' => :first
++subst_only 'only include lines where substitutions were made' => :first;
 
 # Tools
 

@@ -1,8 +1,8 @@
 odin_builtin.lua.h == \
-   ../odin_builtin.lua +subst='["\\\\]/\\\\&' '^/"' '$/\\\\n"' :regex
+   ../odin_builtin.lua +subst='["\\\\]/\\\\&' '^/"' '$/\\\\n"' :regsub
 
 Func.hh == \
-   (..%odin.c.sm :code.list :ls) +subst='$/:c.h' :regex :list :cat
+   (..%odin.c.sm :code.list :ls) +subst='$/:c.h' :regsub :list :cat
 
 TokTyp_.h == ../fsys.ygi,c :tok.h
 
