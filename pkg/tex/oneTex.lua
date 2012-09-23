@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
--- EXEC (oneTex.sh) (:tex) (:label) => (:one_tex_vtd)
+-- EXEC (oneTex.lua) (:tex) (:label) => (:one_tex_vtd)
 
 otv = io.open('one_tex_vtd', 'w')
 for l in io.lines(arg[2]) do

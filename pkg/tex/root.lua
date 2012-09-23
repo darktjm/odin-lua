@@ -5,7 +5,7 @@ if not runcmd then
    dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
 
--- EXEC (root.sh) (:tex.vtd) (+texroot)
+-- EXEC (root.lua) (:tex.vtd) (+texroot)
 --   NEEDS (:tex.vtd :vir_tgt.list)
 --   => (:rootName) (:rootFileName);
 

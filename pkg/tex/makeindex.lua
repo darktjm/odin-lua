@@ -1,11 +1,16 @@
 #!/usr/bin/env lua
 
--- EXEC (makeindex.sh) (:indexntry)& (+index_flags)
+-- EXEC (makeindex.lua) (:indexntry)& (+index_flags)
 --   => (:tex.ind) (:tex.ilg);
+
+-- in case run from cmd line, grab built-ins
+if not runcmd then
+   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+end
 
 ODIN_idx, ODIN_flags = unpack(arg)
 
-if is-file(ODIN_idx) then
+if is_file(ODIN_idx) then
    ln(ODIN_idx, 'tex.idx')
 else
    touch('tex.idx')

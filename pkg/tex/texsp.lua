@@ -5,7 +5,7 @@ if not runcmd then
    dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
 
--- EXEC (texsp.sh) (:tex.vtd :vir_dir)@ (:dir)@ (+texsearch)
+-- EXEC (texsp.lua) (:tex.vtd :vir_dir)@ (:dir)@ (+texsearch)
 --   => (:texsp);
 
 ODIN_vir_dir, ODIN_dir, ODIN_texsearch = unpack(arg)

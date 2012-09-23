@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
--- EXEC (tex_view.sh) (:texnames) (+texsppt) => (:tex.view_desc);
+-- EXEC (tex_view.lua) (:texnames) (+texsppt) => (:tex.view_desc);
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then

@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
--- EXEC (tex.sh) (:fmtcmd) (:rootName) (:texsp) (:tex.vtd :texauxin.vtd :vir_dir)&
+-- EXEC (tex.lua) (:fmtcmd) (:rootName) (:texsp) (:tex.vtd :texauxin.vtd :vir_dir)&
 --    NEEDS (:texbasis :extract=:tex) (:texbasis :extract=:sty)
 --      (:texbasis :extract=:cls)
 --      (:tex.vtd :texauxin.vtd :vir_tgt.list)&
@@ -11,13 +11,23 @@ if not runcmd then
    dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
 
-ODIN_fmtcmd, ODIN_root, ODIN_search, ODIN_aux = unpack(args)
+ODIN_fmtcmd, ODIN_root, ODIN_search, ODIN_aux = unpack(arg)
 mkdir('texauxout')
 
-sp = ""
-for d in words(ODIN_search) do sp = apr.filepath_list_merge(sp, d) end
-sp = apr.filepath_list_merge('.', apr.filepath_list_merge(sp, getenv("TEXINPUTS")))
-setenv('TEXINPUTS', sp)
+tex_progname = wholefile(ODIN_fmtcmd)
+dofile(pathcat(pathcat(pathcat(getenv("ODINCACHE"), 'PKGS'), 'tex'), 'path.lua'))
+
+sp = {'.'}
+for d in words(ODIN_search) do table.insert(sp, d) end
+for i, v in ipairs(apr.filepath_list_split(getenv("TEXINPUTS"))) do
+   table.insert(sp, v)
+end
+-- kpathsea tacks on built-in path if final element is empty
+-- but apr.filepath_list_merge doesn't support empty elements
+-- table.insert(sp, 'zZzZ')
+-- setenv('TEXINPUTS', string.gsub(apr.filepath_list_merge(sp), 'zZzZ', ''))
+setenv('TEXINPUTS', apr.filepath_list_merge(sp))
+print(getenv('TEXINPUTS'))
 
 if is_dir(ODIN_aux) then
    for f in apr.glob(pathcat(ODIN_aux, '*')) do
@@ -26,14 +36,18 @@ if is_dir(ODIN_aux) then
    end
 end
 
+odin_log(wholefile(ODIN_fmtcmd) .. ' ' .. wholefile(ODIN_root) .. '.tex')
+
 runcmd(wholefile(ODIN_fmtcmd), {wholefile(ODIN_root) .. '.tex', chdir = 'texauxout'})
 
+touch('tex.log')
+touch('indexntry')
 c = io.open("citations", "w")
 for f in apr.glob(pathcat('texauxout', '*')) do
    b, e = basename(f, true)
    if e == '.dvi' then mv(f, 'dvi') end
    if e == '.pdf' then mv(f, 'texpdf') end
-   if e == '.log' then mv(f, 'tex.log') else touch('tex.log') end
+   if e == '.log' then mv(f, 'tex.log') end
    if e == '.aux' then
       for l in io.lines(f) do
 	 if string.find(l, '\\citation') or
@@ -43,7 +57,7 @@ for f in apr.glob(pathcat('texauxout', '*')) do
 	 end
       end
    end
-   if e == '.idx' then cp(f, 'indexntry') else touch('indexntry')
+   if e == '.idx' then cp(f, 'indexntry') end
 end
 c:close()
 
@@ -51,9 +65,9 @@ if is_dir(ODIN_aux) and not cmp(ODIN_aux, 'texauxout') then
    rm('dvi') rm('texpdf')
 end
 
-for f in apr.glob(pathat('texauxout', '*.bbl')) do
+for f in apr.glob(pathcat('texauxout', '*.bbl')) do
    rm(f)
 end
-for f in apr.glob(pathat('texauxout', '*.ind')) do
+for f in apr.glob(pathcat('texauxout', '*.ind')) do
    rm(f)
 end

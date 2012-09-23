@@ -1,11 +1,10 @@
 odin.pdf == odin.tex +usepdf :pdf
 %html-in == <<
    odin.tex +usepdf :texauxin.vtd
-   odin.tex :tex.vtd
+   (odin.tex :texbasis :ls) +subst='^(.*\\/)?([^\\/]*)$/%'\''\\2'\''=='\''\\1\\2'\' :regsub
 
 odin.html == () \
-   +cmd=cd (%html-in :list :cat :vir_dir)';' \
+   +cmd='odir="$PWD";cd' (%html-in :list :cat :vir_dir)'; \
         latex2html -split 0 -noimages -nonavigation -show_section_numbers \
-                   -math -noinfo odin.tex '>/dev/null' '2>&1' ';' \
-        cat 'odin/odin.html' ';' rm -rf odin ';' \
-   :stdout
+                   -math -noinfo -dir "$odir" odin.tex' \
+   :output/odin.html

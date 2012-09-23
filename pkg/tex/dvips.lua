@@ -1,6 +1,6 @@
-#! /bin/sh
+#!/usr/bin/env lua
 
--- EXEC (dvips.sh) (:dvi) (:texsp) (+dvips_flags)
+-- EXEC (dvips.lua) (:dvi) (:texsp) (+dvips_flags)
 --    NEEDS (:texbasis :extract=:ps)
 --    => (:texps);
 
@@ -16,9 +16,14 @@ if ODIN_flags ~= '' then
    flags = wholefile(ODIN_flags)
 end
 
-sp = ''
-for d in words(ODIN_search) do sp = apr.filepath_list_merge(sp, d) end
-sp = apr.filepath_list_merge(sp, getenv("TEXINPUTS"))
-setenv('TEXINPUTS', sp)
+tex_progname = 'dvips'
+dofile(pathcat(pathcat(pathcat(getenv("ODINCACHE"), 'PKGS'), 'tex'), 'path.lua'))
+
+sp = {}
+for d in words(ODIN_search) do table.insert(sp, d) end
+for i, v in ipairs(apr.filepath_list_split(getenv("TEXINPUTS"))) do
+    table.insert(sp, v)
+end
+setenv('TEXINPUTS', apr.filepath_list_merge(sp))
 
 runcmd('dvips ' .. flags, {'-o', 'texps', ODIN_dvi})

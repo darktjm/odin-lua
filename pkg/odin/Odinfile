@@ -14,9 +14,8 @@
 %lint! == <<
    %odin.c.sm +debug +ignore=\\.hh\$ +stub=(extra.c) :lint >
 
-%ctags! == !<<
-#!/bin/sh
-   ctags ipcgen/ig-gen.c *.c ../dg/*.c {inc,../dg/inc}/*.{h,hh}
+%ctags! == <<
+   !ctags ipcgen/ig-gen.c *.c ../dg/*.c {inc,../dg/inc}/*.{h,hh}
 
 %size == () +cmd='args={}\
                   for f in io.lines(trim([['(%src-files)']])) do \

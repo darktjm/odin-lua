@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
--- EXEC (texauxin.sh) (:rootName) (:texauxout)& (:tex.bbl) (:tex.ind)
+-- EXEC (texauxin.lua) (:rootName) (:texauxout)& (:tex.bbl) (:tex.ind)
 --   => (:texauxin.vtd);
 
 -- in case run from cmd line, grab built-ins
@@ -9,7 +9,7 @@ if not runcmd then
 end
 
 ODIN_root, ODIN_aux, ODIN_bbl, ODIN_ind = unpack(arg)
-vtd = io.open('texauxin.vtd')
+vtd = io.open('texauxin.vtd', 'w')
 
 if is_dir(ODIN_aux) then
    for f in apr.glob(pathcat(ODIN_aux, '*')) do

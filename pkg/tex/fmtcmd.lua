@@ -5,7 +5,7 @@ if not runcmd then
    dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
 
--- EXEC (fmtcmd.sh) (:rootFileName +texsppt=(:texsp) :texfiles :ls) (+tex) (+latex)
+-- EXEC (fmtcmd.lua) (:rootFileName +texsppt=(:texsp) :texfiles :ls) (+tex) (+latex)
 --      (+usepdf)
 --    => (:fmtcmd);
 

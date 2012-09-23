@@ -6,9 +6,8 @@
 %lint! == <<
    %dg-lint.c.sm +debug +ignore=\\.hh\$ :lint >
 
-%ctags! == !<<
-#!/bin/sh
-   ctags ../odin/if-err.c ../odin/if-file.c ../odin/if-io.c \
+%ctags! == <<
+   !ctags ../odin/if-err.c ../odin/if-file.c ../odin/if-io.c \\
      ../odin/if-nod.c ../odin/if-symbol.c if-*.c dg-*.c 
 
 %odin-install! == <<
