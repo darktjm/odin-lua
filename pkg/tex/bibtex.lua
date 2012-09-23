@@ -11,7 +11,7 @@ got_dat = false
 if is_file(ODIN_cite) then
    for l in io.lines(ODIN_cite) do
       if string.find(l, '\\citation') then got_cit = true end
-      if string.find(l, '\\bitdata') then got_dat = true end
+      if string.find(l, '\\bibdata') then got_dat = true end
    end
 end
 if not got_cit or not got_dat then
@@ -31,7 +31,7 @@ end
 setenv('BIBINPUTS', apr.filepath_list_merge(bi))
 
 if getenv('BSTINPUTS') ~= '' then
-   bstsrc = 'BISTINPUTS'
+   bstsrc = 'BSTINPUTS'
 else
    bstsrc = 'TEXINPUTS'
 end
@@ -40,5 +40,9 @@ for i, v in ipairs(apr.filepath_list_split(getenv(bstsrc))) do
 end
 setenv('BSTINPUTS', apr.filepath_list_merge(sp))
 
+odin_log('bibtex')
+
 ln(ODIN_cite, 'tex.aux')
 runcmd('bibtex tex')
+
+-- cat('tex.blg')

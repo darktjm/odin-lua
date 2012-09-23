@@ -27,7 +27,6 @@ end
 -- table.insert(sp, 'zZzZ')
 -- setenv('TEXINPUTS', string.gsub(apr.filepath_list_merge(sp), 'zZzZ', ''))
 setenv('TEXINPUTS', apr.filepath_list_merge(sp))
-print(getenv('TEXINPUTS'))
 
 if is_dir(ODIN_aux) then
    for f in apr.glob(pathcat(ODIN_aux, '*')) do
