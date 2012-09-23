@@ -12,11 +12,11 @@ ODIN_prof, ODIN_eprof, ODIN_cc, ODIN_flags = unpack(arg)
 path = apr.filepath_list_split(getenv("PATH"));
 if getenv("ODIN_CC_HOME") ~= "" then
    table.insert(path, getenv("ODIN_CC_HOME"))
-   apr.env_set("PATH", apr.filepath_list_merge(path))
+   setenv("PATH", apr.filepath_list_merge(path))
 end
 if ODIN_home ~= "" then
    table.insert(path, ODIN_home)
-   apr.env_set("PATH", apr.filepath_list_merge(path))
+   setenv("PATH", apr.filepath_list_merge(path))
 end
 
 compiler = getenv("ODIN_CC")
@@ -28,8 +28,8 @@ end
 
 args={}
 objs=''
-for o in apr.glob(apr.filepath_merge(ODIN_o, "*")) do
-   o = apr.filepath_name(o)
+for o in apr.glob(pathcat(ODIN_o, "*")) do
+   o = basename(o)
    objs = objs .. ' ' .. o
    table.insert(args, o)
 end
@@ -45,29 +45,23 @@ if ODIN_lib ~= "" then libs=wholefile(ODIN_lib) end
 
 odin_log(compiler .. flags .. " " .. objs .. " " .. libs .. " -o exe")
 
-cwd = apr.filepath_get(1)
-exe=apr.filepath_merge(cwd, "exe", 'native')
+exe=pathcat(getcwd(), "exe")
 table.insert(args, '-o')
 table.insert(args, exe)
-args.stdout = 'MESSAGES'
 args.chdir = ODIN_o
 runcmd(compiler .. flags .. libs, args)
-msg = io.open("MESSAGES")
-if msg then io.write(msg:read('*a')); msg:close() end
 
 if ODIN_purify ~= "" then
    odir = apr.dir_open(ODIN_o)
    for endle in odir:entries('type', 'path') do
       if endle.type ~= 'link' then
-	 apr.file_remove(endle.path)
+	 rm(endle.path)
       end
    end
 end
 
-xst = apr.stat("exe.exe", "protection")
-if xst then xst = string.sub(xst, 3, 1) end
-if xst == 'x' then
+if is_exec("exe.exe") then
    -- original renamed to mvtmp first, then to exe; not sure why
    -- seems pointless, so I'm not going to do it.
-   apr.file_rename("exe.exe", "exe")
+   mv("exe.exe", "exe")
 end

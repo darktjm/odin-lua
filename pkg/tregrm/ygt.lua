@@ -7,7 +7,7 @@ end
 
 ODIN_ygi, ODIN_yaccid, ODIN_tregrm = unpack(arg)
 
-odin_log(apr.filepath_name(ODIN_tregrm) .. ' ' .. apr.filepath_name(ODIN_ygi))
+odin_log(basename(ODIN_tregrm) .. ' ' .. basename(ODIN_ygi))
 
 runcmd(ODIN_tregrm, { stdin = ODIN_ygi, stdout = 'ygi.log' })
 
@@ -18,7 +18,7 @@ else
    YY = string.upper(ODIN_yaccid)
 end
 
-if apr.stat("LEX_TAB", 'type') == 'file' then
+if is_file("LEX_TAB") then
    if ODIN_yaccid then
       th = io.open("tok.h", 'w')
       for l in io.lines("LEX_TAB") do
@@ -28,13 +28,13 @@ if apr.stat("LEX_TAB", 'type') == 'file' then
       end
       th:close()
    else
-      apr.file_rename("LEX_TAB", "tok.h")
+      mv("LEX_TAB", "tok.h")
    end
 end
-if apr.stat("GRM_TAB", 'type') == 'file' then
-   apr.file_rename("GRM_TAB", 'y')
+if is_file("GRM_TAB") then
+   mv("GRM_TAB", 'y')
 end
-if apr.stat("NOD_TAB", 'type') == 'file' then
+if is_file("NOD_TAB") then
    if ODIN_yaccid then
       nh = io.open("nod.h", 'w')
       for l in io.lines("NOD_TAB") do
@@ -44,6 +44,6 @@ if apr.stat("NOD_TAB", 'type') == 'file' then
       end
       nh:close()
    else
-      apr.file_rename("NOD_TAB", "nod.h")
+      mv("NOD_TAB", "nod.h")
    end
 end

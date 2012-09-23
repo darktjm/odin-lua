@@ -22,10 +22,8 @@ if ODIN_debug ~= "" then flags = flags .. " -g" end
 if ODIN_prof ~= "" then flags = flags .. " -pg" end
 if ODIN_flags ~= "" then flags = flags .. " " .. wholefile(ODIN_flags) end
 
-odin_log(compiler .. flags .. " -c " .. apr.filepath_name(ODIN_f))
+odin_log(compiler .. flags .. " -c " .. basename(ODIN_f))
 
 -- emulate old unsafe behavior for cmd line options, but quote ODIN_f
-runcmd(compiler .. flags , {'-c', ODIN_f})
-
-input = apr.filepath_name(ODIN_f, true)
-if apr.stat(input .. '.o', 'type') == 'file' then apr.file_rename(input .. '.o', 'o') end
+-- also, use -o instead of post-compile mv to rename output
+runcmd(compiler .. flags , {'-c', ODIN_f, '-o', pathcat(getcwd(), 'o')})

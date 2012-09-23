@@ -24,7 +24,7 @@ if ODIN_incsp ~= "" then
    end
 end
 
-odin_log("cproto" .. flags .. " " .. apr.filepath_name(ODIN_FILE))
+odin_log("cproto" .. flags .. " " .. basename(ODIN_FILE))
 
 -- the following simulates the existing Func.hh files:
 -- -f2 removes parameter names (types only)

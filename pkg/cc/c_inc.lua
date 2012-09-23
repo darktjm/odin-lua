@@ -10,14 +10,14 @@ if not runcmd then
    dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
 
-odin_log('scan_for_includes ' .. apr.filepath_name(ODIN_FILE))
+odin_log('scan_for_includes ' .. basename(ODIN_FILE))
 
 incsp=ODIN_home
 if ODIN_incsp ~= "" then incsp=incsp .. ' ' .. wholefile(ODIN_incsp) end
 incsp=incsp .. ' ' .. getenv("ODIN_CC_I")
 for header in string.gmatch(incsp, '%S+') do
    if not apr.filepath_root(header, 'native') then
-      io.open('ERRORS', 'a'):write("Search path entry must be absolute: " .. header .. "\n")
+      odin_error("Search path entry must be absolute: " .. header)
    end
 end
 
@@ -35,8 +35,7 @@ if ODIN_ignore ~= "" then
    for l in io.lines(ODIN_ignore) do
       ok, msg = pcall(rex.new, l, nosub)
       if not ok then
-	 io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. l .. "': " .. msg .. "\n")
-	 os.exit(0)
+	 odin_error("Error in ignore pattern '" .. l .. "': " .. msg, 0)
       end
       if re == "" then re = l else re = re .. "|" .. l end
    end
@@ -45,8 +44,7 @@ if ODIN_ignore ~= "" then
    if ok then
       ignore_re = msg
    else
-      io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. re .. "': " .. msg .. "\n")
-      os.exit(0)
+      odin_error("Error in ignore pattern '" .. re .. "': " .. msg, 0)
    end
 end
 
@@ -54,16 +52,14 @@ ODIN_IGNORE = getenv("ODIN_IGNORE")
 if ODIN_IGNORE ~= "" then
    ok, msg = pcall(rex.new, ODIN_IGNORE, nosub)
    if not ok then
-      io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. ODIN_IGNORE .. "': " .. msg .. "\n")
-      os.exit(0)
+      odin_error("Error in ignore pattern '" .. ODIN_IGNORE .. "': " .. msg, 0)
    elseif ignore_re then
       ODIN_ignore = ODIN_ignore .. '|' .. ODIN_IGNORE
       ok, msg = pcall(rex.new, ODIN_ignore, nosub)
       if ok then
 	 ignore_re = msg
       else
-	 io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. ODIN_ignore .. "': " .. msg .. "\n")
-	 os.exit(0)
+	 odin_error("Error in ignore pattern '" .. ODIN_ignore .. "': " .. msg, 0)
       end
    else
       ignore_re = msg
@@ -84,23 +80,23 @@ for l in io.lines(ODIN_FILE) do
    s, e, m = include_re:tfind(l)
    if s then
       name = nil
-      itype = nil
-      for i, v in ipairs(m) do if v then name, itype = v, i end end
-      if apr.filepath_root(name) then
+      kind = nil
+      for i, v in ipairs(m) do if v then name, kind = v, i end end
+      if apr.filepath_root(name, 'native') then
 	 if not ignore_re or not ignore_re:exec(name) then
 	    vd:write("'" .. name .. "'\n=''\n")
 	 end
       else
 	 didone = nil
 	 if kind == 1 then -- local
-	    aname = apr.filepath_merge(ODIN_dir, name, 'native')
+	    aname = pathcat(ODIN_dir, name)
 	    if not ignore_re or not ignore_re:exec(aname) then
 	       vd:write("'" .. aname .. "'\n")
 	       didone = 1
 	    end
 	 end
 	 for i, header in ipairs(dirs) do
-	    aname = apr.filepath_merge(header, name, 'native')
+	    aname = pathcat(header, name)
 	    if not ignore_re or not ignore_re:exec(aname) then
 	       vd:write("'" .. aname .. "'\n")
 	       didone = 1
@@ -110,3 +106,4 @@ for l in io.lines(ODIN_FILE) do
       end
    end
 end
+vd:close()

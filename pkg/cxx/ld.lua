@@ -54,8 +54,8 @@ flags=flags .. " " .. getenv("ODIN_CXX_FLAGS")
 
 args={}
 objs=''
-for o in apr.glob(apr.filepath_merge(ODIN_o, "*")) do
-   o = apr.filepath_name(o)
+for o in apr.glob(pathcat(ODIN_o, "*")) do
+   o = basename(o)
    objs = objs .. ' ' .. o
    table.insert(args, o)
 end
@@ -65,8 +65,7 @@ if ODIN_lib ~= "" then libs=wholefile(ODIN_lib) end
 
 odin_log(compiler .. flags .. " " .. objs .. " " .. libs .. " -o exe")
 
-cwd = apr.filepath_get(1)
-exe=apr.filepath_merge(cwd, "exe", 'native')
+exe=pathcat(getcwd(), "exe")
 table.insert(args, '-o')
 table.insert(args, exe)
 args.stdout = 'MESSAGES'
@@ -78,7 +77,7 @@ if not runcmd(compiler .. flags .. libs, args) then
       if ok then
 	 for l in io.lines("ERRORS") do
 	    if msg:exec(l) then
-	       apr.file_rename("ERRORS", "WARNINGS")
+	       mv("ERRORS", "WARNINGS")
 	       break
 	    end
 	 end
@@ -98,8 +97,6 @@ if ODIN_purify ~= "" then
    end
 end
 
-xst = apr.stat("exe.exe", "protection")
-if xst then xst = string.sub(xst, 3, 1) end
-if xst == 'x' then
-   apr.file_rename("exe.exe", "exe")
+if is_exec("exe.exe") then
+   mv("exe.exe", "exe")
 end

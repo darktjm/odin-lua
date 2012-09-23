@@ -7,7 +7,7 @@ end
 
 ODIN_FILE, ODIN_cmd, ODIN_cmdfile = unpack(arg)
 
-cmd = "io.write(io.read('*a'))"
+cmd = "cat(io.input())"
 if ODIN_cmd ~= "" then
    cmd = wholefile(ODIN_cmd)
 end
@@ -20,21 +20,30 @@ if ODIN_cmdfile ~= "" then
    end
 end
 
-odin_log("lua " .. cmd)
+odin_log("lua!" .. cmd)
 
 io.input(ODIN_FILE)
 io.output('lua_stdout')
-apr.dir_make('lua_output')
-apr.filepath_set('lua_output')
+mkdir('lua_output')
+chdir('lua_output')
 
 if ODIN_cmd ~= "" then
-   dofile(ODIN_cmd)
+   st, msg = pcall(dofile, ODIN_cmd)
+   if not st then
+      odin_error(msg, 0)
+   end
 end
 if ODIN_cmdfile ~= "" then
    for f in io.lines(ODIN_cmdfile) do
-      dofile(f)
+      st, msg = pcall(dofile, f)
+      if not st then
+	 odin_error(msg, 0)
+      end
    end
 end
 if ODIN_cmd == "" and ODIN_cmdfile == "" then
-   io.write(io.read('*a'))
+   st, msg = pcall(cat, io.input())
+   if not st then
+      odin_error(msg, 0)
+   end
 end

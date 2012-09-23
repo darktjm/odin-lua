@@ -7,7 +7,7 @@ end
 
 ODIN_l, ODIN_yaccid = unpack(arg)
 
-odin_log("lex " .. apr.filepath_name(ODIN_l))
+odin_log("lex " .. basename(ODIN_l))
 
 runcmd("lex", {ODIN_l})
 
@@ -18,7 +18,7 @@ else
    YY = string.upper(ODIN_yaccid)
 end
 
-if apr.stat("lex.yy.c", 'type') == 'file' then
+if is_file("lex.yy.c") then
    c = io.open("c", "w")
    for l in io.lines("lex.yy.c") do
       l = string.gsub(l, '"stdio%.h"', '<stdio.h>')
@@ -33,4 +33,5 @@ if apr.stat("lex.yy.c", 'type') == 'file' then
 	 c:write(l .. "\n")
       -- end
    end
+   c:close()
 end   

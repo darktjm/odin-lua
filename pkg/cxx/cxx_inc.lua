@@ -10,7 +10,7 @@ rex = require 'rex_posix'
 ODIN_FILE, ODIN_dir,
 ODIN_home, ODIN_incsp, ODIN_ignore = unpack(arg)
 
-odin_log('scan_for_includes ' .. apr.filepath_name(ODIN_FILE))
+odin_log('scan_for_includes ' .. basename(ODIN_FILE))
 
 incsp=ODIN_home
 if ODIN_incsp ~= "" then incsp=incsp .. ' ' .. wholefile(ODIN_incsp) end
@@ -84,23 +84,23 @@ for l in io.lines(ODIN_FILE) do
    s, e, m = include_re:tfind(l)
    if s then
       name = nil
-      itype = nil
-      for i, v in ipairs(m) do if v then name, itype = v, i end end
-      if apr.filepath_root(name) then
+      kind = nil
+      for i, v in ipairs(m) do if v then name, kind = v, i end end
+      if apr.filepath_root(name, 'native') then
 	 if not ignore_re or not ignore_re:exec(name) then
 	    vd:write("'" .. name .. "'\n=''\n")
 	 end
       else
 	 didone = nil
 	 if kind == 1 then -- local
-	    aname = apr.filepath_merge(ODIN_dir, name, 'native')
+	    aname = pathcat(ODIN_dir, name)
 	    if not ignore_re or not ignore_re:exec(aname) then
 	       vd:write("'" .. aname .. "'\n")
 	       didone = 1
 	    end
 	 end
 	 for i, header in ipairs(dirs) do
-	    aname = apr.filepath_merge(header, name, 'native')
+	    aname = pathcat(header, name)
 	    if not ignore_re or not ignore_re:exec(aname) then
 	       vd:write("'" .. aname .. "'\n")
 	       didone = 1
@@ -110,3 +110,4 @@ for l in io.lines(ODIN_FILE) do
       end
    end
 end
+vd:close()

@@ -15,10 +15,10 @@ if ODIN_pkgdir == "" then
    odin_error("+pkg_dir must be set", 0)
 end
 
-odin_log(apr.filepath_name(ODIN_exe) .. ' ' .. ODIN_pkgdir .. ' ' .. ODIN_pkglst .. ' 0')
+odin_log(basename(ODIN_exe) .. ' ' .. ODIN_pkgdir .. ' ' .. ODIN_pkglst .. ' 0')
 
 runcmd(ODIN_exe, { ODIN_pkglst, ODIN_pkgdir, '0', stdout = 'dg.log' })
 
-if io.open("DG.c") then apr.file_rename("DG.c", "c") end
-if io.open("DG") then apr.file_rename("DG", "dg.tab") end
-if io.open("ENV") then apr.file_rename("ENV", "dg.env") end
+if is_file("DG.c") then mv("DG.c", "c") end
+if is_file("DG") then mv("DG", "dg.tab") end
+if is_file("ENV") then mv("ENV", "dg.env") end

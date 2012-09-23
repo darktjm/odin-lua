@@ -23,6 +23,6 @@ end
 flags=flags .. " " .. getenv("ODIN_CPP_FLAGS")
 
 ODIN_CPP = getenv("ODIN_CPP")
-odin_log(ODIN_CPP .. flags .. ' ' .. apr.filepath_name(ODIN_FILE))
+odin_log(ODIN_CPP .. flags .. ' ' .. basename(ODIN_FILE))
 
 runcmd(ODIN_CPP .. flags, {ODIN_FILE, stdout = ODIN_cpp})

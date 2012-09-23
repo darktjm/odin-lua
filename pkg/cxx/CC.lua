@@ -50,10 +50,11 @@ end
 if ODIN_flags ~= "" then flags = flags .. " " .. wholefile(ODIN_flags) end
 flags=flags .. " " .. getenv("ODIN_CXX_FLAGS")
 
-odin_log(compiler .. flags .. " -c " .. apr.filepath_name(ODIN_source))
+odin_log(compiler .. flags .. " -c " .. basename(ODIN_source))
 
 -- emulate old unsafe behavior for cmd line options, but quote ODIN_source
-if not runcmd(compiler .. flags , {'-c', ODIN_source}) then
+-- also, use -o to rename output instead of post-compile mv
+if not runcmd(compiler .. flags , {'-c', ODIN_source, '-o', pathcat(getcwd(), 'o')}) then
    -- old code did some message mangling that's highly compiler dependent
    -- old code used abort_msgs file; I'm just doing it in-line
    for l in io.lines("ERRORS") do
@@ -68,7 +69,7 @@ if not runcmd(compiler .. flags , {'-c', ODIN_source}) then
    end
 else
    -- yet more message mangling that's highly compiler dependent
-   apr.file_rename("WARNINGS", "MSGS")
+   mv("WARNINGS", "MSGS")
    wrn = io.open("WARNINGS", "w")
    for l in io.lines("MSGS") do
       if string.find(l, "arning") then
@@ -79,7 +80,6 @@ else
 	 io.write(l)
       end
    end
+   wrn:close()
 end
 
-input = apr.filepath_name(ODIN_source, true)
-if apr.stat(input .. '.o', 'type') == 'file' then apr.file_rename(input .. '.o', 'o') end

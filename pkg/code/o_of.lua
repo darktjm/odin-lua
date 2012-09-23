@@ -11,7 +11,7 @@ o_f = io.open(ODIN_o)
 o_of = io.open("o_of", "w")
 for src in io.lines(ODIN_src) do
    o = o_f:read();
-   o_of:write('%' .. apr.filepath_name(src, true) .. '.o == '..o..'\n')
+   o_of:write('%' .. basename(src, true) .. '.o == '..o..'\n')
 end
 o_f:close()
 o_of:close()

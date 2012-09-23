@@ -16,9 +16,10 @@ flags=getenv("ODIN_YACC_FLAGS")
 if ODIN_flags ~= "" then flags = wholefile(ODIN_flags) .. ' ' .. flags end
 if ODIN_gnu ~= "" then flags = flags .. ' -y' end
 
-odin_log(compiler .. ' ' .. flags .. ' ' .. apr.filepath_name(ODIN_y))
+odin_log(compiler .. ' ' .. flags .. ' ' .. basename(ODIN_y))
 
-if runcmd(compiler .. ' ' .. flags, { ODIN_y }) and ODIN_conflictok == "" then
+if runcmd(compiler .. ' ' .. flags, { ODIN_y }) and ODIN_conflictok == "" and
+   not is_empty('WARNINGS') then
    for l in io.lines('WARNINGS') do
       if string.find(l, 'conflicts') then
 	 odin_error(l)
@@ -33,7 +34,7 @@ else
    YY = string.upper(ODIN_yaccid)
 end
 
-if apr.stat("y.tab.c", 'type') == 'file' then
+if is_file("y.tab.c") then
    c = io.open("c", "w")
    for l in io.lines("y.tab.c") do
       if ODIN_sys5 ~= "" or getenv("ODIN_SYS5") ~= "" then
@@ -48,11 +49,12 @@ if apr.stat("y.tab.c", 'type') == 'file' then
 	 end
 	 c:write(l .. "\n")
       -- end
-   end
+  end
+  c:close()
 end
-if apr.stat("y.tab.h", 'type') == 'file' then
-   apr.file_rename("y.tab.h", "h")
+if is_file("y.tab.h") then
+   mv("y.tab.h", "h")
 end
-if apr.stat("y.output", 'type') == 'file' then
-   apr.file_rename("y.output", "yacc.log")
+if is_file("y.output") then
+   mv("y.output", "yacc.log")
 end

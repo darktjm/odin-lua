@@ -31,6 +31,7 @@ if not goterr then
    end
 end
 
-if not goterr then
-   io.write(io.open("MESSAGES"):read('*a'))
+if not goterr and not is_empty("MESSAGES") then
+   cat("MESSAGES")
+   rm("MESSAGES")
 end

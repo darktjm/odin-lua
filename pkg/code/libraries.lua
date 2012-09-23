@@ -43,5 +43,6 @@ for lib_name in string.gmatch(string.gsub(lib_names, "-L ", "-L"), "%S+") do
       flags = flags .. " -l" .. lib_name
    end
 end
+vd:close()
 
-io.open("library_flags", "w"):write(flags)
+append_line('library_flags', flags)

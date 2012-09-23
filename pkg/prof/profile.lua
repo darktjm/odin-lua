@@ -15,6 +15,6 @@ if ODIN_data == "" then
 end
 data = wholefile(ODIN_data)
 
-odin_log("gprof" .. flags .. " " .. apr.filepath_name(ODIN_exe) .. " " .. data)
+odin_log("gprof" .. flags .. " " .. basename(ODIN_exe) .. " " .. data)
 
 runcmd("gprof" .. flags .. " " .. ODIN_exe .. " " .. data, { stdout = 'profile'})

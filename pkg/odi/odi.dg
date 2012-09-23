@@ -31,12 +31,12 @@ $OS_ROOTDIR 'ObjectStore root directory' = '/net/xlendi/usr2/ostore-r3.0';
 READ-LIST (:odi.cxx.sm)
    => (:odi.cxx.sm.list);
 
-EXEC (com_schema.sh) (+schema_src :ls) (+schema_src :map=:dir :ls)
+EXEC (com_schema.lua) (+schema_src :ls) (+schema_src :map=:dir :ls)
  (+schema_dir)@ (+inc_sp) (:com_schema_standin)@
  NEEDS (+schema_src) (+schema_src :map=:all_cxx_inc)
   => (:com_schema_standin);
 
-EXEC (app_schema.sh) (+schema_dir)@
+EXEC (app_schema.lua) (+schema_dir)@
  (:odi.cxx.sm.list :recurse=:sm.list :map=:o :ls) (:library_flags)
  NEEDS (:odi.cxx.sm.list :recurse=:sm.list :map=:o) (:libraries)
  (:com_schema_standin)

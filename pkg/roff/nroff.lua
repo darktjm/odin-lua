@@ -10,6 +10,6 @@ ODIN_roff, ODIN_dir, ODIN_mp = unpack(arg)
 mflag = ''
 if ODIN_mp ~= "" then mflag=' -m' .. wholefile(ODIN_mp) end
 
-odin_log('nroff' .. mflag .. ' ' .. apr.filepath_name(ODIN_roff))
+odin_log('nroff' .. mflag .. ' ' .. basename(ODIN_roff))
 
 runcmd('nroff' .. mflag, {stdin = ODIN_roff, stdout = 'nroff', chdir = ODIN_dir})

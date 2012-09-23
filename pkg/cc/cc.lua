@@ -13,11 +13,11 @@ ODIN_cc, ODIN_flags = unpack(arg)
 path = apr.filepath_list_split(getenv("PATH"));
 if getenv("ODIN_CC_HOME") ~= "" then
    table.insert(path, getenv("ODIN_CC_HOME"))
-   apr.env_set("PATH", apr.filepath_list_merge(path))
+   setenv("PATH", apr.filepath_list_merge(path))
 end
 if ODIN_home ~= "" then
    table.insert(path, ODIN_home)
-   apr.env_set("PATH", apr.filepath_list_merge(path))
+   setenv("PATH", apr.filepath_list_merge(path))
 end
 
 compiler = getenv("ODIN_CC")
@@ -42,10 +42,8 @@ end
 if ODIN_flags ~= "" then flags = flags .. " " .. wholefile(ODIN_flags) end
 flags=flags .. " " .. getenv("ODIN_CC_FLAGS")
 
-odin_log(compiler .. flags .. " -c " .. apr.filepath_name(ODIN_c))
+odin_log(compiler .. flags .. " -c " .. basename(ODIN_c))
 
 -- emulate old unsafe behavior for cmd line options, but quote ODIN_c
-runcmd(compiler .. flags , {'-c', ODIN_c})
-
-input = apr.filepath_name(ODIN_c, true)
-if apr.stat(input .. '.o', 'type') == 'file' then apr.file_rename(input .. '.o', 'o') end
+-- also, eliminate final 'mv' step using -o option
+runcmd(compiler .. flags , {'-c', '-o', pathcat(getcwd(), 'o'), ODIN_c})

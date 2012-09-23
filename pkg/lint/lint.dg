@@ -43,11 +43,11 @@ $ODIN_LINT_FLAGS 'lint flags' = '';
 
 # Tools
 
-EXEC (lint1.sh) (:c) (:c :dir)@ (+inc_sp) (+define) (+lint_flags)
+EXEC (lint1.lua) (:c) (:c :dir)@ (+inc_sp) (+define) (+lint_flags)
  (+ignore_mesg) NEEDS (:c +home=(:c :dir) :lookup=:all_c_inc)
    => (:ln) (:lint1.log);
 
-EXEC (lint.sh) (:code.list :map=:ln :ls) (:code.list :map=:lint1.log :ls)
+EXEC (lint.lua) (:code.list :map=:ln :ls) (:code.list :map=:lint1.log :ls)
  (+stub :map=:ln :ls) (+ln :ls) (+lint_flags) (+ignore_mesg)
  (+global_ignore_mesg)
  NEEDS (:code.list :map=:ln) (:code.list :map=:lint1.log)

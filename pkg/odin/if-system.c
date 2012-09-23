@@ -205,6 +205,11 @@ static int lua_dostring(lua_State * L, const char *s, const char *name)
    return lua_report(L, status);
 }
 
+int Lua_String(void *L, const char *s)
+{
+   return lua_dostring(L, s, s);
+}
+
 static void lua_init_error(lua_State * L)
 {
    lua_pushstring(L, "Lua initialization error");
@@ -257,14 +262,38 @@ static int lua_run(lua_State * L)
    return 0;
 }
 
+void *Lua_Init(void)
+{
+   lua_State *L = lua_open();
+
+   if (!L) {
+      SysCallError(StdOutFD, "lua_open");
+      return NULL;
+   }
+   if (lua_cpcall(L, &lua_init, NULL)) {
+      if (!lua_isnil(L, -1)) {
+	 const char *msg = lua_tostring(L, -1);
+	 if (msg)
+	    fprintf((FILE *) StdOutFD, "*** %s\n", msg);
+      }
+      lua_close(L);
+      return NULL;
+   }
+   return L;
+}
+
 int
 SystemExec(const char *Tool, char *const *ArgV, const char *LogFileName)
 {
    int pid, fd, status;
 
-   /* try to run as lua if non-executable and ends with .lua */
+   /* try to run as lua if name ends with .lua */
    /* only do initialization once; fork() will take care of separation */
+#if 0 /* really, people should not name UNIX executables by content */
    int run_lua = !IsExecutable((tp_FileName)Tool);
+#else
+   int run_lua = 1;
+#endif
    if (run_lua) {
       int len = strlen(Tool);
       if (len < 4 || strcmp(Tool + len - 4, ".lua"))
@@ -275,21 +304,9 @@ SystemExec(const char *Tool, char *const *ArgV, const char *LogFileName)
       /* if(LogLevel >= LOGLEVEL_ExecLine)
          fprintf((FILE *)StdOutFD, "*** Running \"%s\" as Lua\n", Tool); */
       if (!L) {
-         L = lua_open();
-         if (!L) {
-            SysCallError(StdOutFD, "lua_open");
-            return -1;
-         }
-         if (lua_cpcall(L, &lua_init, NULL)) {
-            if (!lua_isnil(L, -1)) {
-               const char *msg = lua_tostring(L, -1);
-               if (msg)
-                  fprintf((FILE *) StdOutFD, "*** %s\n", msg);
-            }
-            lua_close(L);
-            L = NULL;
-            return -1;
-         }
+	 L = Lua_Init();
+	 if(!L)
+	    return -1;
       }
    }
    pid = fork();

@@ -11,7 +11,7 @@ if $ODIN_other == "" then
    odin_error('No comparison file specified', 0)
 end
 
-odin_log("diff " .. apr.filepath_name(ODIN_FILE) .. " " .. apr.filepath_name(ODIN_other))
+odin_log("diff " .. basename(ODIN_FILE) .. " " .. basename(ODIN_other))
 
 -- note: this differs from the sh version in that errors are always
 -- produced if files are different.

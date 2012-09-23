@@ -9,3 +9,4 @@ for l in io.lines(arg[1]) do
    nl = string.gsub(l, '^** Summary of error messages for (.*)', '%1\n')
    if nl ~= l then redo_errs:write(nl) end
 end
+redo_errs:close()

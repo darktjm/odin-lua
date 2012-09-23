@@ -10,7 +10,7 @@ rex = require 'rex_posix'
 ODIN_regsub, ODIN_FILE, ODIN_match, ODIN_hide, ODIN_subst, ODIN_substonly,
 ODIN_prefix, ODIN_suffix = unpack(arg)
 
-odin_log(ODIN_regsub .. ' ' .. apr.filepath_name(ODIN_FILE))
+odin_log(ODIN_regsub .. ' ' .. basename(ODIN_FILE))
 
 -- refl = rex.flags()
 -- nosub = refl['NOSUB'] + refl['EXTENDED']

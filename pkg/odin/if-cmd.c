@@ -19,6 +19,7 @@ geoff@boulder.colorado.edu
 #include "inc/OC_NodTyp_.h"
 #include "inc/Status_.h"
 #include "inc/Str.h"
+#include "lualib.h"
 
 static int CommandNesting = 0;
 static int MaxCommandNesting = 100;
@@ -43,7 +44,6 @@ Execute(boolean * AbortPtr,
       return;
    }
 
-   /* no point in trying Lua here; the user can just use the lua cmd directly */
    InFD = FileName_RFilDsc(FileName, FALSE);
    if (InFD == ERROR) {
       SystemError("\"%s\": cannot read.\n", FileName);
@@ -68,10 +68,12 @@ Execute(boolean * AbortPtr,
    }
 
    while (Str != NIL && !Signalled) {
-      if (LogLevel >= LOGLEVEL_OdinCommand) {
+      if (Str[0] != '@' && LogLevel >= LOGLEVEL_OdinCommand) {
          Write(StdOutFD, "<> ");
          WriteLine(StdOutFD, Str);
       }
+      if (Str[0] == '@')
+	 Str = Str + 1;
       Nod = OC_Parser(Str, FileName, &LineNum);
       if (Nod == ERROR) {
          *AbortPtr = TRUE;
@@ -398,6 +400,20 @@ Do_Execute(boolean * AbortPtr, tp_Nod Root, boolean Interactive)
    if (TgtNod != NIL) {
       (void) strcat(CmdStr, " ");
       (void) strcat(CmdStr, FileName);
+   }
+   /* OK, maybe it is good to be able to do Lua directly */
+   /* there isn't much efficiency benefit, but it is more portable */
+   /* plus it takes care of ensuring the standard library is loaded */
+   if (strncmp(CmdStr, "lua!", 4) == 0) {
+      lua_State *L = Lua_Init();
+      if(!L)
+	 *AbortPtr = TRUE;
+      else {
+	 if (Lua_String(L, "os.exit = nil") || Lua_String(L, CmdStr + 4))
+	    lua_error(L);
+	 lua_close(L);
+      }
+      goto done;
    }
    SystemExecCmdWait(AbortPtr, CmdStr, Interactive);
    if (Signalled) {

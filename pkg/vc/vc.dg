@@ -65,25 +65,25 @@ $ODIN_VC_SCCS 'look for SCCS files in viewpath' = 'yes';
 
 # Tools
 
-EXEC (rcs.log.sh) (:,v) (+date) (+rev) (+state) (+who)
+EXEC (rcs.log.lua) (:,v) (+date) (+rev) (+state) (+who)
    => (:log);
 
-EXEC (rcs_co.sh) (:,v) (+date) (+rev) (+state) (+who)
+EXEC (rcs_co.lua) (:,v) (+date) (+rev) (+state) (+who)
    => (:co);
 
-EXEC (sccs_co.sh) (:sccs) (+date) (+rev)
+EXEC (sccs_co.lua) (:sccs) (+date) (+rev)
    => (:sccs.co);
 
-EXEC (sccs.log.sh) (:sccs) (+date) (+rev)
+EXEC (sccs.log.lua) (:sccs) (+date) (+rev)
    => (:sccs.log);
 
-EXEC (vw.sh) (:,vw :source_names) (+view_sp)
+EXEC (vw.lua) (:,vw :source_names) (+view_sp)
    => (:view.source.spec);
 
-EXEC (merge.sh) (:view.source.spec :view :names) (:,vw :operation_names)
+EXEC (merge.lua) (:view.source.spec :view :names) (:,vw :operation_names)
    => (:view.names);
 
-EXEC (vw.of.sh) (:,vw :source_names) (:view.names :list :map=:try.co :ls)
+EXEC (vw.of.lua) (:,vw :source_names) (:view.names :list :map=:try.co :ls)
    => (:vw.of);
 
 COLLECT (:vw.of :vir_dir)

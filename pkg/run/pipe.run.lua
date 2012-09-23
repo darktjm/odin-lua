@@ -5,6 +5,8 @@ if not runcmd then
    dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
 end
 
+-- this is inherently unportable; use pipe.lua_run.lua instead
+
 ODIN_FILE, ODIN_cmd = unpack(arg)
 
 cmd = "cat"
@@ -14,5 +16,5 @@ end
 
 odin_log(cmd)
 
-apr.dir_make('output')
+mkdir('output')
 runcmd("sh", { "-c", cmd, chdir = 'output', stdin = ODIN_FILE, stdout = 'stdout' })

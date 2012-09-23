@@ -7,14 +7,14 @@ end
 
 ODIN_FILE, ODIN_home = unpack(arg)
 
-odin_log('scan_for_includes ' .. apr.filepath_name(ODIN_FILE))
+odin_log('scan_for_includes ' .. basename(ODIN_FILE))
 
 sis = io.open('so_inc_spec', 'w')
 for l in io.lines(ODIN_FILE) do
    m = string.match(l, '^%.so[ \t]*(.*)$')
    if m then
-      if not apr.filepath_root(m) then
-	 m = apr.filepath_merge(ODIN_home, m, 'native')
+      if not apr.filepath_root(m, 'native') then
+	 m = pathcat(ODIN_home, m)
 	 sis:write(m .. '\n')
       end
    end

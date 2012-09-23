@@ -68,18 +68,18 @@
 
 
 
-EXEC (oneTex.sh) (:tex) (:label) => (:one_tex_vtd);
+EXEC (oneTex.lua) (:tex) (:label) => (:one_tex_vtd);
 
 
 :one_tex_vtd 'Singleton set of TeX formatter inputs' => :tex.vtd;
 
 
-EXEC (root.sh) (:tex.vtd) (+texroot)
+EXEC (root.lua) (:tex.vtd) (+texroot)
   NEEDS (:tex.vtd :vir_tgt.list)
   => (:rootName) (:rootFileName);
 
 
-EXEC (texsp.sh) (:tex.vtd :vir_dir)@ (:dir)@ (+texsearch)
+EXEC (texsp.lua) (:tex.vtd :vir_dir)@ (:dir)@ (+texsearch)
   => (:texsp);
 
 
@@ -91,48 +91,48 @@ COLLECT (:rootFileName +texsppt=(:texsp) :texclose) => (:texbasis);
 :texbasis 'Document basis' => :LIST;
 
 
-EXEC (tex_view.sh) (:texnames) (+texsppt) => (:tex.view_desc);
+EXEC (tex_view.lua) (:texnames) (+texsppt) => (:tex.view_desc);
 :tex.view_desc 'View descriptor for basis files' => :FILE;
 
 
 
-EXEC (texscan.sh) (texscan.c :exe) (:tex) => (:texnames);
+EXEC (texscan.lua) (texscan.c :exe) (:tex) => (:texnames);
 
 
 COLLECT (:tex.view_desc :view) => (:texfiles);
 :texfiles 'Accessible files referenced' => :LIST;
 
 
-EXEC (fmtcmd.sh) (:rootFileName +texsppt=(:texsp) :texfiles :ls) (+tex) (+latex)
+EXEC (fmtcmd.lua) (:rootFileName +texsppt=(:texsp) :texfiles :ls) (+tex) (+latex)
      (+usepdf)
    => (:fmtcmd);
 :fmtcmd 'Formatting command' => :FILE;
 
 
-EXEC (tex.sh) (:fmtcmd) (:rootName) (:texsp) (:tex.vtd :texauxin.vtd :vir_dir)&
+EXEC (tex.lua) (:fmtcmd) (:rootName) (:texsp) (:tex.vtd :texauxin.vtd :vir_dir)&
    NEEDS (:texbasis :extract=:tex) (:texbasis :extract=:sty)
      (:texbasis :extract=:cls)
      (:tex.vtd :texauxin.vtd :vir_tgt.list)&
    => (:dvi) (:texpdf) (:tex.log) (:citations) (:indexntry) (:texauxout);
 
 
-EXEC (bibtex.sh) (:citations)& (:texsp)
+EXEC (bibtex.lua) (:citations)& (:texsp)
    NEEDS (:texbasis :extract=:bib) (:texbasis :extract=:bst)
    => (:tex.bbl);
 :tex.bbl 'TeX bibliographic reference file' => :FILE;
 
 
-EXEC (makeindex.sh) (:indexntry)& (+index_flags)
+EXEC (makeindex.lua) (:indexntry)& (+index_flags)
   => (:tex.ind) (:tex.ilg);
 :tex.ind 'TeX index file' => :FILE;
 :tex.ilg 'Messages from makeindex'? => :FILE;
 
 
-EXEC (texauxin.sh) (:rootName) (:texauxout)& (:tex.bbl) (:tex.ind)
+EXEC (texauxin.lua) (:rootName) (:texauxout)& (:tex.bbl) (:tex.ind)
   => (:texauxin.vtd);
 
 
-EXEC (dvips.sh) (:dvi) (:texsp) (+dvips_flags)
+EXEC (dvips.lua) (:dvi) (:texsp) (+dvips_flags)
    NEEDS (:texbasis :extract=:ps)
    => (:texps);
 
