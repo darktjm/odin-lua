@@ -62,10 +62,10 @@ EXEC (o_of.lua) (:code.list :map=:o_src :ls) (:code.list :map=:o :ls)
    => (:o_of);
 
 EXEC (ar.lua) (:o_of :vir_dir) NEEDS (:o_of :vir_tgt.list)
-   => (:a);
+   $ODIN_RANLIB => (:a);
 
 EXEC (libraries.lua) (+lib) (+lib_sp) NEEDS (:libraries.view_desc :libraries)&
-   => (:libraries.view_desc) (:library_flags);
+   $ODIN_LIB_SP => (:libraries.view_desc) (:library_flags);
 
 COLLECT (:libraries.view_desc :view)
    => (:libraries);

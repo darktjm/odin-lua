@@ -1,0 +1,10 @@
+dbx:
+  This package supports running a debugger on executables.
+:exe->:dbx
+  A script is created to run the debugger dbx/gdb (+gnu).  A core
+  file may optionally be specified with +core.  It is intended to be
+  used interactively with the ! suffix to execute the script.
+BUGS:
+  The script it generates is a shell script (i.e. can't really make it
+  lua easily)
+  The debugger's name is assumed, with no override other than dbx->gdb

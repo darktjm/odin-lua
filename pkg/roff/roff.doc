@@ -1,0 +1,25 @@
+BUGS:
+  +mp can probably be used to add arbitrary command-line options to nroff
+  No support for troff/groff
+roff:
+  This package supports documentation written for UNIX roff.
+:FILE->:so_inc_spec
+  Create a view_spec of files included by roff source.  This is used for
+  automatic dependency calculation.
+:so_inc_spec->:so_inc
+  Create a list of includes from a roff-generated view_spec.  This is
+  used for automatic dependency calculation.
+:so_inc->:all_so_inc
+  Collect all includes recursively from roff-generated include lists.
+  This is used for automatic dependency calculation.
+:FILE->:eqn
+  Format equations for roff.  The output retains its file type.
+:eqn_in->:gnc.eqn
+  Format equations for roff.  The output gets its type from the file
+  name pattern after stripping off the ,eqn.
+:tbl_in->:tbl
+  Format tables for roff.
+:roff->:nroff
+  Run nroff to produce terminal formatted output from roff source.  The
+  +mp parameter may be used to specify a single package to use when
+  formatting (e.g. +mp='an' for man pages).

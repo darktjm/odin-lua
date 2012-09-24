@@ -78,7 +78,7 @@ EXEC (sccs.log.lua) (:sccs) (+date) (+rev)
    => (:sccs.log);
 
 EXEC (vw.lua) (:,vw :source_names) (+view_sp)
-   => (:view.source.spec);
+   NEEDS $ODIN_VC_RCS $ODIN_VC_SCCS => (:view.source.spec);
 
 EXEC (merge.lua) (:view.source.spec :view :names) (:,vw :operation_names)
    => (:view.names);

@@ -36,9 +36,9 @@
 
 EXEC (cpp.lua) cpp (:FILE) (:FILE :dir)@ (+inc_sp) (+define)
  NEEDS (:FILE +home=(:FILE :dir) :lookup=:all_c_inc)
-   => (:cpp);
+   $ODIN_CPP $ODIN_CPP_FLAGS => (:cpp);
 
 EXEC (cpp.lua) gnc.cpp (:cpp_in) (:cpp_in :dir)@ (+inc_sp) (+define)
  NEEDS (:cpp_in +home=(:cpp_in :dir) :lookup=:all_c_inc)
-   => (:gnc.cpp);
+   $ODIN_CPP $ODIN_CPP_FLAGS => (:gnc.cpp);
 

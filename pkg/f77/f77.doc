@@ -1,0 +1,27 @@
+BUGS:
+  There is no ./configure fortran compiler detection or associated env
+  overrides like for C/C++
+  Not sure why there's a debug env var for C/C++, but there isn't for f77
+  No +gnu option to select gfortran/g77 like with C/C++
+  No easy way to use f2c instead
+f77:
+  This package enables compilation of Fortran programs.
+:f->:o
+  Compile Fortran code.  Its options are passed to the Fortran
+  compiler as follows:
+  
+  \begin{itemize}
+  \item +f77 may specify the compiler; the default is f77.  The compiler
+        is parsed into command-line elements like a shell command.  The
+	search path is +f77_home, followed by the path from the last
+	cache reset.
+  \item +prof adds the profiling option -pg.
+  \item +debug adds the debugging option -g.
+  \item +f77_flags may be used to add arbitrary command line options
+  \item The only other options are -c and the source file name.
+  
+  When the compiler is run, all standard output is printed directly to
+  the user.  Any standard error messages are collected as warnings or
+  errors.  Which of the two they are is determined by the compiler's
+  return code:  success produces warnings, and failure produces errors.
+  \end{itemize}

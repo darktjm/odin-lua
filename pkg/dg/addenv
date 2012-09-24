@@ -1,0 +1,94 @@
+#!/bin/sh
+
+# Adds environment variables as NEEDS to scripts it can parse (and removes
+# environment variables otherwise).
+
+# args: <dg-to-modify> <all-other-dg-files>
+dgin="$1"; shift
+
+dir="${dgin%/*}"
+test "$dir" = "$dgin" && dir=.
+
+# LANG=C prevents case folding which seems to happen on utf-8 locales
+export LANG=C
+
+# global list of environment variables (just the names) for quick lookup
+# format: $name$name...$name$
+# skip ODINCACHE because there's not much point and eli uses it a lot
+ev="`cat \"\$@\" | grep '^\\\$' | cut -d\  -f1 | sort -u | grep -v '^\\\$ODINCACHE\$' | tr -d \\\\n`\$"
+#printf %s\\n "$ev"
+
+# print all env vars in a shell script which have a definition in $ev
+# assumes no references in comments or literal strings ('')
+# args: <shell file>
+prenv_sh() {
+  shf="$1"
+  shift
+  # extract all apparent env var references (${all_upper})
+  # note that this also extracts e.g. $ODIN_cc as $ODIN_, but that's OK
+  sed -n -e ':a n; :b s/\(.*\)\${*\([A-Z_][A-Z0-9_]*\)}*\(.*\)/\2 \1 \3/;Ta
+                h;s/ .*//;p;g;s/^[^ ]* //;tb' "$shf" | sort -u | while read x; do
+    # make sure it's an env var that's actually known
+    case "$ev" in
+      *"\$$x\$"*) echo "\$$x"
+    esac
+  done
+}
+
+# print all env vars in a lua script which have a definition in $ev
+# assumes no references in comments or strings
+# args: <lua file>
+prenv_lua() {
+  shf="$1"
+  shift
+  # extract all apparent env var references (getenv("x"))
+  # apr uses env_get(), but I assume you use the library wrapper
+  # only literals are recognized
+  sed -n -e ':a n; :b s/\(.*\)getenv[( \t]*['\''"]\([A-Z_][A-Z0-9_]*\)['\''"][ \t)]*\(.*\)/\2 \1 \3/;Ta
+                h;s/ .*//;p;g;s/^[^ ]* //;tb' "$shf" | sort -u | while read x; do
+    # make sure it's an env var that's actually known
+    case "$ev" in
+      *"\$$x\$"*) echo "\$$x"
+    esac
+  done
+}
+
+# print env vars in shell or lua files
+prenv() {
+#  case "$1" in
+#    *.lua) prenv_lua "$@" ;;
+#    *.sh) prenv_sh "$@" ;;
+#  esac
+   case "`head -n 1 \"\$1\" 2>/dev/null`" in
+     "#!/bin/sh") prenv_sh "$1" ;;
+     "#!"*lua) prenv_lua "$1" ;;
+   esac
+}
+
+# for each script in the file, generate <fn> <vars>
+sed -n -e '/^EXEC/{:a /;/!{N;ba;};s/[^(]*(//;s/).*//p;}' "$dgin" | sort -u | while read x; do
+  case "$x" in
+    \$ODINCACHE/PKGS*) f="${dir%/*}/${x#*/*/}" ;;
+    *) f="$dir/$x" ;;
+  esac
+  echo "$x" `prenv "$f"`
+done | (
+  # generate a sed script based on that output
+  sexpr='/^EXEC/{:a /;/!{N;ba;};'
+  while read f vars; do
+    # assumes that no env vars are directly referenced
+    # and no env vars mentioned in help text
+    # and no NEEDS or => in literals
+    sexpr="$sexpr"'\`^EXEC[ \t\n]*('"$f"')`{
+                     s/[ \t]\$[A-Z_]*//g;s/NEEDS =>/=>/;'"
+                     ${vars:+/NEEDS/!s/=>/NEEDS =>/;s/=>/$vars =>/;}};"
+  done
+  # when done, generate new output into temporary file
+  sed -e "$sexpr}" "$dgin" > /tmp/ae.$$
+  if ! cmp /tmp/ae.$$ "$dgin" >/dev/null 2>&1; then
+    echo "Replacing $dgin"
+    mv /tmp/ae.$$ "$dgin"
+  else
+    rm -f /tmp/ae.$$
+  fi
+)

@@ -1,3 +1,7 @@
+pkgs.tex == (() +cmd=(mkpkgdoc) (../pkg) \
+                +need=((../pkg/PKGLST) +subst='.*/../pkg/&/&.dg;../pkg/&/&.doc' :regsub :list) \
+                  :stdout) +subst='_/\\\\_' :regsub
+
 odin.pdf == odin.tex +usepdf :pdf
 %html-in == <<
    odin.tex +usepdf :texauxin.vtd

@@ -1,0 +1,15 @@
+config:
+  This package stores the results of initial configuration as initial
+  values for environment variables:
+  
+  \begin{itemize}
+  \item \$ODIN_VERSION_STR --- odin-build release number
+  \item \$ODIN_CC --- name of the C compiler
+  \item \$ODIN_CC_FLAGS --- C compiler flags
+  \item \$ODIN_CPP --- name of the C preprocessor
+  \item \$ODIN_CPP_FLAGS -- C preprocessor flags
+  \item \$ODIN_CXX --- name of the C++ compiler
+  \item \$ODIN_CXX_FLAGS --- CC flags
+  \item \$ODIN_YACC --- name of the yacc compiler
+  \item \$ODIN_RANLIB --- archive symbol table program
+  \end{itemize}

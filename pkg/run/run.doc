@@ -1,0 +1,31 @@
+run:
+  This package supports execution of simple command lines.
+:FILE->:run
+  This creates and runs a script to execute comands given by +cmd, in
+  the order given, in the directory specified as input.  The commands
+  are not parsed, so any dependencies must be specified using +needs.
+:FILE->:stdout
+  This executes the given +cmd on the input file, and returns its
+  standard output as :stdout and any output files in the virtual
+  directory :output, assuming that output is generated in the current
+  working directory.  The output file type is retained from the input
+  file.  If no +cmd is specified, the result is a copy of the
+  input file.
+:FILE->:run.lua
+  This creates and runs a Lua script to execute comands given by +cmd, in
+  the order given, in the directory specified as input.  The commands
+  are not parsed, so any dependencies must be specified using +needs.
+:FILE->:lua_stdout
+  This executes the given +cmd Lua commands on the input file, and
+  returns any standard output as :stdout and any output files in the
+  virtual directory :output, assuming that output is generated in the
+  current working directory.  The output file type is retained from
+  the input file.  If no +cmd is specified, the result is a copy of the
+  input file.
+  
+  Within the Lua code, only io.write() will write to the results.  If
+  other commands are used, they should write to a separate file, and
+  the result :output/$<$other_file$>$ should be used instead of
+  :lua_stdout.  Otherwise, :lua_stdout will probably be overwritten on
+  exit.
+

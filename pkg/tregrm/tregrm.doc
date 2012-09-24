@@ -1,0 +1,99 @@
+tregrm:
+  This package supports generating C code for LALR(1) grammars which
+  produce tree structures as the sole side effect of parsing.  This
+  is likely too engrained into the Odin source code to be useful outside
+  of Odin.
+  
+  The input file consists of sequences of tokens, separated by
+  whitespace if necessary.  Comments are text from a hash mark (\#) to
+  the end of the line, and are ignored as whitespace.  Quoted strings
+  are any text between quotes, with backslash to escape quotes and
+  backslashes.  The quotes in this case are either both single-quotes
+  or both double-quotes.  Names are any sequence of letters, digits,
+  dashes, underscores, dots, slashes, and commas.
+  
+  The first section of the input describes C include files.  For each
+  file to include, \texttt{INCLUDE} \emph{name} will generate a
+  \verb|#include| directive.  The \emph{name} should be enclosed in
+  double-quotes for local includes and single-quotes for system
+  includes.
+  
+  The next section describes the lexical analyzer output.  It begins
+  with the word \texttt{SCANNER}.  For each terminal token, the grammar
+  name, followed by an equals sign, followed by the lexical analyzer name,
+  followed by the node type, if required, is given.  For end-of-file
+  detection, the grammar name is the name \texttt{EOF}.  For errors in
+  lexical analysis, the grammar name is the name \texttt{ERR}.  For
+  tokens which carry no additional value, the grammar name is a quoted
+  string in single quotes.  For tokens which carry a value, the
+  grammar name is a quoted string in double quotes.  The value will be
+  passed in a node of the type given in the node type, which is a
+  double-quoted string following the \verb|=>| symbol.  The node types
+  used here must be delcared in the \texttt{NODES} section, just like
+  the grammar nodes.  The value is stored on the top of
+  \texttt{SymStack} by the lexical analyzer; see the source code for
+  details. 
+  
+  The next section lists all node types used by the grammar.  It is
+  introduced by the word \texttt{NODES}.  Each type is a double-quoted
+  string.
+  
+  The next section gives the grammar rules, and is introduced by the
+  word \texttt{RULES}.  Each rule consists of a terminal name, followed
+  by one or more productions, followed by a semicolon.  Each production
+  consists of the symbol \verb|->|, followed by a sequence expression,
+  optionally followed by a node type for this sequence, as the symbol
+  \verb|=>|, followed by the node type in double quotes.  The node type
+  may be followed by a question mark to indicate that no node will be
+  created if there are no children, or it may be enclosed in
+  parentheses to indicate that creating a node of this type also ends
+  the parsing.  Each sequence expression consists of a sequence of
+  terms.  A term is either an element, an optional element (indicated
+  by a trailing \verb|?|), an element which may appear zero or more
+  times (indicated by a trailing \verb|*|), an element which may
+  appear one or more times (indicated by a trailing \verb|+|), or an
+  element which may appear in a list of one or more elements,
+  separated by a separator element (indicated by the list element,
+  followed by \verb|//|, followed by the separator element).  Each
+  element is either a terminal name (i.e, a quoted string), a
+  non-terminal name, or a sequence of terms in parentheses.
+  
+  The first rule is the start rule for the grammar.
+  
+  A production's non-terminals and terminals with values are linked
+  together as siblings.  If the production has a node type, a new node
+  will be created with those siblings as children; otherwise, the
+  collected children are the value for that non-terminal.
+  
+  In order to use the resulting grammar, some support routines are
+  needed.  The lexical analyzer needs \texttt{Init_Lex} to initialize
+  itself, \texttt{EndLex} to finish lexical analysis, and \texttt{YY_Lex}
+  to return the next token.  The \texttt{:tok.h} derivation contains the
+  identifiers to be returned as token values.  An error in parsing
+  calls \verb|ParseError(char *)| and inrements the global variable
+  \texttt{num_ParseErrors}.
+  
+  In order to create and use the resulting tree,
+  \texttt{odin/if-nod.c} or something equivalent needs to be used.  The
+  grammar in particular calls the global function
+  \texttt{Init_ConstructTree()} to start, and
+  \texttt{End_ConstructTree()} to finish.  The \texttt{End} routine must
+  return the finished tree.  For every node to be added,
+  \texttt{Action(int, int)} is called.  The first parameter is the node
+  type, and the second is the number of children.  The type's absolute
+  value is from the \texttt{:nod.h} derivation, if non-zero.  If zero,
+  the type indicates that the children should simply be linked and
+  passed along.  If positive, a node of the given type should be
+  created, with the given number of children.  If the number is
+  positive, the children are previously created nodes.  If the number
+  is negative, there is no child, but instead a value from the lexical
+  analyzer.  If the type and child count are negative, the effect is
+  the same as with a positive type and child count, except that the
+  lexical analyzer should be terminated after creating the node.  If the
+  type is negative and the child count is not, then a node should only
+  be created if the number of children is non-zero.
+:ygi->:y
+  As described in the section introduction, a \texttt{:ygi} file
+  contains a simplified grammar description for building parse trees.
+  This tool generates the parser generator input and header files needed
+  for parsing.

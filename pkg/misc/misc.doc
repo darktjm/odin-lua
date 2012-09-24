@@ -1,0 +1,31 @@
+BUGS:
+  No way to specify diff parameters
+  Nobody uses rsh/rcp any more; these should use ssh/scp instead
+  Specifying both +f_dest and +d_dest should probably be an error
+misc:
+  This package contains miscellaneous support utilities.
+:FILE->:list
+  This reads a list from a file or directory.  If the input is a
+  directory, the list is all file names in that directory.  If it is a
+  file, the file is parsed as a sequence of odin-expressions.
+:OBJECT->:redo
+  This is an alias for !:redo
+:err->:redo_errs
+  This parses the errors produced for a target, and redoes any step
+  which apparently produced errors.
+:FILE->:boot_name
+  This is checks if the target file exists.  If so, the result is the
+  name of the file.  If not, the result is the name of the file
+  specified by +default.  The +default parameter may be any odin
+  expression.
+:boot_name->:boot
+  This converts the odin expression of the boot file name into a list of
+  odin expressions.
+:FILE->:diff
+  This returns the difference between the input file and the file
+  specified by +other.
+:FILE->:rcp
+  This copies the source file to the destination specified by +f_dest or
+  +d_dest.  +f_dest overrides +d_dest.  +d_dest explicitly forces the
+  destination to be a directory; +f_dest copies directly to the
+  target, assuming it is a file.

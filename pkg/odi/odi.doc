@@ -1,0 +1,8 @@
+odi:
+  FIXME: document
+:com_schema_standin->:com_schema_standin
+  FIXME: document
+:library_flags->:schema.C
+  FIXME: document
+:schema.C->:cxx.sm.list
+  FIXME: document

@@ -44,6 +44,8 @@ void OutNames(char *argument)
       }
       if (n && *p != '\0')
          puts(argument);
+      else
+	 putchar('\n');
       if (c == '}')
          return;
    }

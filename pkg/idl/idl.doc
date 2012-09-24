@@ -1,0 +1,16 @@
+idl:
+  FIXME: document
+:IDL->:idl_h_dir
+  FIXME: document
+:idl.a->:idl_targets
+  FIXME: document
+:FILE->:idl_inc.view_desc
+  FIXME: document
+:idl_inc.view_desc->:idl_inc
+  FIXME: document
+:idl_inc->:all_idl_inc
+  FIXME: document
+:cstub.c->:idl_lib.list
+  FIXME: document
+:idl_lib.list->:idl.a
+  FIXME: document

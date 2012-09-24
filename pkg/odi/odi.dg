@@ -34,13 +34,13 @@ READ-LIST (:odi.cxx.sm)
 EXEC (com_schema.lua) (+schema_src :ls) (+schema_src :map=:dir :ls)
  (+schema_dir)@ (+inc_sp) (:com_schema_standin)@
  NEEDS (+schema_src) (+schema_src :map=:all_cxx_inc)
-  => (:com_schema_standin);
+  $OS_ROOTDIR => (:com_schema_standin);
 
 EXEC (app_schema.lua) (+schema_dir)@
  (:odi.cxx.sm.list :recurse=:sm.list :map=:o :ls) (:library_flags)
  NEEDS (:odi.cxx.sm.list :recurse=:sm.list :map=:o) (:libraries)
  (:com_schema_standin)
-  => (:schema.C);
+  $OS_ROOTDIR => (:schema.C);
 
 COLLECT (:odi.cxx.sm.list) (:schema.C)
    => (:cxx.sm.list);

@@ -1,0 +1,946 @@
+#!/usr/bin/env lua
+
+-- TODO:
+--  suppress duplicates due to generic input parameters
+--   e.g. input parameter of :FILE is repeated in every subsection
+--  add sections for output types rather than a generic final section
+--   probably best if file where type defined is known
+--   refer to e.g. :FILE section rather than repeating it everywhere
+--    OK to leave this package's rules in misc sec?
+--  check out EnvVarLst and PrmTypLst; maybe easier way to get at those
+
+apr = require 'apr'
+
+docdir = arg[1] .. '/'
+
+-- first read PKGS/PKGLST
+pkglst = {}
+for pkg in io.lines(docdir .. "PKGLST") do
+    table.insert(pkglst, pkg)
+end
+
+-- now read DG file
+dgf = '(' .. docdir .. pkglst[1] .. '/' .. pkglst[1] .. '.dg) +pkg=(' .. docdir .. 'PKGLST) :dg.tab'
+os.execute("echo '" .. dgf .. "' | odin >/dev/null")
+dg = io.popen("echo '" .. dgf .. ">' | odin")
+if not dg then
+    os.exit(1)
+end
+
+------------------------------------
+-- now parse it
+------------------------------------
+
+-- strings in dg file are . .. \1
+function readstr(f)
+    repeat
+	s = f:read(1)
+	if not s then
+	    os.exit(1)
+	end
+    until s == '.'
+    while string.byte(s, -1) ~= 1 do s = s .. f:read(1) end
+    f:read(1) -- whitespace, guaranteed
+    return string.sub(s, 2, -2)
+end
+
+function prrec(r)
+    print("{")
+    for k, v in pairs(r) do
+	print(k, '=', v)
+    end
+    print("}")
+end
+
+function prarr(a)
+    print("{")
+    for i, v in ipairs(a) do
+	print(i, '=', v)
+    end
+    print("}")
+end
+
+-- skip vesion and banner
+if not dg:read() then
+    os.exit(1)
+end
+readstr(dg)
+nSrcTyp = dg:read('*n')
+nFilTyp = dg:read('*n')
+nPrmTyp = dg:read('*n')
+nEnvVar = dg:read('*n')
+nEnvVarLst = dg:read('*n')
+nTool = dg:read('*n')
+nInpEdg = dg:read('*n')
+nMemEdg = dg:read('*n')
+nEqvEdg = dg:read('*n')
+nCastEdg = dg:read('*n')
+nDrvEdg = dg:read('*n')
+nPrmTypLst = dg:read('*n')
+nInpSpc = dg:read('*n')
+dg:read()
+SrcTyp = {}
+while nSrcTyp > 0 do
+    table.insert(SrcTyp, {
+        Pattern = readstr(dg),
+        IsPrefix = dg:read('*n') ~= 0,
+        FilTyp = dg:read('*n') + 1 })
+    -- prrec(SrcTyp[table.maxn(SrcTyp)])
+    nSrcTyp = nSrcTyp - 1
+end
+FilTyp = {}
+while nFilTyp > 0 do
+    table.insert(FilTyp, {
+        FTClass = dg:read('*n'),
+	FTName = readstr(dg),
+	Desc = readstr(dg),
+	HelpLevel = dg:read('*n'),
+	ArgFilTyp = dg:read('*n') + 1,
+	Tool = dg:read('*n') + 1,
+	MemEdg = dg:read('*n') + 1,
+	EqvEdg = dg:read('*n') + 1,
+	CastEdg = dg:read('*n') + 1,
+	DrvEdg = dg:read('*n') + 1,
+	MapPrmTypLst = dg:read('*n') + 1,
+	IsCopy = dg:read('*n') ~= 0,
+	IsGrouping = dg:read('*n') ~= 0,
+	IsGroupingInput = dg:read('*n') ~= 0 })
+    -- prrec(FilTyp[table.maxn(FilTyp)])
+    nFilTyp = nFilTyp - 1
+end
+GenericFilTyp = dg:read('*n') + 1
+PipeFilTyp = dg:read('*n') + 1
+ListFilTyp = dg:read('*n') + 1
+FileFilTyp = dg:read('*n') + 1
+ObjectFilTyp = dg:read('*n') + 1
+NoInputFilTyp = dg:read('*n') + 1
+ExpandHooksFilTyp = dg:read('*n') + 1
+TargetsPtrFilTyp = dg:read('*n') + 1
+TargetsFilTyp = dg:read('*n') + 1
+ActTargetsFilTyp = dg:read('*n') + 1
+VirTargetsFilTyp = dg:read('*n') + 1
+VirDirFilTyp = dg:read('*n') + 1
+CopyFilTyp = dg:read('*n') + 1
+PrmValuesFilTyp = dg:read('*n') + 1
+ViewSpecFilTyp = dg:read('*n') + 1
+FirstFilTyp = dg:read('*n') + 1
+ApplyFilTyp = dg:read('*n') + 1
+FatherFilTyp = dg:read('*n') + 1
+
+function findft(n)
+    for i, v in ipairs(FilTyp) do
+	if v.FTName == n then
+	    return i
+	end
+    end
+end
+
+FilTyp[ObjectFilTyp].Desc = 'any object'
+FilTyp[FileFilTyp].Desc = 'a file'
+FilTyp[ListFilTyp].Desc = 'a list'
+FilTyp[findft("VOID")].Desc = 'an object with no value'
+FilTyp[findft("REFERENCE")].Desc = 'a reference'
+FilTyp[findft("EXECUTABLE")].Desc = 'a file that should be executed when queried'
+FilTyp[GenericFilTyp].Desc = 'a file whose type is based on its label'
+FilTyp[PipeFilTyp].Desc = 'a file produced by a type-preserving tool'
+FilTyp[findft("DERIVED-DIRECTORY")].Desc = 'a derived directory'
+
+PrmTyp = {}
+while nPrmTyp > 0 do
+    table.insert(PrmTyp, {
+        PTName = readstr(dg),
+	Desc = readstr(dg),
+	HelpLevel = dg:read('*n'),
+	FilTyp = dg:read('*n') + 1 })
+    -- prrec(PrmTyp[table.maxn(PrmTyp)])
+    nPrmTyp = nPrmTyp - 1
+end
+NullPrmTyp = dg:read('*n') + 1
+HookValPrmTyp = dg:read('*n') + 1
+CopyDestPrmTyp = dg:read('*n') + 1
+ApplyPrmTyp = dg:read('*n') + 1
+
+PrmTypLst = {}
+while nPrmTypLst > 0 do
+    table.insert(PrmTypLst, {
+        PrmTyp = dg:read('*n') + 1,
+	Next = dg:read('*n') + 1 })
+    -- prrec(PrmTypLst[table.maxn(PrmTypLst)])
+    nPrmTypLst = nPrmTypLst - 1
+end	
+EnvVar = {}
+while nEnvVar > 0 do
+    table.insert(EnvVar, {
+        Name = readstr(dg),
+	Desc = readstr(dg),
+	HelpLevel = dg:read('*n'),
+	Default = readstr(dg),
+	IsFile = dg:read('*n') ~= 0 })
+    --prrec(EnvVar[table.maxn(EnvVar)])
+    nEnvVar = nEnvVar - 1
+end
+EnvVarLst = {}
+while nEnvVarLst > 0 do
+    table.insert(EnvVarLst, {
+        EnvVar = dg:read('*n') + 1,
+	Next = dg:read('*n') + 1 })
+    -- prrec(EnvVarLst[table.maxn(EnvVarLst)])
+    nEnvVarLst = nEnvVarLst - 1
+end
+Tool = {}
+while nTool > 0 do
+    table.insert(Tool, {
+        TClass = dg:read('*n'),
+	InpEdg = dg:read('*n') + 1,
+	BasePrmTypLst = dg:read('*n') + 1,
+	EnvVarLst = dg:read('*n') + 1,
+	Package = readstr(dg) })
+    -- prrec(Tool[table.maxn(Tool)])
+    nTool = nTool - 1
+end
+SourceTool = dg:read('*n') + 1
+StrTool = dg:read('*n') + 1
+DrvDirElmTool = dg:read('*n') + 1
+VirDirElmTool = dg:read('*n') + 1
+PntrHoTool = dg:read('*n') + 1
+PntrElmTool = dg:read('*n') + 1
+InternalPntrTool = dg:read('*n') + 1
+TextDefTool = dg:read('*n') + 1
+
+InpEdg = {}
+while nInpEdg > 0 do
+    table.insert(InpEdg, {
+        InpSpc = dg:read('*n') + 1,
+	InpKind = dg:read('*n'),
+	IsUserArg = dg:read('*n') ~= 0,
+	Next = dg:read('*n') + 1 })
+    -- prrec(InpEdg[table.maxn(InpEdg)])
+    nInpEdg = nInpEdg - 1
+end
+MemEdg = {}
+while nMemEdg > 0 do
+    table.insert(MemEdg, {
+        FilTyp = dg:read('*n') + 1,
+	Next = dg:read('*n') + 1 })
+    -- prrec(MemEdg[table.maxn(MemEdg)])
+    nMemEdg = nMemEdg - 1
+end
+EqvEdg = {}
+while nEqvEdg > 0 do
+    table.insert(EqvEdg, {
+        FilTyp = dg:read('*n') + 1,
+	Next = dg:read('*n') + 1 })
+    -- prrec(EqvEdg[table.maxn(EqvEdg)])
+    nEqvEdg = nEqvEdg - 1
+end
+CastEdg = {}
+while nCastEdg > 0 do
+    table.insert(CastEdg, {
+        FilTyp = dg:read('*n') + 1,
+	Next = dg:read('*n') + 1 })
+    -- prrec(CastEdg[table.maxn(CastEdg)])
+    nCastEdg = nCastEdg - 1
+end
+DrvEdg = {}
+while nDrvEdg > 0 do
+    table.insert(DrvEdg, {
+        FilTyp = dg:read('*n') + 1,
+	PrmTypLst = dg:read('*n') + 1,
+	Next = dg:read('*n') + 1 })
+    -- prrec(DrvEdg[table.maxn(DrvEdg)])
+    nDrvEdg = nDrvEdg - 1
+end
+InpSpc = {}
+while nInpSpc > 0 do
+    table.insert(InpSpc, {
+        ISKind = dg:read('*n'),
+	FilTyp = dg:read('*n') + 1,
+	PrmTyp = dg:read('*n') + 1,
+	Str = readstr(dg),
+	IsEnvVar = dg:read('*n') ~= 0,
+	InpSpc = dg:read('*n') + 1,
+	Next = dg:read('*n') + 1 })
+    -- prrec(InpSpc[table.maxn(InpSpc)])
+    nInpSpc = nInpSpc - 1
+end
+
+dg:close()
+
+-- for docs, I need source location of SrcTyp and EnvVar
+for i, pkg in ipairs(pkglst) do
+    for l in io.lines(docdir .. pkg .. "/" .. pkg .. ".dg") do
+	if string.match(l, "^[^:' \t]*%*") then
+	    pat = string.match(l, "^[^ \t]*")
+	    ispre = string.sub(pat, 1, 1) ~= '*'
+	    if ispre then
+		pat = string.sub(pat, 1, -2)
+	    else
+		pat = string.sub(pat, 2)
+	    end
+	    pat = string.gsub(pat, "\\", "")
+	    for n, v in ipairs(SrcTyp) do
+		if v.IsPrefix == ispre and v.Pattern == pat then
+		    v.Package = pkg
+		    break
+		end
+	    end
+	end
+	var = string.match(l, "^%$[A-Z][A-Z0-9_]*")
+	if var then
+	    var = string.sub(var, 2)
+	    for n, v in ipairs(EnvVar) do
+		if v.Name == var then
+		    if v.Package == nil then
+			v.Package = pkg
+		    end
+		    break
+		end
+	    end
+	end
+    end
+end
+for n, v in ipairs(SrcTyp) do
+    if v.Package == nil then
+	pat = v.Pattern
+	if v.IsPrefix then pat = pat .. '*' else pat = '*' .. pat end
+	print("Can't find source file for '" .. pat .. "'")
+    end
+end
+for n, v in ipairs(EnvVar) do
+    if v.Package == nil then
+	print("Can't find source file for '$" .. v.Name .. "'")
+    end
+end
+------------------------------------
+-- done parsing
+------------------------------------
+
+-- print documentation from .doc file
+function prdoc(sec, f)
+    if not f then return end
+    f:seek("set")
+    iter, s, v = f:lines()
+    for l in iter, s, v do
+	if l == sec then
+	    for pl in iter, s, v do
+		if string.match(pl, '^[^ \t]') then
+		    return
+		end
+		pl = string.gsub(pl, '\t', '        ')
+		print(string.sub(pl, 3))
+	    end
+	    return
+	end
+    end
+    print('% doc for ' .. sec .. ' not present')
+end
+
+-- get supertypes of t
+function get_super(t, ret)
+    local wasempty = not ret
+    if wasempty then ret = {} end
+    for i, pt in ipairs(ret) do
+	if pt == t then
+	    return ret
+	end
+    end
+    table.insert(ret, t)
+    local e = FilTyp[t].CastEdg
+    while e > 0 do
+	pt = CastEdg[e].FilTyp
+	e = CastEdg[e].Next
+	ret = get_super(pt, ret)
+    end
+    e = FilTyp[t].EqvEdg
+    while e > 0 do
+	pt = EqvEdg[e].FilTyp
+	e = EqvEdg[e].Next
+	for i, pt2 in ipairs(ret) do
+	    if pt2 == pt then
+		pt = 0
+		break
+	    end
+	end
+	if pt > 0 then
+	    table.insert(ret, pt)
+	end
+    end
+    -- process list once all have been recursively added
+    if wasempty then
+	-- filter out self and any invisible types
+	table.remove(ret, 1)
+	for i = table.maxn(ret), 1, -1 do
+	    if FilTyp[ret[i]].Desc == "" then
+		table.remove(ret, i)
+	    end
+	end
+	-- sort by name
+	function tless(a, b)
+	    return FilTyp[a].FTName < FilTyp[b].FTName
+	end
+	table.sort(ret, tless)
+    end
+    return ret
+end
+
+function ufirst(s)
+    return string.upper(string.sub(s, 1, 1)) .. string.sub(s, 2)
+end
+
+function tdoc(t)
+    d = FilTyp[t].Desc
+    return ufirst(d)
+end
+
+-- print supertypes of t
+function pr_super(t)
+    print("\\begin{quote}\\begin{tabular}{|l|l|}\\hline\n" ..
+          "Type&Description\\\\\\hline")
+    -- old shell code also printed 3rd column indicating where def was
+    -- but that's not really as useful as I thought it might be
+    for i, st in ipairs(get_super(t)) do
+	print("\\texttt{:" .. FilTyp[st].FTName .. '}&' .. tdoc(st) .. '\\\\')
+    end
+    print("\\hline\\end{tabular}\\end{quote}")
+end
+
+TC_trans = {
+       'TC_Source',
+       'TC_DrvDirElm',
+       'TC_StructMem',
+       '[:map]',
+       '[:recurse]',
+       '[:extract]',
+       '[:delete]',
+       'TC_PntrHo',
+       '',
+       'TC_InternalPntr',
+       'EXEC',
+       'TC_Str',
+       'TARGETSPTR',
+       'TARGETSINC',
+       'TARGETS',
+       'ACTTARGETS',
+       'VIRTARGETS',
+       'TC_TextDef',
+       'LABEL',
+       'LABELS',
+       'COLLECT',
+       'READ-LIST/READ-REFERENCE',
+       'SOURCES',
+       'OPERATIONS',
+       'READ-VIEW-SPECIFICATION',
+       'COMPUTE-VIEW',
+       'DIRECTORY',
+       'COPYCMD',
+       'VIRDIR',
+       'PRMVALUES',
+       'FIRST',
+       'DEPEND',
+       'FILENAME',
+       'FILENAMES',
+       'CONCATENATE',
+       'UNION',
+       'TC_PntrElm',
+       'ID',
+       'APPLY',
+       'EXPANDHOOKS',
+       'NESTEDHOOKS',
+       '',
+       'ERROR',
+       'WARNING',
+       'NAME',
+       'NAMES',
+       'TC_VirDirElm',
+       '[:lookup]',
+       'PREFIXHELP',
+       'SUFFIXHELP',
+       'DRVHELP',
+       'PRMHELP'
+}
+
+function pr_tool_raw(tl)
+    -- collect output type(s), skipping/including pseudo types
+    local ot, e, spc
+    for i, t in ipairs(FilTyp) do
+	if t.Tool == tl then
+	    ot = {i}
+	    break
+	end
+    end
+    if FilTyp[ot[1]].Desc == "" then
+	-- pseudo types are either struct type with pseudos as memebers
+	e = FilTyp[ot[1]].MemEdg
+	if e > 0 then
+	    while e > 0 do
+		-- where members' immmediate parent is actual
+		table.insert(ot, EqvEdg[FilTyp[MemEdg[e].FilTyp].EqvEdg].FilTyp)
+		e = MemEdg[e].Next
+	    end
+	elseif FilTyp[ot[1]].EqvEdg > 0 then
+	    -- or plain type with actual as immediate parent
+	    table.insert(ot, EqvEdg[FilTyp[ot[1]].EqvEdg].FilTyp)
+	else
+	    table.insert(ot, CastEdg[FilTyp[ot[1]].CastEdg].FilTyp)
+	end
+    end
+    io.write("% ")
+    io.write(TC_trans[Tool[tl].TClass] .. " ")
+    e = Tool[tl].InpEdg
+    inneed = false
+    while e > 0 do
+	if not InpEdg[e].IsUserArg and not inneed then
+	    io.write("NEEDS ")
+	    inneed = true
+	end
+	spc = InpEdg[e].InpSpc
+	function prstr()
+	    if InpSpc[spc].IsEnvVar then io.write('$') end
+	    io.write(InpSpc[spc].Str)
+	end
+	function prspc(spc)
+	    if InpSpc[spc].Next == 0 and InpSpc[spc].ISKind == 1 then -- ISK_Str
+	        prstr()
+	    else
+		io.write("(")
+		while spc > 0 do
+		    -- ISK_Str, ISK_Key
+		    if InpSpc[spc].ISKind == 1 or InpSpc[spc].ISKind == 2 then
+			-- dummy text to emphasize that it's a str
+			-- actually, it should never be a Str
+			if InpSpc[spc].ISKind == 1 then io.write('<>') end
+			prstr()
+		    elseif InpSpc[spc].ISKind == 3 then -- ISK_Drv
+		        local t = InpSpc[spc].FilTyp
+			io.write(':' .. FilTyp[t].FTName)
+			if FilTyp[t].ArgFilTyp > 0 then
+			    io.write('=:' .. FilTyp[FilTyp[t].ArgFilTyp].FTName)
+			end
+		    elseif InpSpc[spc].ISKind == 4 then -- ISK_Prm
+			io.write('+' .. PrmTyp[InpSpc[spc].PrmTyp].PTName)
+			-- prrec(InpSpc[spc])
+			if InpSpc[spc].InpSpc > 0 then
+			    io.write('=')
+			    prspc(InpSpc[spc].InpSpc)
+			end
+		    elseif InpSpc[spc].ISKind == 5 then -- ISK_PrmVal
+			io.write('=')
+			prstr()
+		    elseif InpSpc[spc].ISKind == 6 then -- ISK_Sel
+			io.write('/')
+			if InpSpc[spc].Str ~= "" then prstr() end
+		    elseif InpSpc[spc].ISKind == 7 then -- ISK_VTgt
+			io.write('%')
+			if InpSpc[spc].Str ~= "" then prstr() end
+		    elseif InpSpc[spc].ISKind == 8 then -- ISK_EmptyFile
+			io.write('()')
+		    end
+		    spc = InpSpc[spc].Next
+		end
+		io.write(")")
+	    end
+	end
+	prspc(spc)
+	if InpEdg[e].InpKind == 1 then
+	    io.write('<S>') -- simple
+	elseif InpEdg[e].InpKind == 2 then
+	    -- default (trans)
+	elseif InpEdg[e].InpKind == 3 then
+	    io.write('<@>') -- name
+	elseif InpEdg[e].InpKind == 4 then
+	    io.write('@') -- transname
+	elseif InpEdg[e].InpKind == 5 then
+	    io.write('<S&>') -- simple + no auto-deref
+	elseif InpEdg[e].InpKind == 6 then
+	    io.write('&') -- AnyOK
+	end
+	io.write(" ")
+	e = InpEdg[e].Next
+    end
+    io.write("=> ")
+    for i, t in ipairs(ot) do
+	if i == 2 then
+	    if FilTyp[ot[1]].EqvEdg > 0 then
+		io.write('->')
+	    else
+		io.write('=>')
+	    end
+	end
+	io.write('(:' .. FilTyp[t].FTName .. ')')
+    end
+    io.write("\n")
+end
+
+function pr_tool(tl, p, fort, docf)
+    pr_tool_raw(tl)
+    -- collect output type(s), skipping pseudo types
+    local ot, e
+    for i, t in ipairs(FilTyp) do
+	if t.Tool == tl then
+	    ot = {i}
+	    break
+	end
+    end
+    if FilTyp[ot[1]].Desc == "" then
+	-- pseudo types are either struct type with pseudos as members
+	e = FilTyp[ot[1]].MemEdg
+	if e > 0 then
+	    ot = {}
+	    while e > 0 do
+		-- where members' immmediate parent is actual
+		table.insert(ot, EqvEdg[FilTyp[MemEdg[e].FilTyp].EqvEdg].FilTyp)
+		e = MemEdg[e].Next
+	    end
+	elseif FilTyp[ot[1]].EqvEdg > 0 then
+	-- or plain type with actual as immediate parent
+	    ot = {EqvEdg[FilTyp[ot[1]].EqvEdg].FilTyp}
+	else
+	    ot = {CastEdg[FilTyp[ot[1]].CastEdg].FilTyp}
+	end
+    end
+    -- print output types
+    io.write('\\item[')
+    for i, t in ipairs(ot) do
+	if i > 1 then
+	    io.write(', ')
+	end
+	io.write('\\texttt{:' .. FilTyp[t].FTName .. '}')
+    end
+    io.write('] (')
+    for i, t in ipairs(ot) do
+	if i > 1 then
+	    io.write(', ')
+	end
+	io.write(tdoc(t))
+    end
+    io.write(')')
+    -- if this is not the package which defines this tool, just print a
+    -- reference
+    if p ~= Tool[tl].Package then
+	p = Tool[tl].Package
+	print(".  See section \\ref{sec:" .. p .. "} (\\hyperref[sec:" .. p .. "]{" .. p .. "}).")
+	return
+    end
+    -- find an input type
+    -- if printing this for a type, just use that; otherwise the first input
+    if fort ~= 0 then
+	it = fort
+    else
+	it = 0
+	e = Tool[tl].InpEdg;
+	while e > 0 do
+	    if not InpEdg[e].IsUserArg then break end
+	    -- if InpEdg[e].InpKind ~= 3 then -- IK_Name
+	        spc = InpEdg[e].InpSpc
+		-- while spc > 0 do
+		    if InpSpc[spc].ISKind == 3 then -- ISK_Drv
+			it = InpSpc[spc].FilTyp
+			break
+		    end
+		--     spc = InpSpc[spc].Next
+		-- end
+		-- if spc > 0 then break end
+	    -- end
+	    e = InpEdg[e].Next
+	end
+	if it == 0 then
+	    io.write(" from source (options only)")
+	else
+	    io.write(" from source of type \\texttt{:" .. FilTyp[it].FTName .. "} (" .. tdoc(it) .. ")")
+	end
+    end
+    othert = {it}
+    e = Tool[tl].InpEdg;
+    while e > 0 do
+	if not InpEdg[e].IsUserArg then break end
+	-- if InpEdg[e].InpKind ~= 3 then -- IK_Name
+	    spc = InpEdg[e].InpSpc
+	    -- while spc > 0 do
+		if InpSpc[spc].ISKind == 3 then
+		    doit = true
+		    for i, it in ipairs(othert) do
+			if InpSpc[spc].FilTyp == it then
+			    doit = false
+			    break
+			end
+		    end
+		    if doit then
+			if not othert[2] then
+			    io.write(" with")
+			else
+			    io.write(" and")
+			end
+			it = InpSpc[spc].FilTyp
+			table.insert(othert, it)
+			io.write(" additional source of type \\texttt{:" .. FilTyp[it].FTName .. "} (" .. tdoc(it) .. ")")
+		    end
+		end
+		-- spc = InpSpc[spc].Next
+	    -- end
+	-- end
+	e = InpEdg[e].Next
+    end
+    e = Tool[tl].InpEdg;
+    anyp = false
+    dida = {}
+    while e > 0 do
+	if not InpEdg[e].IsUserArg then break end
+	spc = InpEdg[e].InpSpc
+	if InpSpc[spc].ISKind == 4 then -- ISK_Prm
+	    if not anyp then
+		anyp = true
+		print(" using the following parameters:\n" ..
+		      "\n" ..
+		      "\\begin{description}")
+	    end
+	    a = InpSpc[spc].PrmTyp
+	    for i, oa in ipairs(dida) do
+		if oa == a then
+		    a = 0
+		    break
+		end
+	    end
+	    if a ~= 0 then
+		table.insert(dida, a)
+		print("\\item[\\texttt{+" .. PrmTyp[a].PTName .. "}]~\\\\" .. ufirst(PrmTyp[a].Desc))
+		at = PrmTyp[a].FilTyp
+		if FilTyp[at].FTName == "cat" or FilTyp[at].FTName == "ls" or
+		   FilTyp[at].FTName == "LIST" then
+		    print("(may be given more than once)")
+		end
+	    end
+	end
+	e = InpEdg[e].Next
+    end
+    e = Tool[tl].InpEdg;
+    didv = {}
+    while e > 0 do
+	spc = InpEdg[e].InpSpc
+	while spc > 0 do
+	    if InpSpc[spc].IsEnvVar then
+		if not anyp then
+		    anyp = true
+		    print(" using the following parameters:\n" ..
+		          "\n" ..
+			  "\\begin{description}")
+		end
+		vn = InpSpc[spc].Str
+		for i, v in ipairs(didv) do
+		    if v == vn then
+			vn = nil
+			break
+		    end
+		end
+		if vn then
+		    io.write("\\item[\\texttt{\\$" .. vn .. "}]~\\\\")
+		    for i, v in ipairs(EnvVar) do
+			if v.Name == vn then
+			    print(ufirst(v.Desc))
+			    if v.Package == "config" then
+			        print("(default from initial Odin configuration)")
+			    else
+				print("(default '" .. v.Default .. "')")
+			    end
+			end
+		    end
+		end
+	    end
+	    spc = InpSpc[spc].Next
+	end
+	e = InpEdg[e].Next
+    end
+    if anyp then
+	print("\\end{description}")
+    else
+	print(".")
+    end
+    if it > 0 then
+	prdoc(':' .. FilTyp[it].FTName .. "->:" .. FilTyp[ot[1]].FTName, docf)
+    else
+	prdoc("->:" .. FilTyp[ot[1]].FTName, docf)
+    end
+end
+
+------------------------------------
+-- main loop
+------------------------------------
+for i, pkg in ipairs(pkglst) do
+    docf = io.open(docdir .. pkg .. '/' .. pkg .. '.doc')
+    verf = io.open(docdir .. pkg .. '/version')
+    if verf then
+	ver = verf:read('*l')
+	verf:close()
+    else
+	ver = '1.17.10'
+    end
+    print("\\section{\\label{sec:" .. pkg .. "}" .. pkg .. "}\n" ..
+          "\n" ..
+	  "The \\texttt{" .. pkg .. "} package is at version " .. ver ..'.')
+    prdoc(pkg .. ':', docf)
+    print("")
+    tools = {}
+    for i, ft in ipairs(SrcTyp) do
+	if pkg == ft.Package then
+	    -- remove duplicates
+	    hasdup = false
+	    first_for_t = false
+	    for i1, ft1 in ipairs(SrcTyp) do
+		if ft1.FilTyp == ft.FilTyp then
+		    if not hasdup and not first_for_t then
+			first_for_t = i1 == i
+			hasdup = not first_for_t
+		    else
+			hasdup = true
+		    end
+		end
+	    end
+	    -- if singleton or first of same type, print it
+	    if first_for_t then
+		d = tdoc(ft.FilTyp)
+		t = '\\texttt{:' .. FilTyp[ft.FilTyp].FTName .. '}'
+		if ft.IsPrefix then
+		    p = ft.Pattern .. '*'
+		else
+		    p = '*' .. ft.Pattern
+		end
+		p = '`\\verb/' .. p .. "/'"
+		if hasdup then
+		    for i1, ft1 in ipairs(SrcTyp) do
+			if ft1.FilTyp == ft.FilTyp and i1 ~= i then
+			    cloc = string.len(p)
+			    p = p .. ', `\\verb/'
+			    if ft1.IsPrefix then
+				p = p .. ft.Pattern .. '*'
+			    else
+				p = p .. '*' .. ft.Pattern
+			    end
+			    p = p .. "/'"
+			end
+		    end
+		    p = string.sub(p, 1, cloc) .. ' or' .. string.sub(p, cloc + 1)
+		end
+		print("\\subsection{" .. d .. "}\n" ..
+		      "\n" ..
+		      "Files matching the pattern " .. p .. " are of type " .. t .. " (" .. d .. ").\n" ..
+		      "They may be used whenever a rule calls for a supertype of " .. t .. ":\n")
+		pr_super(ft.FilTyp)
+		-- gather all tools that explicitly depend on this or a super
+		-- printedhead = false
+		super = get_super(ft.FilTyp)
+		table.insert(super, 1, ft.FilTyp)
+		for i, t in ipairs(super) do
+		    printedhead = false
+		    for j, tl in ipairs(Tool) do
+			toolname = TC_trans[tl.TClass]
+			-- don't print psuedo tools
+			if tl.Package == pkg and string.match(toolname, '^[A-Z]+$') then
+			    e = tl.InpEdg;
+			    while e > 0 do
+				if not InpEdg[e].IsUserArg then break end
+				if InpEdg[e].InpKind ~= 3 then -- IK_Name
+				    spc = InpEdg[e].InpSpc
+				    -- while spc > 0 do
+					if InpSpc[spc].ISKind == 3 and -- ISK_Drv
+					   InpSpc[spc].FilTyp == t then
+					    table.insert(tools, j)
+					    if not printedhead then
+						print("")
+						if ft.FilTyp == t then
+						    io.write('They')
+						else
+						    io.write('As the type \\texttt{:' .. FilTyp[t].FTName .. '} (' .. tdoc(t) .. '), they')
+						end
+						print(" may be transformed to any of the following:\n" ..
+						      "\n" ..
+						      "\\begin{description}")
+						printedhead = true
+					    end
+					    pr_tool(j, pkg, t, docf)
+					    break
+					end
+					-- spc = InpSpc[spc].Next
+				    -- end
+				    -- if spc > 0 then break end
+				end
+				e = InpEdg[e].Next
+			    end
+			end
+		    end
+		    for j, tl in ipairs(Tool) do
+			toolname = TC_trans[tl.TClass]
+			-- don't print psuedo tools
+			if tl.Package ~= pkg and string.match(toolname, '^[A-Z]+$') then
+			    e = tl.InpEdg;
+			    while e > 0 do
+				if not InpEdg[e].IsUserArg then break end
+				if InpEdg[e].InpKind ~= 3 then -- IK_Name
+				    spc = InpEdg[e].InpSpc
+				    -- while spc > 0 do
+					if InpSpc[spc].ISKind == 3 and -- ISK_Drv
+					   InpSpc[spc].FilTyp == t then
+					    table.insert(tools, j)
+					    if not printedhead then
+						print("")
+						if ft.FilTyp == t then
+						    io.write('They')
+						else
+						    io.write('As the type \\texttt{:' .. FilTyp[t].FTName .. '} (' .. tdoc(t) .. '), they')
+						end
+						print(" may be transformed to any of the following:\n" ..
+						      "\n" ..
+						      "\\begin{description}")
+						printedhead = true
+					    end
+					    pr_tool(j, pkg, t, docf)
+					    break
+					end
+					-- spc = InpSpc[spc].Next
+				    -- end
+				    -- if spc > 0 then break end
+				end
+				e = InpEdg[e].Next
+			    end
+			end
+		    end
+		    if printedhead then
+			print("\\end{description}")
+		    end
+		end
+		--if printedhead then
+		--    print("\\end{description}")
+		--end
+	    end
+	end
+    end
+    -- next, print all tools that belong to this package, but
+    -- have not yet been printed
+    printedhead = false
+    for i, tl in ipairs(Tool) do
+	toolname = TC_trans[tl.TClass]
+	-- don't print psuedo tools (only relevant for odin package)
+	if tl.Package == pkg and string.match(toolname, '^[A-Z]+$') then
+	    alreadydone = false
+	    for j, tl2 in ipairs(tools) do
+		if tl2 == i then
+		    alreadydone = true
+		    break
+		end
+	    end
+	    if not alreadydone then
+		if not printedhead then
+		    print("\\subsection{Other transformations}\n" ..
+		          "\n" ..
+			  "In addition, the following transformations are defined within this\n" ..
+			  "package.  They are used in the other packages as indicated.\n" ..
+			  "\n" ..
+			  "\\begin{description}")
+		    printedhead = true
+		end
+		pr_tool(i, pkg, 0, docf)
+	    end
+	end
+    end
+    if printedhead then
+	print("\\end{description}")
+    end
+end

@@ -1,0 +1,54 @@
+BUGS:
+  No kpathsea support
+tex:
+  This package supports \TeX{} and \LaTeX{} documentation.
+:tex->:one_tex_vtd
+  Convert a single \TeX{} input file path into a virtual target translation
+:tex.vtd->:rootName
+  Return the file name and base name of the root document.  If there is
+  only one document, its name is used.  Otherwise, the root document
+  should be specified using +texroot.
+:dir->:texsp
+  Return a file containing directories, one per line, to search for \TeX{}
+  inputs.  This includes the directory containing the virtual inputs,
+  as well as any path specified by +texsearch.  If unspecified, the
+  original source directory for the input file is used.
+:texfiles->:texclose
+  Given a list of \TeX{} files, list all files needed during a run.  This
+  is for automatic dependency scanning.
+:rootFileName->:texbasis
+  Given a \TeX{} root file name, list all files needed during a run.  This
+  is for automatic dependency scanning.
+:texnames->:tex.view_desc
+  Given a list of \TeX{} input files, produce a view descriptor.  This is
+  for automatic dependency scanning.
+:tex->:texnames
+  Given a \TeX{} input file, return a list of files needed during a run.
+:tex.view_desc->:texfiles
+  Collapse view descriptor to actual present files.
+:rootFileName->:fmtcmd
+  Given a \TeX{} input file, determine which command to run for output.  If
+  +usepdf is set, PDF is produced directly from input using
+  pdf(la)tex.  If +tex is set, the input is plain \TeX{}.  If +latex is
+  set, the input is \LaTeX{}.  Otherwise, selection is based on presence of
+  the \LaTeX{} command \\documentstyle or \\documentclass.
+:texsp->:dvi
+  Run \TeX{} on inputs until auxiliary files settle.  The actual command
+  to run is obtained by the \texttt{:fmtcmd} derivation.  The
+  \texttt{:dvi} and \texttt{:texpdf} outputs are optional, and depend on
+  the formatter type (\texttt{+usepf}).
+:label->:one_tex_vtd
+  Return a file listing the input \TeX{} file.
+:texsp->:tex.bbl
+  Given \TeX{} input, create a bibliography file if needed, using
+  \texttt{bibtex}.
+:indexntry->:tex.ind
+  Given \TeX{} input, create indices using \texttt{makeindex}, if
+  needed.
+:tex.ind->:texauxin.vtd
+  Return file listing all auxiliary inputs associated with a \TeX{} run.
+:texsp->:texps
+  After running \TeX{}, run \texttt{dvips} to convert the DVI output
+  to PostScript.
+:tex.vtd->:refpdf
+  A back path to creating PDF using pdf(la)tex directly.

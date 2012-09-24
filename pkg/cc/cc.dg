@@ -85,7 +85,7 @@ READ-LIST (:c.sm)
    => (:c.sm.list);
 
 EXEC (c_inc.lua) (:FILE) (:FILE :dir)@ (+home)@ (+inc_sp) (+ignore)
-   => (:c_inc.view_desc);
+   NEEDS $ODIN_CC_I $ODIN_IGNORE => (:c_inc.view_desc);
 
 COLLECT (:c_inc.view_desc :view)
    => (:c_inc);
@@ -96,12 +96,12 @@ COLLECT (:c_inc :map=:all_c_inc) (:c_inc)
 EXEC (cc.lua) (:c) (:c :dir)@ (+inc_sp) (+cc_home)@ (+gnu) (+debug) (+prof)
  (+optimize) (+define) (+cc) (+cc_flags)
  NEEDS (:c +home=(:c :dir) :lookup=:all_c_inc)
-   => (:o);
+   $ODIN_CC $ODIN_CC_DEBUGF $ODIN_CC_FLAGS $ODIN_CC_HOME => (:o);
 
 EXEC (ld.lua) (:o_of :vir_dir) (:library_flags)
  (+cc_home)@ (+gnu) (+purify) (+debug) (+prof) (+eprof) (+cc) (+ld_flags)
  NEEDS (:o_of :vir_tgt.list) (:libraries) (:c.exe.list)@
-   => (:exe);
+   $ODIN_CC $ODIN_CC_DEBUGF $ODIN_CC_FLAGS $ODIN_CC_HOME => (:exe);
 
 EXEC (fmt.c.lua) (:c)
    => (:fmt);

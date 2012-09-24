@@ -1,0 +1,263 @@
+dg:
+  This package contains the derivation graph parser.
+:dg->:dg.log
+  Given a directed graph file, find its parent directory and from there
+  compile all packages named in the +pkg parameter.  This parameter must
+  either be a package name or (by enclosing the file name in parentheses)
+  a file listing all pacakge names to include.  Note that only those
+  specified packages will be compiled; not even the built-in types will be
+  added.  Therefore, it is best to make the parameter a member of a virtual
+  directory containing all desired packages, and to make the package
+  list also contain all of these, in the order they are to be included
+  in the final graph.  The results are intended for Odin internal use
+  only, but include:
+  
+  \begin{itemize}
+  \item :dg.log --- A verbose description of the created graph
+  \item :c --- A C file containing the tables.
+  \item :dg.tab --- A text file containing the tables for easy parsing.
+  \item :dg.env --- The environment variables defined by the graph,
+                    and their current values.
+  \end{itemize}
+  
+  Normally, the default derivation graph's :c is compiled into the
+  Odin executable.  The :dg.tab of the current graph, if different from
+  the default, is stored in \$ODINCACHE/DG.  The :dg.env of the current
+  graph is stored in \$ODINCACHE/ENV.
+  
+  The information in these tables is as follows:
+  
+  The :dg.env file has as its first line a decimal number indicating
+  the number of entries.  Following this is one line for each variable:
+  the variable name, followed by an equals sign, followed by the current
+  value, followed by an ASCII SOH character (1, ctrl-A).  No attempt
+  is made to escape ASCII SOH characters in the names or values, so
+  hopefully values will not cause problems.  For multi-line values,
+  the above description considers them part of the line they started
+  on.
+  
+  In the :dg.tab file, strings are encoded as a dot, followed by the
+  string, followed by an ASCII SOH character (1, ctrl-A).  No attempt
+  is made to escape ASCII SOH characters in the strings, so don't use
+  them in your derivation graph.  If a string spans more than one line,
+  it is still considered to be part of the same line that it started on.
+  Numbers are simply decimal digits.  Fields are separated by spaces.
+
+  The first line of the :dg.tab file is the version number of the
+  executable which created this file.  If there is any difference from
+  1.16.10, the following description is likely wrong.  In the C code,
+  this is stored in the string variable DG_Version.
+  
+  The next line of the file is a banner string, if defined by any
+  package's derivation graph via the BANNER command.  In the C code,
+  this is stored in the string variable Banner.
+  
+  The next line in the file is a space-separated sequence of counts,
+  one for each table:
+  \begin{enumerate}
+  \item SrcTyp --- stored in num_SrcTypS in the C code
+  \item FilTyp --- stored in num_FilTypS in the C code
+  \item PrmTyp --- stored in num_PrmTypS in the C code
+  \item EnvVar --- stored in num_EnvVarS in the C code
+  \item EnvVarLst --- stored in num_EnvVarLstS in the C code
+  \item Tool --- stored in num_ToolS in the C code
+  \item InpEdg --- stored in num_InpEdgS in the C code
+  \item MemEdg --- stored in num_MemEdgS in the C code
+  \item EqvEdg --- stored in num_EqvEdgS in the C code
+  \item CastEdg --- stored in num_CastEdgS in the C code
+  \item DrvEdg --- stored in num_DrvEdgS in the C code
+  \item PrmTypLst --- stored in num_PrmTypLstS in the C code
+  \item InpSpc --- stored in num_InpSpcS in the C code
+  \end{enumerate}
+
+  Next is the contents of each table, one line per entry.  The
+  structure of each table entry is defined in inc/$<$tabletype$>$.h;
+  for each element, the structure element name in the C code is
+  provided.  Pointers to other table elements are stored as table index
+  numbers in the text file, with -1 indicating NULL.
+  
+  \begin{enumerate}
+  \item SrcTyp (C table tps_SrcTyp _SrcTypS[]): Source Types
+  \begin{enumerate}
+  \item Pattern --- The suffix or prefix string
+  \item IsPrefix --- Non-zero if prefix pattern; otherwise suffix pattern
+  \item FilTyp --- Pointer to FilTyp table entry for type of matching names
+  \end{enumerate}
+  \item FilTyp (C table tps_FilTyp _FilTypS[]): Derivation types (all
+        declared derivation types, as well as any types that were
+	artificially generated).
+  \begin{enumerate}
+  \item FTClass --- general classification dervied from parent or self:
+  \begin{itemize}
+  \item FTC_None (1) --- :OBJECT, :noinput
+  \item FTC_Atmc (2) --- :FILE
+  \item FTC_List (3) --- :LIST
+  \item FTC_Void (4) --- :VOID
+  \item FTC_Pntr (5) --- :REFERENCE
+  \item FTC_Exec (6) --- :EXECUTABLE
+  \item FTC_Generic (7) --- :GENERIC
+  \item FTC_Pipe (8) --- :PIPE
+  \item FTC_DrvDir (9) --- :DERIVED-DIRECTORY
+  \item FTC_Struct (10) --- pseudo type for describing multiple outputs
+  \item FTC_ViewSpec (11) --- :view
+  \end{itemize}
+  \item FTName --- type name without leading colon
+  \item Desc --- on-line help for declared types
+  \item HelpLevel --- 1 for help text with a ?; 2 for normal help
+                      text, and 3 (impossible to print) for
+                      artificially generated types.
+  \item ArgFilTyp --- If this is a second-order type, this field
+                      points to the FilTyp table entry for the argument
+		      type
+  \item Tool --- A pointer to the Tool table for the tool which
+                 generates this type, if applicable.  Note that
+                 parents of this type can be generated implicitly by
+                 this tool as well.
+  \item MemEdg --- If this type is FTC_Struct, the multiple outputs it
+                   describes are linked via entries in the MemEdg table
+		   starting with the entry pointed to by this field.
+  \item EqvEdg --- If this type has full super types, they are linked
+                   via entries in the EqvEdg table starting with the
+                   entry pointed to by this field.
+  \item CastEdg --- If this type has blocking super types, they are
+                    linked via entries in the CastEdg table starting
+                    with the entry pointed to by this field.
+  \item DrvEdg --- All types derivable from this type are linked via
+                   entries in the DrvEdg table starting with the entry
+		   pointed to by this field.
+  \item MapPrmTypLst --- ? (pointer to PrmTypLst)
+  \item IsCopy --- non-zero if subtype of built-in :copy
+  \item IsGrouping --- non-zero if subtype of a type whose tool is one of
+                     PRMVALUES, APPLY, COLLECT, READ-LIST, NAME, NAMES,
+		     or EXPANDHOOKS
+  \item IsGroupingInput ---  non-zero if subtype of a type whose tool is
+                     NESTEDHOOKS, or one of the second order types
+		     :map, :lookup, or :recurse
+  \end{enumerate}
+  \item GenericFilTyp --- constant pointer to FilTyp entry for :GENERIC
+  \item PipeFilTyp --- constant pointer to FilTyp entry for :PIPE
+  \item ListFilTyp --- constant pointer to FilTyp entry for :LIST
+  \item FileFilTyp --- constant pointer to FilTyp entry for :FILE
+  \item ObjectFilTyp --- constant pointer to FilTyp entry for :OBJECT
+  \item NoInputFilTyp --- constant pointer to FilTyp entry for :noinput
+  \item ExpandHooksFilTyp -- constant pointer to FilTyp entry for
+                             :expand_hooks in odin package
+  \item TargetsPtrFilTyp -- constant pointer to FilTyp entry for
+                            :targets_ptr in odin package
+  \item TargetsFilTyp --- constant pointer to FilTyp entry for
+                          :targets in odin package
+  \item ActTargetsFilTyp --- constant pointer to FilTyp entry for
+                          :act_tgt.list in odin package
+  \item VirTargetsFilTyp --- constant pointer to FilTyp entry for
+                          :vir_tgt.list in odin package
+  \item VirDirFilTyp --- constant pointer to FilTyp entry for
+                          :vir_dir in odin package
+  \item CopyFilTyp --- constant pointer to FilTyp entry for
+                          :copy in odin package
+  \item PrmValuesFilTyp --- constant pointer to FilTyp entry for
+                          :prm_values in odin package
+  \item ViewSpecFilTyp --- constant pointer to FilTyp entry for
+                          :view_spec in odin package
+  \item FirstFilTyp --- constant pointer to FilTyp entry for :first
+  \item ApplyFilTyp --- constant pointer to FilTyp entry for
+                          :apply in odin package
+  \item FatherFilTyp --- constant pointer to FilTyp entry for
+                          :abstract in odin package
+  \item PrmTyp (C table tps_PrmTyp _PrmTypS[]): All parameter declarations
+  \begin{enumerate}
+  \item PTName --- Parameter name without leading plus.
+  \item Desc --- Help text
+  \item HelpLevel --- Help level (1 for those with ?, and 2 for those without)
+  \item FilTyp --- Derivation to apply to parameters (pointer to FilTyp)
+  \end{enumerate}
+  \item NullPrmTyp --- constant pointer to PrmTyp entry for +null
+  \item HookValPrmTyp --- constant pointer to PrmTyp entry for +hookvalue
+  \item CopyDestPrmTyp --- constant pointer to PrmTyp entry for +copy_dest
+  \item ApplyPrmTyp --- constant pointer to PrmTyp entry for +apply
+  \item PrmTypLst (C table tps_PrmTypLst _PrmTypLstS[]): Lists of
+                              parameter declarations used by other tables
+  \begin{enumerate}
+  \item PrmTyp --- A pointer to this list element in PrmTyp
+  \item Next --- A pointer to the next list entry in PrmTypLst
+  \end{enumerate}
+  \item EnvVar (C table tps_EnvVar _EnvVarS[]): All environment variable
+                                                declarations
+  \begin{enumerate}
+  \item Name --- Variable name without the leading dollar sign
+  \item Desc --- Help text
+  \item HelpLevel --- Help level (1 for those with ?, and 2 for those without)
+  \item Default --- Default value (string)
+  \item IsFile --- non-zero if Default is an odin-expression of a file
+                   to read for actual default value; otherwise Default is
+		   the actual default value
+  \end{enumerate}
+  \item EnvVarLst (C table tps_EnvVarLst _EnvVarLstS[]): Lists of environment
+                                                variables used by other tables
+  \begin{enumerate}
+  \item EnvVar --- Pointer to EnvVar entry which is this list element
+  \item Next --- Pointer to EnvVarLst entry containing the next
+                element, or NULL/-1 for end-of-list.
+  \end{enumerate}
+  \item Tool (C table tps_Tool _ToolS[]): All derivation tools.
+  \begin{enumerate}
+  \item TClass
+  \item InpEdg
+  \item BasePrmTypLst
+  \item EnvVarLst
+  \item Package
+  \end{enumerate}
+  \item SourceTool --- constant pointer to Tool entry for hidden tool
+                       TC_Source (1).
+  \item StrTool --- constant pointer to Tool entry for hidden tool
+                    TC_Str (12).
+  \item DrvDirElmTool --- constant pointer to Tool entry for hidden tool
+                          TC_DrvDirElm (2).
+  \item VirDirElmTool --- constant pointer to Tool entry for hidden tool
+                          TC_VirDirElm (47).
+  \item PntrHoTool --- constant pointer to Tool entry for hidden tool
+                       TC_PntrHo (8).
+  \item PntrElmTool --- constant pointer to Tool entry for hidden tool
+                        TC_PntrElm (37).
+  \item InternalPntrTool --- constant pointer to Tool entry for hidden tool
+                             TC_InternalPntr (10).
+  \item TextDefTool --- constant pointer to Tool entry for hidden tool
+                        TC_TextDef (18).
+  \item InpEdge
+  \begin{enumerate}
+  \item InpSpc
+  \item InpKind
+  \item IsUserArg
+  \item Next
+  \end{enumerate}
+  \item MemEdg
+  \begin{enumerate}
+  \item FilTyp
+  \item Next
+  \end{enumerate}
+  \item EqvEdg
+  \begin{enumerate}
+  \item FilTyp
+  \item Next
+  \end{enumerate}
+  \item CastEdg
+  \begin{enumerate}
+  \item FilTyp
+  \item Next
+  \end{enumerate}
+  \item DrvEdg
+  \begin{enumerate}
+  \item FilTyp
+  \item PrmTypLst
+  \item Next
+  \end{enumerate}
+  \item InpSpc
+  \begin{enumerate}
+  \item ISKind
+  \item FilTyp
+  \item PrmTyp
+  \item Str
+  \item IsEnvVar
+  \item InpSpc
+  \item Next
+  \end{enumerate}
+  \end{enumerate}

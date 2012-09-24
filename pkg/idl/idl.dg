@@ -61,7 +61,7 @@ $ODIN_IDL_I 'directory containing default idl include files' = '';
 # Tools
 
 EXEC (idl_inc.lua) (:FILE) (:FILE :dir)@ (+home)@ (+inc_sp) (+ignore)
-   => (:idl_inc.view_desc);
+   NEEDS $ODIN_IDL_I $ODIN_IGNORE => (:idl_inc.view_desc);
 
 COLLECT (:idl_inc.view_desc :view)
    => (:idl_inc);
@@ -71,7 +71,7 @@ COLLECT (:idl_inc :map=:all_idl_inc) (:idl_inc)
 
 EXEC (idl.lua) (:IDL) (:IDL :dir)@ (+inc_sp) (+idl_flags)
  NEEDS (:IDL +home=(:IDL :dir) :lookup=:all_idl_inc)
-   => (:idl_h_dir) (:client.C) (:epv.C) (:sstub.c) (:cstub.c);
+   $ODIN_IDL $ODIN_IDL_FLAGS $ODIN_IDL_HOME => (:idl_h_dir) (:client.C) (:epv.C) (:sstub.c) (:cstub.c);
 
 COLLECT (:client.C) (:epv.C) (:sstub.c) (:cstub.c)
    => (:idl_lib.list);

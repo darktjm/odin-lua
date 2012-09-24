@@ -1,0 +1,29 @@
+yacc:
+  This package supports automatically generated LALR(1) parsers.
+BUGS:
+  +yaccid is blindly overinclusive
+:y->:c
+  This produces a C file using \texttt{yacc}.  If the \texttt{+yaccid}
+  parameter is specified, all occurrences of yy in  resulting output
+  are turned into the given ID, and all occurreces of YY are turned
+  into the ID converted to upper-case.  Note that this includes yy and
+  YY within any literal C code or other text inserted by \texttt{yacc}.
+
+  The parser builder used is \texttt{yacc} by default, or the value of
+  the \$ODIN_YACC variable.  If the \texttt{+gnu} option is specified,
+  \texttt{bison} in \texttt{yacc} compatibility mode (\texttt{-y}) is
+  used instead.  The \texttt{+yacc} parameter overrides all of these.
+  Flags passed into the parser builder are \$ODIN_YACC_FLAGS, followed
+  by \texttt{+yacc_flags}, followed by the \texttt{-y} inserted by the
+  \texttt{+gnu} option.  Note that this is added even if the parser
+  builder was overridden using \texttt{+yacc}.
+  
+  If the \texttt{+conflict_ok} parameter is not specified, any
+  conflicts flagged by the parser builder become errors.  Otherwise,
+  they are warnings.  Note that there is no way to distinguish between
+  types of conflicts; in fact, the presence of any log message
+  containing the word conflicts will trigger an error.
+  
+  The misnamed \$ODIN_SYS5 and \texttt{'+sys5'} flag parameters, if
+  non-blank/specified, transform any obsolete type definition of the
+  \texttt{malloc} C function to use the correct pointer type.

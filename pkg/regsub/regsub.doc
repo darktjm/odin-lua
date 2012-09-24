@@ -7,7 +7,7 @@ regsub:
   This parameter consists of the search string, followed by a / that is
   not escaped, followed by the replacement string.  In the replacement
   string, a backslash escapes any character but the digits 0-9 and
-  open curly braces.  An unescaped ampersand (&) represents the entire
+  open curly braces.  An unescaped ampersand (\&) represents the entire
   matching text.  A backslash followed by a single digit, or a
   backslash followed by a curly-brace enclosed decimal number,
   represents that parenthesis-enclosed subexpression.  Subexpression
@@ -25,7 +25,7 @@ regsub:
   \^/$<$text$>$ and +subst \$/$<$text$>$, respectively, except that
   they do not count towards +subst_only, and only one of each may be
   given.
-:cpp_in->:gnc.regsub
+:regsub_in->:gnc.regsub
   Filters a file, showing (or hiding, if +hide_match is given) only
   lines that match the extended regular expression in +match (if given).
   The type of the file is based on source file name matching after
@@ -34,7 +34,7 @@ regsub:
   This parameter consists of the search string, followed by a / that is
   not escaped, followed by the replacement string.  In the replacement
   string, a backslash escapes any character but the digits 0-9 and
-  open curly braces.  An unescaped ampersand (&) represents the entire
+  open curly braces.  An unescaped ampersand (\&) represents the entire
   matching text.  A backslash followed by a single digit, or a
   backslash followed by a curly-brace enclosed decimal number,
   represents that parenthesis-enclosed subexpression.  Subexpression

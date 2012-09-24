@@ -1,0 +1,37 @@
+BUGS:
+  Spaces are not supported in include search paths. Technically,
+  this is the script's fault, since odin gives one entry per line,
+  with no added characters.
+  Similarly, spaces are not supported in the +define option.
+  The ld option +eprof is unused.  I suspect it was supposed to be
+  independent of +prof, and just for the linker.
+cpp:
+  This package supports running arbitrary files through the C
+  preprocessor.
+:FILE->:cpp
+  Run the C preprocessor on a file, retaining its type.  The C
+  preprocessor is defined by the \$ODIN_CPP environment variable.
+  Options are passed as follows:
+  \begin{itemize}
+  \item For each +define parameter, a -D$<$parm$>$ option is added.  Note
+        that spaces are not supported: they separated multiple
+        parameters.  This is not a problem when only defining the
+        symbol, but may require work for defining its value.
+  \item For each +inc_sp parameter, a -I$<$parm$>$ option is added.  Once
+        again, spaces are not supported.
+  \item The environment variable \$ODIN_CPP_FLAGS is then appended.
+  \end{itemize}
+:cpp_in->:gnc.cpp
+  Run the C preprocessor on a file, changing its type according to its
+  file name pattern after stripping the ,c extension.  The
+  preprocessor is defined by the \$ODIN_CPP environment variable.
+  Options are passed as follows: 
+  \begin{itemize}
+  \item For each +define parameter, a -D$<$parm$>$ option is added.  Note
+        that spaces are not supported: they separated multiple
+        parameters.  This is not a problem when only defining the
+        symbol, but may require work for defining its value.
+  \item For each +inc_sp parameter, a -I$<$parm$>$ option is added.  Once
+        again, spaces are not supported.
+  \item The environment variable \$ODIN_CPP_FLAGS is then appended.
+  \end{itemize}

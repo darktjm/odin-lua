@@ -43,4 +43,4 @@ $ODIN_YACC_FLAGS 'yacc flags' = '-dv';
 
 EXEC (yacc.lua) (:y) (+yaccid) (+conflict_ok) (+sys5) (+gnu)
  (+yacc) (+yacc_flags)
-   => (:c) (:h) (:yacc.log);
+   NEEDS $ODIN_SYS5 $ODIN_YACC $ODIN_YACC_FLAGS => (:c) (:h) (:yacc.log);

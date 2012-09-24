@@ -1,0 +1,107 @@
+cc:
+  This package supports compiling C code.  It includes the C dependency
+  scanner and pretty printer, as well.
+BUGS:
+  Comments and #if are not supported by the include file scanner.
+  Spaces are not supported in include search paths. Technically,
+  this is the script's fault, since odin gives one entry per line,
+  with no added characters.
+  Similarly, spaces are not supported in the +define option.
+  The ld option +eprof is unused.  I suspect it was supposed to be
+  independent of +prof, and just for the linker.
+:c->:c.one.list
+  Convert a C file name into a list of filenames
+:c.sm->:c.sm.list
+  Convert a list of C files in a file into a normal list
+:FILE->:c_inc.view_desc
+  Convert a file to a list of possible include files.  This is for
+  anything that preprocess with cpp.  Note that it does not support
+  filtering by definitions or commented-out lines.  The output format
+  is compatible with the built-in :view transformation; all groups are
+  terminated by the empy string, so if an include file cannot be
+  found, it is ignored.
+
+  Any filenames which match the egrep pattern in the +ignore parameter(s)
+  or the \$ODIN_IGNORE variable are filtered out.  Generally, ODIN_IGNORE
+  should include the system directories, like /usr/include.
+
+  The +inc_sp parameter specifies search paths; multiple options add
+  more paths in the order given.  Spaces are not supported in search
+  paths.  The \$ODIN_CC_I variable is intended to be cpp's built-in
+  search path, which is appended to the search list.  +home is
+  simply an alternate, single-entry option to prepend to the path.
+  For local includes (using "" instead of $<>$), the file's source
+  directory is prepended to the path as well.
+:c_inc.view_desc->:c_inc
+  This processes the :c_inc.view_desc entries, filtering them for
+  existence and making them into a list.
+:c_inc->:all_c_inc
+  This recursively scans all entries of the list, producing more
+  :c_inc and appending them to the list.
+:c->:o
+  This compiles C code into object code.  Its options are passed to
+  the C compiler as follows:
+  
+  \begin{itemize}
+  \item +gnu, +cc, and \$ODIN_CC may specify the compiler, in that
+        order.  +gnu is merely a shortcut for +cc=gcc.  The compiler
+        is parsed into command-line elements like a shell command.  The
+	search path is +cc_home, \$ODIN_CC_HOME, and the path from the last
+	cache reset, in that order.  The default value of ODIN_CC is set
+        in the config package when Odin is first configured.
+  \item Specifying +debug adds the debugger option specified by
+        \$ODIN_CC_DEBUGF, which defaults to -g.
+  \item Specifying +prof adds the profiling option -pg.
+  \item Specifying +optimize=$<$type$>$ adds the optimization option
+        -O$<$type$>$.
+  \item For each +define parameter, a -D$<$parm$>$ option is added.  Note
+        that spaces are not supported: they separated multiple
+        parameters.  This is not a problem when only defining the
+        symbol, but may require work for defining its value.
+  \item For each +inc_sp parameter, a -I$<$parm$>$ option is added.  Once
+        again, spaces are not supported.
+  \item Finally, the parameter +cc_flags and the variable
+        \$ODIN_CC_FLAGS specify any other options, in that order.
+        These are parsed in a shell-like manner.  Any flags whic could
+        be specified using the more specific options should be used
+	instead for compatibility.
+  \item Actually, there is one more set of parameters:  -c to specify
+        only an object file, and -o $<$output$>$ to create the appropriate
+	output file.
+  \end{itemize}
+  
+  When the compiler is run, all standard output is printed directly to
+  the user.  Any standard error messages are collected as warnings or
+  errors.  Which of the two they are is determined by the compiler's
+  return code:  success produces warnings, and failure produces errors.
+:library_flags->:exe
+  This runs the linker on C code.  Note that the linker in this case
+  is the C compiler without the -c option.  Its options are passed to
+  the C compiler as follows:
+  
+  \begin{itemize}
+  \item +gnu, +cc, and \$ODIN_CC may specify the compiler, as with :c
+        to :o.  In addition, purify may be run by selecting +purify;
+        the multiple +purify options are concatenated and prepended to
+        the linker command.  When done, any extra result files from
+        purity are removed.  As with individual C compilation, the
+	search path is determined by the +cc_home parameter, the
+	\$ODIN_CC_HOME variable, and the path from the last cache reset,
+	in that order.
+  \item Specifying +debug and +prof work the same way as with :c to
+        :o.  The +eprof flag is unused.
+  \item Then, any generic opions are added from +ld_flags and
+        ODIN_CC_FLAGS, respectively.  Spaces are interpreted as
+	separators regardless for these two as well.
+  \item Finally, any +libs parameters are turned into appropriate -l
+        parameters and tacked on, in the order they were found.
+  \end{itemize}
+:c->:fmt
+  This runs the C code through indent, with no special options.
+:c->:c.h
+  This is an obsolete transformation that will be removed soon.  It
+  attempts to produce prototypes, but it does not use the C definitions
+  and include path, and its pattern for finding functions only extracts
+  functions with just a type name followed by a function name on a
+  separate line with no space between the name and the opening
+  parentheses.

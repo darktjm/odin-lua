@@ -99,7 +99,7 @@ READ-LIST (:cxx.sm)
    => (:cxx.sm.list);
 
 EXEC (cxx_inc.lua) (:FILE) (:FILE :dir)@ (+home)@ (+inc_sp) (+ignore)
-   => (:cxx_inc.view_desc);
+   NEEDS $ODIN_CXX_I $ODIN_IGNORE => (:cxx_inc.view_desc);
 
 COLLECT (:cxx_inc.view_desc :view)
    => (:cxx_inc);
@@ -110,10 +110,10 @@ COLLECT (:cxx_inc :map=:all_cxx_inc) (:cxx_inc)
 EXEC (CC.lua) (:cxx) (ptr_of :vir_dir) (:cxx :dir)@ (+inc_sp)
  (+gnu) (+debug) (+prof) (+optimize) (+define) (+cxx) (+cxx_flags)
  NEEDS (:cxx +home=(:cxx :dir) :lookup=:all_cxx_inc)
-   => (:o);
+   $ODIN_CXX $ODIN_CXX_DEBUGF $ODIN_CXX_FLAGS $ODIN_CXX_HOME $ODIN_CXX_LD_LIBRARY_PATH $ODIN_CXX_PTR => (:o);
 
 EXEC (ld.lua) (:o_of :vir_dir) (:library_flags) (ptr_of :vir_dir)
  (+define) (+inc_sp) (+gnu) (+purify) (+debug) (+prof) (+eprof)
  (+cxx) (+ld_flags)
  NEEDS (:o_of :vir_tgt.list) (:libraries) (:cxx.exe.list)@
-   => (:exe);
+   $ODIN_CXX $ODIN_CXX_DEBUGF $ODIN_CXX_FLAGS $ODIN_CXX_HOME $ODIN_CXX_IGNORE_ERR $ODIN_CXX_LD_LIBRARY_PATH $ODIN_CXX_PTR => (:exe);

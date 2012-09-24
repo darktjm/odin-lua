@@ -1,0 +1,34 @@
+BUGS:
+  Not even the pathetic '' attempt at quoting file names in view specs
+  No way to support revision control systems that use a server or a
+  single source (e.g. svn, git, NoWeb, etc.)
+vc:
+  This package supports files in revision control systems (only RCS
+  and SCCS are supported).  The \texttt{:try.co} type in particular
+  can be parented by other version control systems to hook in.
+  However, it is likely that the \texttt{:vc*view.source.spec}
+  derivation needs to be overridden as well.
+:,v->:log
+  Get the RCS information for a revision control file.  The parameters
+  specify information for a particular revision.
+:,v->:co
+  Check out a version from RCS.  The parameters specify a version
+  other than the top.
+:sccs->:sccs.co
+  Check out a version from SCCS.  The parameters specify a version
+  other than the top.
+:sccs->:sccs.log
+  Get the SCCS information for a revision control file.  The
+  parameters specify information for a particular revision.
+:,vw->:view.source.spec
+  Convert a list of odin expressions into a view spec that includes potential
+  RCS and SCCS sources.
+:view.source.spec->:view.names
+  Convert any file names in a list of odin expressions into one which
+  references RCS and SCCS sources, if present.
+:view.names->:vw.of
+  Convert a list of odin expressions into a virtual directory spec where
+  RCS and SCCS sources have been accounted for.
+:vw.of->:vw.dir
+  Convert a virtual directory spec where RCS and SCCS sources have been
+  accounted for into a virtual directory.

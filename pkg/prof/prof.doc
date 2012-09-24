@@ -1,0 +1,6 @@
+prof:
+  This package supports running the standard profiler, gprof.
+:exe->:profile
+  Run the profiler, gprof.  The profiling output data file should be
+  specified using +prof_data.  Any additional flags to gprof may be
+  given in +gprof_flags.

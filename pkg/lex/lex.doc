@@ -1,0 +1,11 @@
+lex:
+  This package supports automatically generated lexical analyzers.
+BUGS:
+  No direct flex support (hard-coded name of lex tool is lex)
+  +yaccid is blindly overinclusive
+:l->:c
+  This produces a C file using \texttt{lex}.  If the +yaccid parameter is
+  specified, all occurreces of yy in resulting output are turned into
+  the given ID, and all occurreces of YY are turned into the ID converted
+  to upper-case.  Note that this includes yy and YY within any literal
+  C code or other text inserted by \texttt{lex}.

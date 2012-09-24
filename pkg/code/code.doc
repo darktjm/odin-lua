@@ -1,0 +1,29 @@
+BUGS:
+  Can't specify format of library file name.  This is not too
+  terrible, as it only drops the dependency, but not allowing name.lib
+  disallows Windows native libraries.
+code:
+  This package supports object file management.
+:sm->:sm.list
+  Convert a system model file into a system model list
+:sm.list->:code.list
+  Flatten any system model file references in a system model list, recursively.
+:code.list->:o_of
+  Turn a list of code files into an Odinfile to map the code files
+  which can produce object files from their full type name to their
+  abbreviated name used elsewhere.
+:o_of->:a
+  Generate an archive of the specified object files, using ar.
+  If \$ODIN_RANLIB is non-empty, run it on the archive as well.
+->:libraries.view_desc
+  Generate dependency information and library flags from +lib and
+  +lib_sp arguments.  The +lib arguments can be command-line options
+  (preceeded by dashes), absolute paths to library files (which are
+  added to the dependencies), and library base names (for use with the
+  -l option).  The latter are converted to dependencies based on the
+   library path and added as options with -l.  The file associated
+   with their dependency is assumed to be lib$<$name$>$.$<$ext$>$, where
+   $<$ext$>$ is one of a, so, or sl, or one of those with two or more
+   numeric extensions.
+:libraries.view_desc->:libraries
+  Converts view descriptor's valid entries into the list of libraries.

@@ -1,0 +1,206 @@
+BUGS:
+  !? is supported for help, but impossible to type (! can only be
+    followed by = < :)
+  A lot of uninternationalized help text
+  I don't have ClearCase, so I have no idea what that stuff is supposed
+  to do, and therefore it is undocumented.
+  It uses rsh instead of ssh for remote execution.  Nobody uses rsh any more.
+  PATH is not a package variable (neither are a number of other
+  env. vars that may be important)
+odin:
+  This package includes the main Odin executables.  Actions described in
+  this package are built-in to the Odin server.  In addition, this
+  package is home to the remote build server.  This can be overridden by
+  specifing a different \$ODIN_RBSCMD (relative to the current cache's
+  package directory).  Its arguments are, in order, the remote host
+  name, the Odin cache directory name, the local host name, and the
+  local port number to which to connect.  The default command,
+  \texttt{odin/rbs.sh}, simply uses rsh to execute the
+  \texttt{PKGS/odin/rbs.exe} command out of the cache directory of the
+  remote host, with the local host name and port number as arguments.
+  
+  The following environment variables directly affect Odin operation:
+  \begin{itemize}
+  \item \$DUMPCORE --- whether to dump core when anomaly detected
+  \item \$ODIN_RBSCMD --- the name of the Odin remote-build-server
+  \item \$ODIN_SHORTNAMES --- use short cache filenames
+  \item \$ODIN_LOCALIPC --- use Unix domain interprocess communication
+  \item \$ODIN_SERVER --- internal use only: non-empty spawns a server
+  \item \$ODIN_SERVER_SHUTDOWN --- internal use only: non-empty causes
+        client to send shutdown command to server
+  \item \$ODINCACHE --- the Odin cache directory.  The odin wrapper
+        script normally sets this based on \$ODIN and \$ODINVIEW.
+	\$ODIN is a top-level directory for the cache, and \$ODINVIEW is
+	the directory under that (by default, these are
+	\texttt{\$HOME/.ODIN} and the local host name, respectively).
+  \end{itemize}
+  
+  In addition, the following environment variables are available to tool
+  programs:
+  \begin{itemize}
+  \item \$ODINVERBOSE --- if non-empty, a trace message should be
+        printed to standard output.
+  \item \$ODINRBSHOST --- a prefix to prepend to any trace messages to
+        indicate what host it is running on
+  \item \$ODINCACHE --- the Odin cache directory
+  \end{itemize}
+:OBJECT->:err
+  All error messages produced by any tool used to create this object.
+:OBJECT->:warn
+  All error and warning messages produced by any tool used to create
+  this object.
+:FILE->:targets
+  Given an input that is an Odinfile, convert all nested target
+  definitions into their constituent text
+:OBJECT->:name
+  Given any object, give a consise, unique Odin-expr which produces that
+  object.
+:LIST->:names
+  Given a list of objects, give a consise, unique Odin-expr which
+  produces each object in the list, one expression per line.
+:FILE->:filename
+  Given a a derivation which produces a file, give that file's name.
+  For derived files, the name is that of the file in the cache.  For
+  literal strings, the string is its own name.
+:LIST->:ls
+  Converts a list of derivations to a printed list of file names (as
+  per the \texttt{:filename} derivation), one per line.
+:LIST->:cat
+  Concatenates the contents of all files in the list to produce a single
+  output file.  The contents of a literal string are the literal string
+  itself.
+:LIST->:first
+  Returns the first element of a list.  Often used in parameter
+  definitions to select a single value.
+:LIST->:union
+  Removes duplicates from a list.
+:OBJECT->:id
+  Prints an object's unique decimal ID.
+:OBJECT->:label
+  Give the label (base filename plus type name modifications) of an
+  input object.
+:LIST->:labels
+  Give the label (\texttt{:label}) of each element of a list, one per
+  line. 
+:OBJECT->:dir
+  Returns a reference to the directory containing the object, or, if
+  the object is derived, the directory containing the source object from
+  which it was derived.  Use \texttt{:filename} to manually
+  dereference. 
+:vir_tgt.list->:vir_dir
+  Produce a virtual directory containing all the given targets.  This
+  can be used to isolate targets into a directory for a tool.  Since
+  targets rename expressions, they can also be used to rename inputs.
+:OBJECT->:depend
+  List of all source files (including automatically added ones, like the
+  results of header and library scanning) that the given object
+  depends on.  If any object in this list changes, the object must be
+  rebuilt.
+:FILE->:source_names
+  Given a file with one odin expr per line, each describing operations
+  on a source, return the names of the sources, one per line (i.e.,
+  strip all operations from the expressions).
+:FILE->:operation_names
+  Given a file with one odin expr per line, each describing operations
+  on a source, return the the operations, one per line (i.e., strip all
+  source names from the expressions).
+:view_spec->:view
+  A view specification is a list continaing groups of odin
+  expressions.  Each group is terminated by a string; i.e., an equals
+  sign followed by a single ID token.  The string is used in error
+  messages regarding that group, but is otherwise ignored.  Each
+  expression is evaluated in sequence, until one returns an error status
+  better than ERROR.  This expression is then transferred to the view
+  output, and all others in the group are ignored.  If none have an
+  error status better than ERROR, the entire group is in error.  If
+  the string is blank (e.g. \verb|=''|), though, the error is ignored
+  and the group is simply dropped.  Otherwise, the entire view is in
+  error.
+  
+  Most dependency scanners start by creating a view specification of all
+  possible paths to a file, and then collapsing that to a view using
+  this derivation.  Note that this is done via the \texttt{:view_spec}
+  derivation, which actually parses the file into a list.
+:FILE->:view_spec
+  This produces a \texttt{:view_spec} for the \texttt{:view}
+  derivation.  The format of the input file is one odin expression per
+  line, grouped by terminating each group with a literal string (=
+  followed by a token). 
+:FILE->:expand_hooks
+  Given a file with hooks, expand all hooks into an output file.  A
+  hook could be more commonly called a cross-reference, or a mark.
+  A hook may be surrounded by other text.  Its syntax is:
+  \begin{quote}
+  \verb%(|% \emph{odin-expression} \verb%|% \emph{hooktype} \verb%|%
+            \emph{hookdata} \verb%|)%
+  \end{quote}
+  Backslashes can be used to escape the delimiters.
+  
+  The \emph{odin-expression} is what derives the object being
+  referenced by the hook.  The \emph{hooktype} derivation is applied
+  to the expression with the parameter \texttt{+hookvalue} set to the
+  \emph{hookdata}, and the entire hook is replaced by the results.
+  Hooks are applied recursively; that is, if the replacement text
+  contains hooks, they are evaluated and replaced as well.
+  
+  These hooks are normally used to transform error messages from various
+  formats to a standard format.
+:FILE->:nested_hooks
+  This is a helper to retrieve nested hooks.  It is normally not used
+  directly, but rather as a side effect of \texttt{:expand_hooks}.
+:OBJECT->:apply
+  The \texttt{+apply} parameter is required.  This derivation applies
+  the operations given by the \texttt{+apply} parameter.
+->:odin_help
+  This produces an executable which is run when general help is
+  requested by the user.  By default, it is a simple program which
+  prints the Odin command syntax.  Override the one in odin if
+  different help is desired.
+  
+  See also \texttt{:prefix_help}, \texttt{:suffix_help},
+  \texttt{:drv_help}, and \texttt{:prm_help}.  There is no way to
+  override the help text for plain strings, type names in
+  mid-derivation, copy arguments, utility invocation, built-in
+  variables, path elements, secondary parameters, parameter arguments,
+  or second-order derivation types. 
+:OBJECT->:prefix_help
+  This derivation is invoked to print the list of all prefix file name
+  patterns.  Override the one in odin if different help is desired.
+  The input object is always () and may be ignored.
+:OBJECT->:suffix_help
+  This derivation is invoked to print the list of all file name suffix
+  patterns.  Override the one in odin if different help is desired.
+  The input parameter is always () and may be ignored.
+:OBJECT->:drv_help
+  This derivation is invoked to print the list of all possible
+  derivations in response to \verb|:?|.  If an object preceeds the
+  help request, it is passed in.
+:OBJECT->:prm_help
+  This derivation is invoked to print the list of all possible
+  derivations in response to \verb|+?|.  If an object preceeds the
+  help request, it is passed in.  If a derivation type follows the help
+  request, it is passed in using the \texttt{+prm_help} parameter.
+:OBJECT->:targets_ptr
+  Given a path or an Odinfile, create a copy in the cache and return
+  the name of the copy.
+:FILE->:targets_inc
+  Given a path or an Odinfile, find all directly nested target
+  definitions.
+:targets_inc->:all_targets_inc
+  Given a path or an Odinfile, find all nested target definitions.
+:targets_ptr->:act_tgt.list
+  Given a path or an Odinfile, list all targets which map to real
+  files.
+:targets_ptr->:vir_tgt.list
+  Given a path or an Odinfile, list all targets which are virtual or
+  are in virtual directories.
+:OBJECT->:copy
+  Copy the given file or directory to the target specified in
+  \texttt{+copy_dest}.
+:OBJECT->:copy_cmd
+  Copying in or out actually uses this.  The input object is the input
+  side of the copy, and the \texttt{+copy_dest_desc} is the output
+  side of the copy.  Internally, the \texttt{:copy} transformation is
+  used for each individual copy.
+:FILE->:prm_values
+  FIXME: document
