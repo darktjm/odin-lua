@@ -652,7 +652,7 @@ char *C_Esc(const char *in)
       return NULL;
    int len = strlen(in) * 2 + 1;
    char *out;
-   cur_obuf = ++cur_obuf % 5;
+   cur_obuf = (cur_obuf + 1) % 5;
    if(!obuf_len[cur_obuf]) {
       obuf_len[cur_obuf] = 128;
       obuf[cur_obuf] = malloc(128);

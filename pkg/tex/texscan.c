@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void PassChr(char *argument)
+static void PassChr(char *argument)
 {
    int c, t = getchar();
 
@@ -11,7 +11,7 @@ void PassChr(char *argument)
          exit(0);
 }
 
-void PassStr(char *argument)
+static void PassStr(char *argument)
 {
    char *p = argument;
    int c;
@@ -26,7 +26,7 @@ void PassStr(char *argument)
    }
 }
 
-void OutNames(char *argument)
+static void OutNames(char *argument)
 {
    for (;;) {
       char *p = argument;
@@ -51,7 +51,7 @@ void OutNames(char *argument)
    }
 }
 
-struct {
+static struct {
    char *repr;
    int common;
    void (*routine) (char *);

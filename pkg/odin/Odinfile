@@ -1,6 +1,12 @@
 %all! == <<
    %install-rbs; ../tregrm%install; %install
 
+%local! == <<
+   rbs.exe; ../tregrm/tregrm.exe; ../dg/dg.exe
+
+odin.exe == %exe
+rbs.exe == %rbs-exe
+
 %install! == <<
    %exe >$THORPKGS/odin/odin.exe
    ../dg%install

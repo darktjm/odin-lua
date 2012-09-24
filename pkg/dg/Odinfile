@@ -1,5 +1,7 @@
 %exe == %dg.c.sm +ignore=\\.hh\$ :exe
 
+dg.exe == %exe
+
 %install! == <<
    %exe > $THORPKGS/dg/dg.exe
 

@@ -19,7 +19,7 @@ nested:
 	(cd editline; make CC=$(CC) CFLAGS='$(CFLAGS)')
 
 odin.exe: $(FILES)
-	- $(CC) $(CFLAGS) $(LDFLAGS) -o odin.exe -llua $(FILES) \
+	- $(CC) $(CFLAGS) $(LDFLAGS) -o odin.exe $(FILES) -llua \
          `if [ $$ODINBOOT_CONFIG ] ; then echo $$ODINBOOT_SOCKET_LIBS; \
 	  elif [ -f /usr/lib/libsocket.* ] ; then echo '-lsocket -lnsl'; \
 	  else true; fi`

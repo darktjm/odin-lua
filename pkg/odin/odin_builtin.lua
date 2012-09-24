@@ -317,6 +317,7 @@ ODINRBSHOST = getenv("ODINRBSHOST")
 function odin_log(msg)
     if ODINVERBOSE then
 	io.write(ODINRBSHOST .. msg .. '\n')
+	io.flush()
     end
 end
 

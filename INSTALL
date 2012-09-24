@@ -41,7 +41,7 @@ for pkg in $newpkgs; do
    if [ ! -d $destpkg ] ; then mkdir $destpkg || exit 1; fi
    #select
       if [ -r pkg/$pkg/Odinfile ] ; then
-	 files=`(cd ./pkg/$pkg; ls *.dg *sh *.exe)`
+	 files=`(cd ./pkg/$pkg; ls *.dg *sh *.exe *.txt *.lua)`
       else
 	 files=`(cd ./pkg/$pkg; ls) | sed -e s/CVS// -e 's/.*\.in//'`; fi
    for file in $files; do

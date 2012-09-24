@@ -404,6 +404,7 @@ Do_Execute(boolean * AbortPtr, tp_Nod Root, boolean Interactive)
    /* OK, maybe it is good to be able to do Lua directly */
    /* there isn't much efficiency benefit, but it is more portable */
    /* plus it takes care of ensuring the standard library is loaded */
+   /* unfortunately, this has to be in a subprocess to properly isolate it */
    if (strncmp(CmdStr, "lua!", 4) == 0) {
       lua_State *L = Lua_Init();
       if(!L)

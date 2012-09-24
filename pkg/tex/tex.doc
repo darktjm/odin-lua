@@ -7,12 +7,12 @@ tex:
 :tex.vtd->:rootName
   Return the file name and base name of the root document.  If there is
   only one document, its name is used.  Otherwise, the root document
-  should be specified using +texroot.
+  should be specified using \texttt{+texroot}.
 :dir->:texsp
   Return a file containing directories, one per line, to search for \TeX{}
   inputs.  This includes the directory containing the virtual inputs,
-  as well as any path specified by +texsearch.  If unspecified, the
-  original source directory for the input file is used.
+  as well as any path specified by \texttt{+texsearch}.  If
+  unspecified, the original source directory for the input file is used.
 :texfiles->:texclose
   Given a list of \TeX{} files, list all files needed during a run.  This
   is for automatic dependency scanning.
@@ -28,10 +28,11 @@ tex:
   Collapse view descriptor to actual present files.
 :rootFileName->:fmtcmd
   Given a \TeX{} input file, determine which command to run for output.  If
-  +usepdf is set, PDF is produced directly from input using
-  pdf(la)tex.  If +tex is set, the input is plain \TeX{}.  If +latex is
-  set, the input is \LaTeX{}.  Otherwise, selection is based on presence of
-  the \LaTeX{} command \\documentstyle or \\documentclass.
+  \texttt{+usepdf} is set, PDF is produced directly from input using
+  pdf(la)tex.  If \texttt{+tex} is set, the input is plain \TeX{}.  If
+  \texttt{+latex} is set, the input is \LaTeX{}.  Otherwise, selection
+  is based on presence of the \LaTeX{} command
+  \textbackslash{}documentstyle or \textbackslash{}documentclass. 
 :texsp->:dvi
   Run \TeX{} on inputs until auxiliary files settle.  The actual command
   to run is obtained by the \texttt{:fmtcmd} derivation.  The

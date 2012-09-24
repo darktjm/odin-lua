@@ -24,9 +24,7 @@ goterr = not runcmd('ar qcv a', cmdargs)
 if not goterr then
    ranlib = getenv("ODIN_RANLIB")
    if ranlib ~= "" then
-      if getenv("ODINVERBOSE") ~= "" then
-	 print(getenv("ODINRBSHOST") .. ranlib .. ' out.a')
-      end
+      odin_log(ranlib .. ' out.a')
       goterr = not runcmd(ranlib, {'a', stdout = true})
    end
 end

@@ -11,7 +11,7 @@ if ODIN_default == '' then
    odin_error('No default file specified', 0)
 end
 
-if apr.stat(ODIN_FILE, 'type') == 'file' then
+if is_file(ODIN_FILE) then
    append_line("boot_name", ODIN_FILE)
 else
    append_line("boot_name", ODIN_default)
