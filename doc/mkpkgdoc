@@ -771,7 +771,7 @@ for i, pkg in ipairs(pkglst) do
 	ver = verf:read('*l')
 	verf:close()
     else
-	ver = '1.17.10'
+	ver = '1.18'
     end
     print("\\section{\\label{sec:" .. pkg .. "}" .. pkg .. "}\n" ..
           "\n" ..

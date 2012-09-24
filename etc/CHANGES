@@ -1,3 +1,61 @@
+1.18
+
+Any EXEC tool whose first argument ends with .lua is executed in an
+internal interpreter which has odin_builtin.lua pre-loaded.  See that
+file for a list of available functions.  This requires lua 5.1,
+lua-apr, and, optionally, if you want symbolic links, lua-posix.
+
+Executing commands in odin scripts which have lua! as their first four
+characters also executes the command as Lua code in an internal
+interpeter.  This interpreter is not forked (unlike the lua tools
+above), so care must be taken to not accidentally crash or otherwise
+interfere with the main Odin process.
+
+An odin script line starting with @ is not echoed even if the
+verbosity is set high enough.  This allows in-line shell code to be
+replaced by odin scripts with no change in functionality.
+
+Added :lua_stdout/:lua_output and :run.lua derivations, which execute
+Lua code instead of shell commands, to the run package.
+
+Since the most common shell commands are egrep and sed, a :regsub
+derivation has been added, which performs simple search and
+substitution.  This is contained in its own package (regsub).
+
+All EXEC shell scripts have been converted to Lua.  This adds an
+additional requirement of lrexlib (rex_posix).  All uses of shell
+commands in Odinfiles in Odin itself have been converted to use either
+lua or odin scripts.
+
+Added the missing makeindex from the previous eli tex package merge.
+
+Changed the documentation target to PDF instead of PostScript.
+
+Added hevea and latex2html methods for generating odin.html
+
+Made .c.h derivation use cproto instead of sed; it actually works now.
+All the Func.hh files are now generated using this method.
+
+Several scripts have been added to support package documentation.  The
+standard Odin library is documented in the main documentation this way:
+  - pkg/dg/addenv adds all environment variables accessed directly by
+    shell scripts and lua scripts in EXEC tools to the NEEDS.  Thus, the
+    .dg file documents where the variables are used.
+  - doc/mkpkgdoc <dir> extracts <dir>/*/*.{dg,doc} and uses them to
+    generate documentation for the packages in the library.  The
+    .doc file provides additional commentary for the package and each
+    tool.  See doc/Odinfile for example usage.
+
+A number of other minor bug fixes have been made; unless you depended
+on buggy behavior, this should not affect anything.
+
+Reformatted the entire source code using GNU indent, with the
+so-called K&R style.  Removed all K&R-style function definition
+support, and replaced with c89-style definitions.  Again, this should
+not affect anything, unless you wrote code which required the old K&R
+support macros or you depended on the specific format of the ipcgen
+output.
+
 1.17.10
 
 Corrected a race condition in the select() invocation.

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([Odin], [1.17.10], [odin-build-users@lists.sourceforge.net])
+AC_INIT([Odin], [1.18.0], [darktjm@gmail.com])
 AC_CONFIG_SRCDIR([pkg])
 AC_CONFIG_HEADERS([pkg/odin/inc/config.hh])
 
