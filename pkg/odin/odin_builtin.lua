@@ -326,3 +326,17 @@ end
 function trim(s)
     return string.gsub(string.gsub(s, "^[\t\n ]*", ""), "[ \t\n]*$", "")
 end
+
+-- return a string escaped as an Odin token
+function odin_quote(s)
+    return "'" .. string.gsub(s, "'", "'\\''") .. "'"
+end
+
+-- return a string with parts between slashes escaped
+function odin_quote_file(s, virt)
+    if virt then
+	return (string.gsub(s, "[^/%]+", odin_quote))
+    else
+	return (string.gsub(s, "[^/]+", odin_quote))
+    end
+end

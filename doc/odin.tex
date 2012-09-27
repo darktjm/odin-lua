@@ -1,4 +1,4 @@
-\documentstyle[hyperref]{report}
+\documentstyle[url,hyperref]{report}
 \topmargin -0.25in
 \textheight 8.75in
 \oddsidemargin 0.0in
@@ -797,6 +797,7 @@ For example, the {\ex Odinfile} entry:
       mv $1 $backup_name
       cp $backup_name $1
 \end{verbatim}
+%$ -- for jed
 specifies {\ex \%backup} to be an executable text target.
 
 
@@ -1088,6 +1089,12 @@ commonly the control-D character.
    2%
 \end{verbatim}
 
+When the logging level is high enough, executing odin-commands from a
+script will print the odin-command before executing it.  However, some
+command scripts are expected to execute silently regardless of log
+level.  In this case, each odin-command to be silently executed may be
+prefixed with the at-character ({\ex @}).
+
 There are four kinds of odin-commands: {\em query odin-commands},
 {\em copy odin-commands}, {\em execute odin-commands},
 and {\em variable assignment odin-commands}.
@@ -1258,6 +1265,15 @@ A leading colon, equal-sign, or whitespace character can be
 included in the escaped sequence of characters by preceding it
 with a backslash.
 
+If the host-command begins with the characters {\ex lua!}, the text
+following that prefix is executed as Lua code.  Otherwise, it is
+executed using the system command interpreter.  See
+Appendix~\ref{ch:lualib} for a list of additional functions provided
+by the Lua interpreter.  Each Lua host-command is executed in a
+separate interpreter, but in the same process space as the Odin
+server.  Care must be taken to not invoke C shared libraries which
+might disrupt Odin.
+
 If the host-command is omitted, the Odin object itself is executed.
 If execute permission is set for the Odin object,
 it is given to the host operating system for execution;
@@ -1417,6 +1433,7 @@ For example, if the environment variable {\ex \$HOME} has the value
    -> $HOME/prog.c :exe
    -> /u/geoff/prog.c :exe
 \end{verbatim}
+%$ -- for jed
 are equivalent.
 The value of an environment variable can be quoted by immediately 
 preceding it with a quoted identifier.
@@ -1426,6 +1443,7 @@ then the two odin-commands:
    -> prog.c +path='/etc:'$PATH
    -> prog.c +path='/etc:/bin:/usr/bin'
 \end{verbatim}
+%$ -- for jed
 are equivalent.
 
 The environment variable {\ex \$ODINCACHE} is set by Odin to be the location
@@ -2410,6 +2428,17 @@ where {\ex /xxx/filename.o} is the name of a file with type {\ex :o}.
 When the {\ex execl()} completes,
 Odin moves all output files into the cache.
 
+If the first argument (the program name) ends with the extension {\ex
+.lua}, the {\ex execl()} is replaced by an invocation of the script
+using a built-in Lua interpreter.  See Appendix~\ref{ch:lualib} for a
+list of additional functions provided by this interpreter.  All
+references to {\ex execl()} arguments below refer to the arguments to
+the Lua script, passed in via {\ex arg}, instead.  On UNIX, the script
+is executed in a separate process.  On Windows, each script is
+executed in a separate interpreter, but the interpreter shares the
+process space with the Odin server.  Care must be taken to not disrupt
+the operation of the server via externally loaded libraries.
+
 An identifier input is passed to the {\ex execl()} as a {\ex C} string.
 
 An input-expression is passed to the {\ex execl()} as an absolute pathname
@@ -2617,7 +2646,7 @@ Word            -> "Identifier"
 
 Variable        -> '$' "Identifier";
 \end{verbatim}
-
+%$ - for jed
 
 \chapter{Derivation Graph Example}
 
@@ -2709,6 +2738,146 @@ The following sections document the tool package library included in
 the Odin distribution.  Each section documents a single package.
 
 \input{pkgs}
+
+\chapter{\label{ch:lualib}Odin Lua Library}
+
+When Lua code is executed directly by Odin, it first defines some
+utility functions for convenience and portability.
+
+\section{Apache Portable Runtime}
+
+Portability to other operating systems is supported by including the
+lua-apr package in the table {\ex apr}.  See
+\url{http://peterodding.com/code/lua/apr} for details.  Some of its
+commonly used functions are aliased globally to shorten scripts: 
+
+\begin{description}
+\item[basename(name{[}, ext{]})] {\ex apr.filepath\_name} --- get last path
+element, and optionally return extension separately
+\item[pathcat(dir,name)] {\ex apr.filepath\_merge} with the {\ex
+native} option set. --- add path elements portably
+\item[getcwd()] {\ex apr.filepath\_get} with the {\ex native} option
+set. --- return current directory
+\item[chdir(dir)] {\ex apr.filepath\_set} --- change working directory
+\item[mkdir(dir)] {\ex apr.dir\_make\_recursive} --- create directory and
+any missing intervening directories
+\item[mv(src, dest)] {\ex apr.file\_rename} --- file rename
+\item[cp(src, dest)] {\ex apr.file\_copy} --- file copy
+\item[rm(name)] {\ex apr.file\_remove} --- recursive delete
+\end{description}
+
+In addition, light wrappers are available for a few functions:
+
+\begin{description}
+\item[getenv(v)] --- return the given environment variable's value, or
+blank if unset (in comparison to {\ex nil} as returned by {\ex
+apr.env\_get})
+\item[exists(name)] --- return true if \emph{name} exists in the file
+system.
+\item[is\_dir(name)] --- return true if \emph{name} is a directory or a
+soft link to a directory.
+\item[is\_file(name)] --- return true if \emph{name} is a file or a
+soft link to a file.
+\item[is\_exec(name)] --- return true if \emph{name} is a file and
+executable permission is set for that file.  Note that on Windows, all
+files are considered executable by this logic.
+\item[is\_empty(name)] --- return true if \emph{name} either does not
+exist or is an empty file.
+\item[touch(name{[}, date{]})] --- if \emph{name} does not exist, it is
+created as an empty file.  Otherwise, this is the same as {\ex
+apr.file\_mtime\_set}.
+\end{description}
+
+\section{File Commands}
+
+Some additional file commands not provided by APR are provided here:
+
+\begin{description}
+\item[cmp(f1, f2)] --- recursively compare two files or directories,
+returning true if they match.  Only contents are compared; differences
+in file modification times and permissions are ignore.  Soft links are
+resolved before comparison.
+\item[cp\_RpL(src, dest{[}, plus\_w{]})] --- copy source to destination
+recursively, copying permissions if possible.  If \emph{plus\_w} is
+true, user write permission is added to all destination items.
+\item[ln(src, dest)] --- make a link from source to destination.  If
+lua-posix is installed, a soft link is made.  Otherwise, if possible,
+a hard link if made.  If no link can be made, this is the same as
+{\ex cp\_RpL}.
+\item[cat(f)] --- print \emph{f} on standard output.  \emph{f} may be
+either the name of a file or a Lua file descriptor.  The entire file
+is not read into memory at once, so this can be safely used with large
+files.
+\item[append\_line(f, msg)] --- append \emph{msg} and a newline to the
+file \emph{f}.  \emph{f} may be either the name of a file or a Lua
+file descriptor.
+\end{description}
+
+\section{Odin Support Utilities}
+
+The following functions are for common things done in Odin scripts:
+
+\begin{description}
+\item[odin\_error(msg{[}, ret{]})] --- append \emph{msg} to {\ex ERRORS}
+and, if \emph{ret} is provided, exit the script with \emph{ret} as the
+result.
+\item[odin\_log(msg)] --- print \emph{msg} if ODINVERBOSE is set in
+the environment, and prepend ODINRBSHOST if it is set in the
+environment.  This is intended for printing the command to execute
+before exeuting it.
+\item[trim(s)] --- trim leading and trailing whitespace from \emph{s}.
+This is intended for use with command strings with embedded
+odin-expressions, since they are technically separate words, and
+therefore separated by whitespace (usually newlines):\\
+{\ex () +cmd='{\ldots}files = trim{[}{[}'(\%files)'{]}{]}{\ldots}' :lua\_stdout}
+\item[odin\_quote(s)] --- quote \emph{s} as a single Odin token
+\item[odin\_quote\_file(s{[}, virt{]})] --- quote \emph{s} as an Odin
+path; that is, slashes remain unquoted.  If \emph{virt} is true,
+percent signs remain unquoted as well.
+\item[runcmd(cmd{[}, args{]})] --- execute a system command.
+\emph{cmd} is parsed like a shell command.  Array elements of
+\emph{args} are appended to arguments split out from \emph{cmd} as if
+they were fully quoted arguments.  \emph{args} may also have named
+options:
+\begin{description}
+\item[stdin] --- set to the name of a file for standard input to the
+command; otherwise standard input comes from an empty file.
+\item[stdout] --- set to true to retain standard output as the file
+{\ex MESSAGES}; set to a string file name to retain standard output in
+a different file.  If false or unset, standard output from the command
+is gathered and then printed to Lua standard output.
+\item[ignret] --- set to true to ignore the return value from the
+command.  Otherwise, a non-zero return value indicates an error.
+\item[chdir] --- set to a directory path name to execute the command
+with a different working directory than the current Lua directory.
+\end{description}
+All output to standard error is captured in a file called {\ex
+WARNINGS}.  If the command fails, standard output and standard error
+are concatenated to produce {\ex ERRORS}, and neither {\ex WARNINGS}
+nor the standard output file are produced.  In addition, a message
+indicating failure of the command is appended to {\ex ERRORS}, both to
+inform the user what command failed and to ensure that the file is
+non-empty.  If no standard error output is produced, {\ex WARNINGS} is
+removed as well.
+\end{description}
+
+\section{Miscellaneous}
+
+The following defy categorization:
+
+\begin{description}
+\item[words(f)] --- replacement for shell's {\ex for x in `cat f`}, in
+that the file \emph{f} (either a file name or a Lua file descriptor)
+is read, and an iterator is returned which iterates over
+whitespace-separated words.
+\item[wholefile(f)] --- replacement for shell's {\ex `cat f`} as a
+command-line argument, equivalent to concatenating all of {\ex
+words(f)} into a single string, each word separated by a single space.
+\item[unpack(table)] --- an alias for {\ex table.unpack()} in Lua 5.2.
+\item[has\_posix] --- a boolean indicating presence of the lua-posix
+library.
+\item[posix] --- the lua-posix library, if present
+\end{description}
 
 \bibliographystyle{plain}
 \bibliography{odin}
