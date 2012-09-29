@@ -1,12 +1,18 @@
 #!/usr/bin/env lua
 
-ODIN_cpp, ODIN_FILE, ODIN_dir,
-ODIN_incsp, ODIN_define = unpack(arg)
-
 -- in case run from cmd line, grab built-ins
 if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
 end
+
+ODIN_cpp, ODIN_FILE, ODIN_dir,
+ODIN_incsp, ODIN_define = unpack(arg)
 
 flags = ""
 if ODIN_define ~= "" then

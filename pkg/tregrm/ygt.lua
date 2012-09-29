@@ -2,7 +2,13 @@
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
 end
 
 ODIN_ygi, ODIN_yaccid, ODIN_tregrm = unpack(arg)
@@ -15,15 +21,15 @@ if ODIN_yaccid == "" then
    ODIN_yaccid = nil
 else
    yy = ODIN_yaccid
-   YY = string.upper(ODIN_yaccid)
+   YY = ODIN_yaccid:upper()
 end
 
 if is_file("LEX_TAB") then
    if ODIN_yaccid then
       th = io.open("tok.h", 'w')
       for l in io.lines("LEX_TAB") do
-	 l = string.gsub(l, "yy", yy)
-	 l = string.gsub(l, "YY", YY)
+	 l = l:gsub("yy", yy)
+	 l = l:gsub("YY", YY)
 	 th:write(l .. '\n')
       end
       th:close()
@@ -38,8 +44,8 @@ if is_file("NOD_TAB") then
    if ODIN_yaccid then
       nh = io.open("nod.h", 'w')
       for l in io.lines("NOD_TAB") do
-	 l = string.gsub(l, "yy", yy)
-	 l = string.gsub(l, "YY", YY)
+	 l = l:gsub("yy", yy)
+	 l = l:gsub("YY", YY)
 	 nh:write(l .. '\n')
       end
       nh:close()

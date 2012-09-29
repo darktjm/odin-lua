@@ -2,7 +2,13 @@
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
 end
 
 ODIN_names, ODIN_ops = unpack(arg)
@@ -13,7 +19,7 @@ curop = ""
 names = io.open(ODIN_names)
 vn = io.open('view.names', 'w')
 for op in io.lines(ODIN_ops) do
-   if string.sub(op, -1) == "\\" then
+   if op:sub(-1) == "\\" then
       curop = curop .. op .. '\n'
    else
       vn:write(names:read() .. curop .. op .. '\n')

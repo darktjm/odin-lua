@@ -410,8 +410,8 @@ Do_Execute(boolean * AbortPtr, tp_Nod Root, boolean Interactive)
       if(!L)
 	 *AbortPtr = TRUE;
       else {
-	 if (Lua_String(L, "os.exit = nil") || Lua_String(L, CmdStr + 4))
-	    lua_error(L);
+	 Lua_String(L, "os.exit = nil");
+	 Lua_String(L, CmdStr + 4);
 	 lua_close(L);
       }
       goto done;

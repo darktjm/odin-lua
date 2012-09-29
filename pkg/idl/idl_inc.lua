@@ -2,7 +2,13 @@
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
 end
 
 ODIN_FILE, ODIN_dir, ODIN_home,
@@ -13,7 +19,7 @@ odin_log('scan_for_includes ' .. basename(ODIN_FILE))
 incsp=ODIN_home
 if ODIN_incsp ~= "" then incsp=incsp .. ' ' .. wholefile(ODIN_incsp) end
 incsp=incsp .. ' ' .. getenv("ODIN_IDL_I")
-for header in string.gmatch(incsp, '%S+') do
+for header in incsp:gmatch('%S+') do
    if not apr.filepath_root(header, 'native') then
       odin_error("Search path entry must be absolute: " .. header)
    end
@@ -83,7 +89,7 @@ for l in io.lines(ODIN_FILE) do
       for i, v in ipairs(m) do if v then name, kind = v, i end end
       if kind == 3 then
 	 kind = 1
-	 name = string.gsub(name, '[ \t]*,[ \t]*"', ' ')
+	 name = name:gsub('[ \t]*,[ \t]*"', ' ')
       end
       if apr.filepath_root(name, 'native') then
 	 if not ignore_re or not ignore_re:exec(name) then

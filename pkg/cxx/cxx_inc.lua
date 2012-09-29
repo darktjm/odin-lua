@@ -2,7 +2,13 @@
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
 end
 
 rex = require 'rex_posix'
@@ -15,7 +21,7 @@ odin_log('scan_for_includes ' .. basename(ODIN_FILE))
 incsp=ODIN_home
 if ODIN_incsp ~= "" then incsp=incsp .. ' ' .. wholefile(ODIN_incsp) end
 incsp=incsp .. ' ' .. getenv("ODIN_CXX_I")
-for header in string.gmatch(incsp, '%S+') do
+for header in incsp:gmatch('%S+') do
    if not apr.filepath_root(header, 'native') then
       odin_error("Search path entry must be absolute: " .. header, 0)
    end

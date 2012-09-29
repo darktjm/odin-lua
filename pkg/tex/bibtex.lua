@@ -10,8 +10,8 @@ got_cit = false
 got_dat = false
 if is_file(ODIN_cite) then
    for l in io.lines(ODIN_cite) do
-      if string.find(l, '\\citation') then got_cit = true end
-      if string.find(l, '\\bibdata') then got_dat = true end
+      if l:find('\\citation') then got_cit = true end
+      if l:find('\\bibdata') then got_dat = true end
    end
 end
 if not got_cit or not got_dat then

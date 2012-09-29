@@ -2,7 +2,13 @@
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
 end
 
 ODIN_y, ODIN_yaccid, ODIN_conflictok,
@@ -21,7 +27,7 @@ odin_log(compiler .. ' ' .. flags .. ' ' .. basename(ODIN_y))
 if runcmd(compiler .. ' ' .. flags, { ODIN_y }) and ODIN_conflictok == "" and
    not is_empty('WARNINGS') then
    for l in io.lines('WARNINGS') do
-      if string.find(l, 'conflicts') then
+      if l:find('conflicts') then
 	 odin_error(l)
       end
    end
@@ -31,21 +37,21 @@ if ODIN_yaccid == "" then
    ODIN_yaccid = nil
 else
    yy = ODIN_yaccid
-   YY = string.upper(ODIN_yaccid)
+   YY = ODIN_yaccid:upper()
 end
 
 if is_file("y.tab.c") then
    c = io.open("c", "w")
    for l in io.lines("y.tab.c") do
       if ODIN_sys5 ~= "" or getenv("ODIN_SYS5") ~= "" then
-	 l = string.gsub(l, '^(extern )char( %*malloc\(\))', '%1void%2')
+	 l = l:gsub('^(extern )char( %*malloc\(\))', '%1void%2')
       end
       -- note: these obsolete greps were commented out in sh version as well
-      -- if not string.find(l, "yypvt") and
-      --    not string.find(l, "yyerrlab") then
+      -- if not l:find("yypvt") and
+      --    not l:find("yyerrlab") then
 	 if ODIN_yaccid then
-	    l = string.gsub(l, "yy", yy)
-	    l = string.gsub(l, "YY", YY)
+	    l = l:gsub("yy", yy)
+	    l = l:gsub("YY", YY)
 	 end
 	 c:write(l .. "\n")
       -- end

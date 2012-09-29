@@ -34,9 +34,9 @@ rbs.exe == %rbs-exe
 
 %src-files == %exe :depend :ls +match='ODIN|os9|boot|dg/if|h$' +hide_match :regsub
 
-%exe == %odin.c.sm +ignore=\\.hh\$ +lib=lua +(%extra-lib) :exe
+%exe == %odin.c.sm +ignore=\\.hh\$ +(%extra-lib) +(%apr) :exe
 
-%rbs-exe == %rbs.c.sm +ignore=\\.hh\$ +lib=lua +(%extra-lib) :exe
+%rbs-exe == %rbs.c.sm +ignore=\\.hh\$ +(%extra-lib) :exe
 
 %extra-lib == () +cmdfile=(%el-script) :lua_stdout
 
@@ -49,6 +49,11 @@ rbs.exe == %rbs-exe
 	 break
       end
    end
+   lua = getenv('LUA_LIBNAME')
+   if lua == '' then lua = 'lua' end
+   io.write('+lib=' .. lua)
+
+%apr == () +cmd='io.write(apr_cflags() or "")' :lua_stdout
 
 %odin.c.sm == <<
    if-bcast.c; if-candrv.c; if-build.c; if-client.c; if-cmd.c;

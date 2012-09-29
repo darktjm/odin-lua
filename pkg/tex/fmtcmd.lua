@@ -1,13 +1,19 @@
 #!/usr/bin/env lua
 
--- in case run from cmd line, grab built-ins
-if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
-end
-
 -- EXEC (fmtcmd.lua) (:rootFileName +texsppt=(:texsp) :texfiles :ls) (+tex) (+latex)
 --      (+usepdf)
 --    => (:fmtcmd);
+
+-- in case run from cmd line, grab built-ins
+if not runcmd then
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
+end
 
 ODIN_rootFile, ODIN_tex, ODIN_latex,
 ODIN_pdf = unpack(arg)
@@ -23,8 +29,7 @@ elseif ODIN_latex ~= '' then
    cmd = 'latex'
 elseif ODIN_tex == '' then
    for l in io.lines(rootFile) do
-      if string.find(l, '^\\documentstyle') or
-         string.find(l, '^\\documentclass') then
+      if l:find('^\\documentstyle') or l:find('^\\documentclass') then
 	 cmd = 'latex'
 	 break
       end

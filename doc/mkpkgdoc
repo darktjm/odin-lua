@@ -39,9 +39,9 @@ function readstr(f)
 	    os.exit(1)
 	end
     until s == '.'
-    while string.byte(s, -1) ~= 1 do s = s .. f:read(1) end
+    while s:byte(-1) ~= 1 do s = s .. f:read(1) end
     f:read(1) -- whitespace, guaranteed
-    return string.sub(s, 2, -2)
+    return s:sub(2, -2)
 end
 
 function prrec(r)
@@ -269,15 +269,15 @@ dg:close()
 -- for docs, I need source location of SrcTyp and EnvVar
 for i, pkg in ipairs(pkglst) do
     for l in io.lines(docdir .. pkg .. "/" .. pkg .. ".dg") do
-	if string.match(l, "^[^:' \t]*%*") then
-	    pat = string.match(l, "^[^ \t]*")
-	    ispre = string.sub(pat, 1, 1) ~= '*'
+	if l:match("^[^:' \t]*%*") then
+	    pat = l:match("^[^ \t]*")
+	    ispre = pat:sub(1, 1) ~= '*'
 	    if ispre then
-		pat = string.sub(pat, 1, -2)
+		pat = pat:sub(1, -2)
 	    else
-		pat = string.sub(pat, 2)
+		pat = pat:sub(2)
 	    end
-	    pat = string.gsub(pat, "\\", "")
+	    pat = pat:gsub("\\", "")
 	    for n, v in ipairs(SrcTyp) do
 		if v.IsPrefix == ispre and v.Pattern == pat then
 		    v.Package = pkg
@@ -285,9 +285,9 @@ for i, pkg in ipairs(pkglst) do
 		end
 	    end
 	end
-	var = string.match(l, "^%$[A-Z][A-Z0-9_]*")
+	var = l:match("^%$[A-Z][A-Z0-9_]*")
 	if var then
-	    var = string.sub(var, 2)
+	    var = var:sub(2)
 	    for n, v in ipairs(EnvVar) do
 		if v.Name == var then
 		    if v.Package == nil then
@@ -323,11 +323,11 @@ function prdoc(sec, f)
     for l in iter, s, v do
 	if l == sec then
 	    for pl in iter, s, v do
-		if string.match(pl, '^[^ \t]') then
+		if pl:match('^[^ \t]') then
 		    return
 		end
-		pl = string.gsub(pl, '\t', '        ')
-		print(string.sub(pl, 3))
+		pl = pl:gsub('\t', '        ')
+		print(pl:sub(3))
 	    end
 	    return
 	end
@@ -384,7 +384,7 @@ function get_super(t, ret)
 end
 
 function ufirst(s)
-    return string.upper(string.sub(s, 1, 1)) .. string.sub(s, 2)
+    return s:sub(1, 1):upper() .. s:sub(2)
 end
 
 function tdoc(t)
@@ -807,7 +807,7 @@ for i, pkg in ipairs(pkglst) do
 		if hasdup then
 		    for i1, ft1 in ipairs(SrcTyp) do
 			if ft1.FilTyp == ft.FilTyp and i1 ~= i then
-			    cloc = string.len(p)
+			    cloc = #p
 			    p = p .. ', `\\verb/'
 			    if ft1.IsPrefix then
 				p = p .. ft.Pattern .. '*'
@@ -817,7 +817,7 @@ for i, pkg in ipairs(pkglst) do
 			    p = p .. "/'"
 			end
 		    end
-		    p = string.sub(p, 1, cloc) .. ' or' .. string.sub(p, cloc + 1)
+		    p = p:sub(1, cloc) .. ' or' .. p:sub(cloc + 1)
 		end
 		print("\\subsection{" .. d .. "}\n" ..
 		      "\n" ..
@@ -833,7 +833,7 @@ for i, pkg in ipairs(pkglst) do
 		    for j, tl in ipairs(Tool) do
 			toolname = TC_trans[tl.TClass]
 			-- don't print psuedo tools
-			if tl.Package == pkg and string.match(toolname, '^[A-Z]+$') then
+			if tl.Package == pkg and toolname:match('^[A-Z]+$') then
 			    e = tl.InpEdg;
 			    while e > 0 do
 				if not InpEdg[e].IsUserArg then break end
@@ -869,7 +869,7 @@ for i, pkg in ipairs(pkglst) do
 		    for j, tl in ipairs(Tool) do
 			toolname = TC_trans[tl.TClass]
 			-- don't print psuedo tools
-			if tl.Package ~= pkg and string.match(toolname, '^[A-Z]+$') then
+			if tl.Package ~= pkg and toolname:match('^[A-Z]+$') then
 			    e = tl.InpEdg;
 			    while e > 0 do
 				if not InpEdg[e].IsUserArg then break end
@@ -918,7 +918,7 @@ for i, pkg in ipairs(pkglst) do
     for i, tl in ipairs(Tool) do
 	toolname = TC_trans[tl.TClass]
 	-- don't print psuedo tools (only relevant for odin package)
-	if tl.Package == pkg and string.match(toolname, '^[A-Z]+$') then
+	if tl.Package == pkg and toolname:match('^[A-Z]+$') then
 	    alreadydone = false
 	    for j, tl2 in ipairs(tools) do
 		if tl2 == i then

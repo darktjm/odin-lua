@@ -2,7 +2,13 @@
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
 end
 
 ODIN_view, ODIN_viewsp = unpack(arg)
@@ -19,7 +25,7 @@ fpcat = pathcat
 for name in io.lines(ODIN_view) do
    file = basename(name)
    -- lua_apr has no way to get at raw dir part (filepath_parent tacks on cwd)
-   dir = string.sub(name, 1, -#file - 1)
+   dir = name:sub(1, -#file - 1)
    vss:write(name .. '\n')
    if do_rcs then
       vss:write(fpcat(fpcat(dir, 'RCS'), file .. ',v') .. '\n')
@@ -30,7 +36,7 @@ for name in io.lines(ODIN_view) do
       vss:write(fpcat(dir, 's.' .. file) .. '\n')
    end
    if not apr.filepath_root(name, 'native') then
-      for base in string.gmatch(viewsp, '%S+') do
+      for base in viewsp:gmatch('%S+') do
 	 vss:write(fpcat(base, name) .. '\n')
 	 if do_rcs then
 	    vss:write(fpcat(fpcat(fpcat(base, dir), 'RCS'), file .. ',v') .. '\n')

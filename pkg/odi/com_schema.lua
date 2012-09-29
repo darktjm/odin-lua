@@ -2,7 +2,13 @@
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
 end
 
 ODIN_schemas, ODIN_schemadirs,
@@ -41,7 +47,7 @@ odin_log(cmd)
 
 if not runcmd(cmd) then
    for l in io.lines('WARNINGS') do
-      if string.find(l, 'Out of virtual memory') then
+      if l:find('Out of virtual memory') then
 	 cat('ERRORS')
 	 mv('ERRORS', 'WARNINGS')
 	 os.exit(1)

@@ -35,7 +35,7 @@ end
 function is_exec(f)
     local p = apr.stat(f, 'protection')
     if p == nil then return false end
-    return string.sub(p, 3, 1) == 'x'
+    return p:sub(3, 1) == 'x'
 end
 
 function is_empty(f)
@@ -53,6 +53,7 @@ function touch(f, ...)
 end
 
 -- shell-style getenv: undef returns empty string
+-- that way you don't have to check for both blank and nil
 function getenv(v)
    return apr.env_get(v) or ''
 end
@@ -114,7 +115,7 @@ function cp_RpL(src, dest, plus_w, d_to_d)
    if not d_to_d then
       local t, m = apr.stat(src, 'type', 'protection')
       if plus_w then
-	 m = string.sub(m, 1, 1) .. 'w' .. string.sub(m, 3)
+	 m = m:sub(1, 1) .. 'w' .. m:sub(3)
       end
       if t == 'directory' then
 	 st, msg = mkdir(dest, m)
@@ -138,7 +139,7 @@ function cp_RpL(src, dest, plus_w, d_to_d)
       -- this dereferences any link (-L)
       t, m = apr.stat(p, 'type', 'protection')
       if plus_w then
-	 m = string.sub(m, 1, 1) .. 'w' .. string.sub(m, 3)
+	 m = m:sub(1, 1) .. 'w' .. m:sub(3)
       end
       local d = pathcat(dest, n)
       if t == 'directory' then
@@ -180,7 +181,7 @@ function words(fn)
    if not f then return nil end
    local s = f:read('*a')
    fclose(f, fn)
-   return string.gmatch(s, '%S+')
+   return s:gmatch('%S+')
 end
 
 -- shell-style backtick-cat-as args for making cmdline
@@ -188,7 +189,7 @@ end
 function wholefile(fn)
    local f = fopen(fn)
    if not f then return '' end
-   local s = string.gsub(string.gsub(f:read('*a'), '%s+', ' '), ' $', '')
+   local s = f:read('*a'):gsub('%s+', ' '):gsub(' $', '')
    fclose(f, fn)
    return s
 end
@@ -324,19 +325,137 @@ end
 -- for in-line +cmd strings
 -- e.g. +cmd='... trim([['(%files)']]) .... '
 function trim(s)
-    return string.gsub(string.gsub(s, "^[\t\n ]*", ""), "[ \t\n]*$", "")
+    return s:gsub("^[\t\n ]*", ""):gsub("[ \t\n]*$", "")
 end
 
 -- return a string escaped as an Odin token
 function odin_quote(s)
-    return "'" .. string.gsub(s, "'", "'\\''") .. "'"
+    return "'" .. s:gsub("'", "'\\''") .. "'"
 end
 
 -- return a string with parts between slashes escaped
 function odin_quote_file(s, virt)
     if virt then
-	return (string.gsub(s, "[^/%]+", odin_quote))
+	return (s:gsub("[^/%]+", odin_quote))
     else
-	return (string.gsub(s, "[^/]+", odin_quote))
+	return (s:gsub("[^/]+", odin_quote))
     end
+end
+
+-- configuration support
+-- parse output from a configuration program as ldflags
+-- any options other than -L and -l are returned in +ld_flags
+function parse_ldflags(fl)
+    local a = apr.tokenize_to_argv(fl)
+    local i, v, ret
+    ret = ''
+    for i, v in ipairs(a) do
+	if v:sub(1, 2) == 'L' then
+	    ret = ret .. "+lib_sp=" .. odin_quote(v:sub(3))
+	elseif v:sub(1, 2) == '-l' then
+	    ret = ret .. "+lib=" .. odin_quote(v:sub(3))
+	else
+	    ret = ret .. "+ld_flags=" .. odin_quote(v)
+	end
+    end
+    return ret
+end
+
+-- parse output from a configuration program as cflags
+-- any options other than -I and -D are returned in +cc_flags
+-- -O and -g are ignored
+function parse_cflags(fl)
+    local a = apr.tokenize_to_argv(fl)
+    local i, v, ret
+    ret = ''
+    for i, v in ipairs(a) do
+	if v:sub(1, 2) == '-I' then
+	    ret = ret .. "+inc_sp=" .. odin_quote(v:sub(3))
+	elseif v:sub(1, 2) == '-D' then
+	    ret = ret .. "+define=" .. odin_quote(v:sub(3))
+	elseif v:sub(1, 2) ~= '-O' and v:sub(1, 2) ~= '-g' then
+	    ret = ret .. "+cc_flags=" .. odin_quote(v)
+	end
+    end
+    return ret
+end
+
+-- there is no portable way to find pkg-config, so just use an env var
+-- if not in path
+pkgconfig = getenv("PKGCONFIG")
+if pkgconfig == '' then
+    pkgconfig = 'pkg-config'
+end
+
+-- run pkg-config for pkg; optionally requiring min/max version
+-- arg is usually --cflags or --libs
+function get_pkgconfig(arg, pkg, vermin, vermax)
+    local cmd = pkgconfig .. ' ' .. arg
+    if vermin then
+	cmd = cmd .. ' --atleast-version=' .. vermin
+    end
+    if vermax then
+	cmd = cmd .. ' --max-version=' .. vermax
+    end
+    cmd = cmd .. ' ' .. pkg
+    local p = io.popen(cmd)
+    local ret = p:read()
+    p:close()
+    return ret
+end
+
+-- run pkg-config for ldflags
+function pkg_libs(...)
+    local fl = get_pkgconfig('--libs', ...)
+    if not fl then return nil end
+    return parse_ldflags(fl)
+end
+
+-- run pkg-config for cflags *and* ldflags
+-- this is done with two runs so generic flags are separated properly
+function pkg_cflags(...)
+    local fl = get_pkgconfig('--cflags', ...)
+    if not fl then return nil end
+    return parse_cflags(fl) .. pkg_libs(...)
+end
+
+-- since we use apr internally, may as well support it directly as well
+aprconfig = getenv("APRCONFIG")
+if aprconfig == '' then
+    aprconfig = 'apr-1-config'
+end
+apuconfig = getenv("APUCONFIG")
+if apuconfig == '' then
+    apuconfig = 'apu-1-config'
+end
+
+function get_aprconfig(fl)
+    local ret, p
+    p = io.popen(aprconfig .. fl)
+    ret = p:read()
+    p:close()
+    if p == nil then
+	return nil
+    end
+    if apuconfig ~= '' then
+	p = io.popen(apuconfig .. fl:gsub('--cp*flags', ''))
+	ret = ret .. ' ' .. p:read()
+	p:close();
+    end
+    return ret
+end    
+
+-- run apr-1-config and apu-1-config for ldflags
+function apr_libs()
+    local lf = get_aprconfig(' --link-ld --libs')
+    if lf == nil then return nil end
+    return parse_ldflags(lf)
+end
+
+-- run apr-1-config and apu-1-config for cflags *and* ldflags
+-- this is done with two runs so generic flags are separated properly
+function apr_cflags()
+    local cf = get_aprconfig(' --cflags --cppflags --includes')
+    if cf == nil then return nil end
+    return parse_cflags(cf) .. apr_libs()
 end

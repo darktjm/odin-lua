@@ -2,7 +2,13 @@
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
 end
 
 rex = require 'rex_posix'
@@ -65,18 +71,18 @@ if ODIN_subst ~= "" then
 	 if not flag then
 	    odin_error("Error in substitution value '" .. l .. "'", 0)
 	 end
-	 suf = string.gsub(suf, "\\(.)", "%1")
+	 suf = suf:gsub("\\(.)", "%1")
 	 for prefix, ign, repl in rex.gmatch(s, one_repl_re) do
-	    prefix = string.gsub(prefix, "\\(.)", "%1")
+	    prefix = prefix:gsub("\\(.)", "%1")
 	    -- should really ensure # <= # of ('s, but that's too hard here
 	    -- instead, it's done at subst time
 	    -- so no subst means no error message <sigh>
 	    if repl == "&" then
 	       table.insert(sub, {prefix, 1})
 	    elseif #repl == 2 then
-	       table.insert(sub, {prefix, tonumber(string.sub(repl, 2)) + 1})
+	       table.insert(sub, {prefix, tonumber(repl:sub(2)) + 1})
 	    else
-	       table.insert(sub, {prefix, tonumber(string.sub(repl, 3, -2)) + 1})
+	       table.insert(sub, {prefix, tonumber(repl:sub(3, -2)) + 1})
 	    end
 	 end
       else

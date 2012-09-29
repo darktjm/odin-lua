@@ -2,7 +2,13 @@
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
 end
 
 ODIN_OBJECT, ODIN_dest = unpack(arg)
@@ -48,7 +54,7 @@ end
 apr.file_remove(ODIN_dest)
 m = apr.stat(ODIN_OBJECT, 'protection')
 -- bug fix wrt original: chmod u+w for copied out files
-m = string.sub(m, 1, 1) .. 'w' .. string.sub(m, 3)
+m = m:sub(1, 1) .. 'w' .. m:sub(3)
 st, msg = cp(ODIN_OBJECT, ODIN_dest, m)
 if not st then
    -- assumes all errors are transient, but actually

@@ -2,7 +2,13 @@
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
 end
 
 ODIN_dir, ODIN_cmd = unpack(arg)
@@ -18,4 +24,4 @@ cmd = cf:read('*a')
 cf:close()
 
 append_line('run.lua', "@!lua!chdir('" .. ODIN_dir .. "')\\\n" ..
-		   string.gsub(string.gsub(cmd, '\\', '\\\\'), '\n', '\\\n'))
+		   cmd:gsub('\\', '\\\\'):gsub('\n', '\\\n'))

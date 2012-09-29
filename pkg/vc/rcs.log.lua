@@ -2,7 +2,13 @@
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
 end
 
 ODIN_v,
@@ -10,7 +16,7 @@ ODIN_date, ODIN_rev, ODIN_state, ODIN_who = unpack(args)
 
 -- need to ensure that name ends with ,v
 file = basename(ODIN_v)
-if string.sub(file, -3) ~= ',v' then
+if file:sub(-3) ~= ',v' then
    file = file .. ',v'
    -- original did soft link, but that's not portable
    cp(ODIN_v, file)

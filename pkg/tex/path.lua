@@ -18,7 +18,7 @@ end
 use_kpse = kpserun('-version') ~= nil
 if use_kpse then
     for i, v in ipairs({'tex', 'bib', 'bst'}) do
-	V = string.upper(v)
+	V = v:upper()
         setenv(V .. 'INPUTS', trim(kpserun('-show-path=' .. v)))
     end
 end

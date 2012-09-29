@@ -2,7 +2,13 @@
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
 end
 
 ODIN_source, ODIN_ptr,
@@ -58,8 +64,8 @@ if not runcmd(compiler .. flags , {'-c', ODIN_source, '-o', pathcat(getcwd(), 'o
    -- old code did some message mangling that's highly compiler dependent
    -- old code used abort_msgs file; I'm just doing it in-line
    for l in io.lines("ERRORS") do
-      if string.find(l, "Out of virtual memory") or
-         string.find(l, "virtual memory exhausted") then
+      if l:find("Out of virtual memory") or
+         l:find("virtual memory exhausted") then
 	 errs = io.open("ERRORS")
 	 io.write(errs:read('*a'))
 	 errs:close()
@@ -72,8 +78,8 @@ else
    mv("WARNINGS", "MSGS")
    wrn = io.open("WARNINGS", "w")
    for l in io.lines("MSGS") do
-      if string.find(l, "arning") then
-	 if not string.find(l, "& before array or function: ignored") then
+      if l:find("arning") then
+	 if not l:find("& before array or function: ignored") then
 	    wrn:write(l)
 	 end
       else

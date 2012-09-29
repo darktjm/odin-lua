@@ -8,7 +8,13 @@
 
 -- in case run from cmd line, grab built-ins
 if not runcmd then
-   dofile(string.gsub(arg[0], "[/\\][^/\\]*[/\\][^/\\]*$", "/odin/odin_builtin.lua"))
+   d = os.getenv("ODINCACHE")
+   if d and d ~= '' then
+      d = d .. '/PKGS'
+   else
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+   end
+   dofile(d .. "/odin/odin_builtin.lua"))
 end
 
 ODIN_fmtcmd, ODIN_root, ODIN_search, ODIN_aux = unpack(arg)
@@ -25,7 +31,7 @@ end
 -- kpathsea tacks on built-in path if final element is empty
 -- but apr.filepath_list_merge doesn't support empty elements
 -- table.insert(sp, 'zZzZ')
--- setenv('TEXINPUTS', string.gsub(apr.filepath_list_merge(sp), 'zZzZ', ''))
+-- setenv('TEXINPUTS', apr.filepath_list_merge(sp):gsub('zZzZ', ''))
 setenv('TEXINPUTS', apr.filepath_list_merge(sp))
 
 if is_dir(ODIN_aux) then
@@ -49,9 +55,9 @@ for f in apr.glob(pathcat('texauxout', '*')) do
    if e == '.log' then mv(f, 'tex.log') end
    if e == '.aux' then
       for l in io.lines(f) do
-	 if string.find(l, '\\citation') or
-	    string.find(l, '\\bibstyle') or
-	    string.find(l, '\\bibdata') then
+	 if l:find('\\citation') or 
+	    l:find('\\bibstyle') or
+	    l:find('\\bibdata') then
 	    c:write(l .. '\n')
 	 end
       end
