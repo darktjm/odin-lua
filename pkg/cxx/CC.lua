@@ -6,9 +6,9 @@ if not runcmd then
    if d and d ~= '' then
       d = d .. '/PKGS'
    else
-      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$" -- strip 2 path elts
+      d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$", '') -- strip 2 path elts
    end
-   dofile(d .. "/odin/odin_builtin.lua"))
+   dofile(d .. "/odin/odin_builtin.lua")
 end
 
 ODIN_source, ODIN_ptr,
