@@ -8,7 +8,7 @@ if not runcmd then
    else
       d = arg[0]:gsub("[/\\][^/\\]*[/\\][^/\\]*$", '') -- strip 2 path elts
    end
-   dofile(d .. "/odin/odin_builtin.lua"))
+   dofile(d .. "/odin/odin_builtin.lua")
 end
 
 ODIN_FILE, ODIN_default = unpack(arg)
