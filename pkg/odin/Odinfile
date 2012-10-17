@@ -6,9 +6,11 @@
 
 odin.exe == %exe
 rbs.exe == %rbs-exe
+glib.so == %glib-so
 
 %install! == <<
    %exe >$THORPKGS/odin/odin.exe
+   %glib-so >$THORPKGS/odin/glib.so
    ../dg%install
 
 %install-rbs! == <<
@@ -34,9 +36,14 @@ rbs.exe == %rbs-exe
 
 %src-files == %exe :depend :ls +match='ODIN|os9|boot|dg/if|h$' +hide_match :regsub
 
-%exe == %odin.c.sm +ignore=\\.hh\$ +(%extra-lib) +(%apr) :exe
+%exe == %odin.c.sm +ignore=\\.hh\$ +(%extra-lib) +(%glib) :exe
 
-%rbs-exe == %rbs.c.sm +ignore=\\.hh\$ +(%extra-lib) :exe
+%rbs-exe == %rbs.c.sm +ignore=\\.hh\$ +(%extra-lib) +(%glib) :exe
+
+%glib-so == lua-glib.c +cc_flags=-fPIC -Werror +(%glib) +ld_flags=-shared +debug :exe
+
+%glib-doc! ==(.) +cmd='ldoc.lua -p lua-glib -o lua-glib -d /tmp -f markdown -t' \
+                  '"Lua GLib Library"' (lua-glib.c) :run
 
 %extra-lib == () +cmdfile=(%el-script) :lua_stdout
 
@@ -53,7 +60,7 @@ rbs.exe == %rbs-exe
    if lua == '' then lua = 'lua' end
    io.write('+lib=' .. lua)
 
-%apr == () +cmd='io.write(apr_cflags() or "")' :lua_stdout
+%glib == () +cmd='io.write(pkg_cflags("glib-2.0") or "")' :lua_stdout
 
 %odin.c.sm == <<
    if-bcast.c; if-candrv.c; if-build.c; if-client.c; if-cmd.c;

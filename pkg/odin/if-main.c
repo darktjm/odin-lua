@@ -15,6 +15,7 @@ geoff@boulder.colorado.edu
 
 #include "inc/GMC.h"
 #include "inc/FileName.h"
+#include <glib.h>
 
 tp_Str Author = "odin-build-users@lists.sourceforge.net";
 
@@ -64,6 +65,8 @@ int main(int argc, char **argv)
    boolean Abort, NewFlag;
    int i;
 
+   g_set_application_name("Odin");
+   g_set_prgname(g_path_get_basename(argv[0]));
    Init_IO();
    Init_Err();
    Init_Env();

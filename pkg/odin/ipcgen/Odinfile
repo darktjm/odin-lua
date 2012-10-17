@@ -1,4 +1,4 @@
-%exe == %ipcgen.c.sm +ignore=\\.hh\$ :exe
+%exe == %ipcgen.c.sm +ignore=\\.hh\$ +(..%glib) :exe
 
 %lint! == <<
    %ipcgen.c.sm +debug +ignore=\\.hh\$ :lint >
