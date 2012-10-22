@@ -3,7 +3,19 @@ This package wraps the GLib library fairly thinly.
 Unlike other lua-glib implementations, this is not meant to be a
 stepping stone for GTK+ support.  It is meant to be a portability
 and utility library.  There are other projects which provide
-support for GTK+ and other various derivatives of GLib.
+support for GTK+ and other various derivatives of GLib.  The specific
+version against this was developed was 2.32.4; I have not fully scanned
+the documentation to determine what functions should be guarded using
+the GLib version, so it may require a very recent (but not more)
+version of GLib.
+
+This package was originally part of another proect with a weird
+build system, so no build support is provided in this standalone
+version, at least for now.  Just compile with appropriate flags
+to create a shared library linked against the Lua and GLib libraries.
+This documentation was built as follows:
+
+     ldoc.lua -p lua-glib -o lua-glib -d /tmp -f markdown -t 'Lua GLib Library' lua-glib.c
 
 No support is provided for Type Conversion Macros, Byte Order Macros,
 Numerical Definitions, or Miscellaneous Macros, as they are all
@@ -13,7 +25,7 @@ Asynchronous queues; use a Lua-specific threading module instead
 (such as Lanes).  No support is provided for The Main Event Loop, as
 its utility versus implementation effort seems low.  No support is
 provided for Dynamic Loading of Modules, because lua already does
-that.  No support is provided for Memory Allocate or Memory Slices,
+that.  No support is provided for Memory Allocation or Memory Slices,
 since you shouldn't be doing that in Lua.  IO Channels also seem
 below my minimum utility-to-effort ratio.  There is no direct support
 for the Error Reporting, Message Output, and Debugging Functions.
@@ -22,7 +34,16 @@ fatality flags in log messages, although that may come some day.
 The String Utility Functions are C-specific, and not supported.
 The Hook Functions seem useless for Lua.  The Lexical Scanner is
 not very configurable and hard to bind to Lua; use a made-for-Lua
-scanner instead like Lpeg.
+scanner instead like Lpeg.  No support is provided for the Commandline
+option parser, as adapting it to Lua would remove most of its convenience
+and there are plenty of other similar libraries for lua.  The Glob-style
+pattern matching is too simplistic and can easily be emulated using
+regex-style patterns.  The UNIX-specific and Windows-specific functions
+are not supported, since such blatantly non-portable functions should
+not be used.  The Testing framework is not supported, because a
+Lua-specific framework would be more suited to the task.  None of the
+GLib Data Types are supported, although there may be merit in eventually
+supporting the GVariant type somewhat.
 
 The only Standard Macros supported are the OS and path separator
 macros.  Date and Time Functions are mostly unsupported; the only
@@ -41,11 +62,17 @@ of the low-level support functions), Miscellaneous Utility
 Functions (except for bit operations, which really need to be added
 to lua-bit, and a few other low-level/internal-use type functions),
 Timers, Spawning Processes (including some extra features),
-File Utilities
+File Utilities (except a few MS library compatibility functions and
+memory mapped files), URI Functions, Hostname Utilities, Shell-related
+Utilities, Perl-compatible regular expressions, Simle XML Subset Parser
+(without vararg functions since building varargs generically is not possible),
+Key-value file parser, and Bookmark file parser.
+
+Eventually, this may be split into multiple modules, so that uselses stuff
+can be removed.  However, removing useless stuff from GLib is not easy,
+so having Lua bindings for what's there is not necessarily harmful.
 @module glib
 */
-
-/* ldoc.lua -p lua-glib -o lua-glib -d /tmp -f markdown -t 'Lua GLib Library' lua-glib.c */
 
 #include <glib.h>
 #include <glib/gi18n.h>
@@ -58,6 +85,16 @@ File Utilities
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
+#include <fcntl.h>
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+#ifdef G_OS_UNIX
+#include <pwd.h>
+#include <grp.h>
+#endif
+/* note: Windows sticks this in sys/utime.h for some reason */
+#include <utime.h>
 
 /* this is the only exported function: */
 int luaopen_glib(lua_State *L);
@@ -66,29 +103,36 @@ int luaopen_glib(lua_State *L);
 #include <io.h>
 /* MS VS 2005 deprecatesregular versions in favor of _ versions */
 #if _MSC_VER >= 1400
-#ifdef dup
 #undef dup
-#endif
-#ifdef dup2
-#undef dup2
-#endif
-#ifdef write
-#undef write
-#endif
-#ifdef read
-#undef read
-#endif
-#ifdef close
-#undef close
-#endif
 #define dup _dup
+#undef dup2
 #define dup2 _dup2
+#undef write
 #define write _write
+#undef read
 #define read _read
+#undef close
 #define close _close
+#undef umask
+#define umask win_umask
+static int win_umask(int m)
+{
+    _umask_s(m, &m);
+    return m;
+}
 #endif
 #else
 #include <unistd.h>
+#endif
+
+/* 5.1/5.2 compatibility */
+#if LUA_VERSION_NUM <= 501
+#define lua_len lua_objlen
+#define luaL_setfuncs(L, f, n) luaL_register(L, NULL, f)
+#define lua_setuservalue(L, n) lua_setfenv(L, n)
+#define lua_getuservalue(L, n) lua_getfenv(L, n)
+#else
+#define lua_lessthan(L, a, b) lua_compare(L, a, b, LUA_OPLT)
 #endif
 
 /* Some of this was taken from cmorris' lua-glib */
@@ -111,6 +155,46 @@ static int ns_cmp(const void *a, const void *b)
     return strcmp((const char *)a, *(const char * const *)b);
 }
 
+/* there does not appear to be a way to move this up to the top in ldoc */
+/* this documents variables defined below */
+/*********************************************************************/
+/***
+Version Information.
+@section Version Information
+*/
+
+/***
+GLib version string.
+@table version
+Version of running glib (not the one it was compiled against)
+*/
+
+/*********************************************************************/
+/***
+Standard Macros.
+@section Standard Macros
+*/
+
+/***
+Operating system.
+@table os
+A string representing the operating system: 'win32', 'beos', 'unix',
+ 'unknown'
+*/
+
+/***
+Directory separator.
+@table dir_separator
+Unlike GLib's directory separator, this includes both valid values under
+Win32.
+*/
+
+/***
+Path list separator
+@table searchpath_separator
+*/
+
+/*********************************************************************/
 /***
 Message Logging
 @section Message Logging
@@ -133,6 +217,7 @@ static struct lf {
 };
 
 /***
+Log a message, GLib-style.
 This is a wrapper for `g_log()`.
 @function log
 @tparam string domain (optional) The log domain.  This parameter may be absent
@@ -179,6 +264,7 @@ static int glib_log(lua_State *L)
     return 0;
 }
 
+/*********************************************************************/
 /***
 Character Set Conversion
 @section Character Set Conversion
@@ -340,6 +426,7 @@ static int glib_convert(lua_State *L)
     if(err) {
 	lua_pushnil(L);
 	lua_pushstring(L, err->message);
+	g_error_free(err);
 	return 2;
     } else {
 	lua_pushlstring(L, ret, retlen);
@@ -348,6 +435,7 @@ static int glib_convert(lua_State *L)
     }
 }
 
+/*********************************************************************/
 /***
 Unicode Manipulation
 @section Unicode Manipulation
@@ -998,6 +1086,7 @@ static int glib_##n(lua_State *L) \
     if(err) { \
 	lua_pushnil(L); \
 	lua_pushstring(L, err->message); \
+	g_error_free(err); \
 	return 2; \
     } \
     lua_pushlstring(L, (char *)res, rlen * sizeof(rt)); \
@@ -1079,6 +1168,7 @@ static int glib_to_utf8(lua_State *L)
     return 1;
 }
 
+/*********************************************************************/
 /***
 Base64 Encoding
 @section Base64 Encoding
@@ -1229,6 +1319,7 @@ static int glib_base64_decode(lua_State *L)
     return 1;
 }
 
+/*********************************************************************/
 /***
 Data Checksums
 @section Data Checksums
@@ -1404,6 +1495,7 @@ static int glib_sha256sum(lua_State *L)
     return glib_sum(L, G_CHECKSUM_SHA256);
 }
 
+/*********************************************************************/
 /***
 Secure HMAC Digests
 @section Secure HMAC Digests
@@ -1583,6 +1675,7 @@ static int glib_sha256hmac(lua_State *L)
     return glib_hmac(L, G_CHECKSUM_SHA256);
 }
 
+/*********************************************************************/
 /***
 Internationalization
 @section Internationalization
@@ -1704,6 +1797,7 @@ static int glib_get_locale_variants(lua_State *L)
     return 1;
 }
 
+/*********************************************************************/
 /***
 Date and Time Functions
 @section Date and Time Functions
@@ -1734,6 +1828,7 @@ static int glib_usleep(lua_State *L)
     return 0;
 }
 
+/*********************************************************************/
 /***
 Random Numbers
 @section Random Numbers
@@ -1819,7 +1914,7 @@ static int glib_rand_new(lua_State *L)
     else if(lua_isnumber(L, 1))
 	st->state = g_rand_new_with_seed(lua_tonumber(L, 1));
     else if(lua_istable(L, 1)) {
-	size_t len = lua_objlen(L, 1);
+	size_t len = lua_len(L, 1);
 	guint32 *arr = g_malloc(len * sizeof(guint32));
 	int i;
 	for(i = 0; i < len; i++) {
@@ -1842,6 +1937,7 @@ static int glib_rand_new(lua_State *L)
     return 1;
 }
 
+/*********************************************************************/
 /***
 Miscellaneous Utility Functions
 @section Miscellaneous Utility Functions
@@ -2157,7 +2253,7 @@ static gchar **build_varargs(lua_State *L, int skip)
 
     ++skip; /* instead of 1 + skip everywhere */
     if(narg == 1 && lua_istable(L, skip)) {
-	size_t len = lua_objlen(L, skip);
+	size_t len = lua_len(L, skip);
 	luaL_checkstack(L, len, "unpacking table");
 	args = g_malloc((len + 1) * sizeof(args));
 	for(i = 0; i < len; i++) {
@@ -2352,7 +2448,7 @@ static int glib_qsort(lua_State *L)
     if(lua_gettop(L) > 1)
 	luaL_checktype(L, 2, LUA_TFUNCTION);
     /* sort an array of indices instead of Lua array directly */
-    nind = lua_objlen(L, 1);
+    nind = lua_len(L, 1);
     ind = g_malloc(nind * sizeof(*ind) * 2);
     for(i = 0; i < nind; i++)
 	ind[i] = i + 1;
@@ -2455,6 +2551,7 @@ static int glib_cmp(lua_State *L)
     return 1;
 }
 
+/*********************************************************************/
 /***
 Timers
 @section Timers
@@ -2545,7 +2642,7 @@ static int timer_elapsed(lua_State *L)
     return 1;
 }
 
-luaL_Reg timer_state_funcs[] = {
+static luaL_Reg timer_state_funcs[] = {
     {"start", timer_start},
     {"stop", timer_stop},
     {"continue", timer_continue},
@@ -2554,6 +2651,7 @@ luaL_Reg timer_state_funcs[] = {
     {NULL, NULL}
 };
 
+/*********************************************************************/
 /***
 Spawning Processes
 @section Spawning Processes
@@ -2845,7 +2943,7 @@ static int glib_spawn(lua_State *L)
     st->infd = st->outinfo[0].fd = st->outinfo[1].fd = -1;
     inf = outf = errf = NULL;
     if(lua_istable(L, 1)) {
-	nargs = lua_objlen(L, 1);
+	nargs = lua_len(L, 1);
 	lua_getfield(L, 1, "path");
 	if(!lua_isnil(L, -1))
 	    use_path = lua_toboolean(L, -1);
@@ -2889,7 +2987,12 @@ static int glib_spawn(lua_State *L)
 	lua_getfield(L, 1, "stdin");
 	if(lua_isuserdata(L, -1)) {
 	    /* the only type of userdata supported is FILE, so check. */
+#if LUA_VERSION_NUM <= 501
 	    FILE **inf = luaL_checkudata(L, -1, LUA_FILEHANDLE);
+#else
+	    luaL_Stream *str = luaL_checkudata(L, -1, LUA_FILEHANDLE);
+	    FILE **inf = &str->f;
+#endif
 	    if(*inf)
 		newin = fileno(*inf);
 	    /* else inf == /dev/null */
@@ -2899,12 +3002,14 @@ static int glib_spawn(lua_State *L)
 		gboolean isb = *fn == '!';
 		inf = fopen(isb ? fn + 1 : fn, isb ? "rb" : "r");
 		if(!inf) {
+		    int en = errno;
+
 		    g_strfreev(env);
 		    lua_pushnil(L);
 		    lua_pushliteral(L, "Can't open stdin ");
 		    lua_pushvalue(L, -3);
 		    lua_pushliteral(L, ": ");
-		    lua_pushstring(L, strerror(errno));
+		    lua_pushstring(L, strerror(en));
 		    lua_concat(L, 3);
 		    return 2;
 		}
@@ -2917,7 +3022,12 @@ static int glib_spawn(lua_State *L)
 	lua_getfield(L, 1, "stdout");
 	if(lua_isuserdata(L, -1)) {
 	    /* the only type of userdata supported is FILE, so check. */
+#if LUA_VERSION_NUM <= 501
 	    FILE **outf = luaL_checkudata(L, -1, LUA_FILEHANDLE);
+#else
+	    luaL_Stream *str = luaL_checkudata(L, -1, LUA_FILEHANDLE);
+	    FILE **outf = &str->f;
+#endif
 	    opipe = FALSE;
 	    if(*outf)
 		newout = fileno(*outf);
@@ -2929,6 +3039,8 @@ static int glib_spawn(lua_State *L)
 		gboolean isb = *fn == '!';
 		outf = fopen(isb ? fn + 1 : fn, isb ? "ab" : "a");
 		if(!outf) {
+		    int en = errno;
+
 		    g_strfreev(env);
 		    if(inf)
 			fclose(inf);
@@ -2936,7 +3048,7 @@ static int glib_spawn(lua_State *L)
 		    lua_pushliteral(L, "Can't open stdout ");
 		    lua_pushvalue(L, -3);
 		    lua_pushliteral(L, ": ");
-		    lua_pushstring(L, strerror(errno));
+		    lua_pushstring(L, strerror(en));
 		    lua_concat(L, 3);
 		    return 2;
 		}
@@ -2949,7 +3061,12 @@ static int glib_spawn(lua_State *L)
 	lua_getfield(L, 1, "stderr");
 	if(lua_isuserdata(L, -1)) {
 	    /* the only type of userdata supported is FILE, so check. */
+#if LUA_VERSION_NUM <= 501
 	    FILE **errf = luaL_checkudata(L, -1, LUA_FILEHANDLE);
+#else
+	    luaL_Stream *str = luaL_checkudata(L, -1, LUA_FILEHANDLE);
+	    FILE **errf = &str->f;
+#endif	    
 	    if(*errf)
 		newerr = fileno(*errf);
 	    /* else errf == /dev/null */
@@ -2959,16 +3076,18 @@ static int glib_spawn(lua_State *L)
 		gboolean isb = *fn == '!';
 		errf = fopen(isb ? fn + 1 : fn, isb ? "ab" : "a");
 		if(!errf) {
+		    int en = errno;
+
 		    g_strfreev(env);
 		    if(inf)
 			fclose(inf);
 		    if(outf)
 			fclose(outf);
 		    lua_pushnil(L);
-		    lua_pushliteral(L, "Can't open stdin ");
+		    lua_pushliteral(L, "Can't open stderr ");
 		    lua_pushvalue(L, -3);
 		    lua_pushliteral(L, ": ");
-		    lua_pushstring(L, strerror(errno));
+		    lua_pushstring(L, strerror(en));
 		    lua_concat(L, 3);
 		    return 2;
 		}
@@ -3060,6 +3179,7 @@ static int glib_spawn(lua_State *L)
 		fclose(errf);
 	    lua_pushnil(L);
 	    lua_pushstring(L, err->message);
+	    g_error_free(err);
 	    return 2;
 	}
 	st->mctx = g_main_context_new();
@@ -3760,7 +3880,7 @@ static int proc_kill(lua_State *L)
     return 1;
 }
 
-luaL_Reg spawn_state_funcs[] = {
+static luaL_Reg spawn_state_funcs[] = {
     {"read", out_read},
     {"read_err", err_read},
     {"read_ready", out_ready},
@@ -3779,10 +3899,64 @@ luaL_Reg spawn_state_funcs[] = {
     {NULL, NULL}
 };
 
+/*********************************************************************/
 /***
 File Utilities
 @section File Utilities
 */
+
+/***
+Return contents of a file as a string.
+This function is a wrapper for `g_file_get_contents()`.
+It is mostly equivalent to io.open(*name*):read('\*a').
+@function file_get
+@tparam string name Name of file to read
+@treturn string|nil Contents of file, or nil if there was an error.
+@treturn string Error message if there was an error.
+*/
+static int glib_file_get(lua_State *L)
+{
+    const char *f = luaL_checkstring(L, 1);
+    gsize len;
+    gchar *cont;
+    GError *err = NULL;
+    if(g_file_get_contents(f, &cont, &len, &err)) {
+	lua_pushlstring(L, cont, len);
+	g_free(cont);
+	return 1;
+    }
+    lua_pushnil(L);
+    lua_pushstring(L, err->message);
+    g_error_free(err);
+    return 2;
+}
+
+/***
+Set contents of file to a string.
+This function is a wrapper for `g_file_set_contents()`.  Rather than
+write directly to a file, it writes to a temporary first and then moves
+the result into place.
+@function file_set
+@tparam string name Name of file to write
+@tparam string contents Contents to write
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful
+*/
+static int glib_file_set(lua_State *L)
+{
+    size_t len;
+    const char *f = luaL_checkstring(L, 1);
+    const char *cont = luaL_checklstring(L, 2, &len);
+    GError *err = NULL;
+    gboolean ok = g_file_set_contents(f, cont, len, &err);
+    lua_pushboolean(L, ok);
+    if(!ok) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
 
 #define file_test(t, n) \
     static int glib_##n(lua_State *L) \
@@ -3838,7 +4012,12 @@ file_test(EXISTS, exists)
 
 static int fileclose(lua_State *L)
 {
+#if LUA_VERSION_NUM <= 501
     FILE **f = luaL_checkudata(L, 1, LUA_FILEHANDLE);
+#else
+    luaL_Stream *str = luaL_checkudata(L, -1, LUA_FILEHANDLE);
+    FILE **f = &str->f;
+#endif
     int ret = *f ? fclose(*f) : -1;
     *f = NULL;
     if(!ret) {
@@ -3855,20 +4034,153 @@ static int fileclose(lua_State *L)
 
 static FILE **mkfile(lua_State *L)
 {
+#if LUA_VERSION_NUM <= 501
     FILE **ret = lua_newuserdata(L, sizeof(FILE *));
+#else
+    luaL_Stream *str = lua_newuserdata(L, sizeof(luaL_Stream));
+    FILE **ret = &str->f;
+    str->closef = fileclose;
+#endif
     *ret = NULL;
     luaL_getmetatable(L, LUA_FILEHANDLE);
     lua_setmetatable(L, -2);
     return ret;
 }
 
+static int getmode(lua_State *L, int arg, int def, int isdir)
+{
+    if(lua_isnumber(L, arg))
+	return lua_tointeger(L, arg) & 07777;
+    else if(lua_isstring(L, arg)) {
+	const char *s = lua_tostring(L, arg);
+	while(*s) {
+	    int mask = 07777; /* all */
+	    int nowho = 1;
+	    char op = '=';
+	    int what = 0;
+	    /* parse "who" */
+	    while(*s && *s != ',') {
+		switch(*s) {
+		  case 'u':
+		    if(nowho)
+			mask = 01000;
+		    mask |= 04700;
+		    nowho = 0;
+		    s++;
+		    continue;
+		  case 'g':
+		    if(nowho)
+			mask = 01000;
+		    mask |= 02070;
+		    nowho = 0;
+		    s++;
+		    continue;
+		  case 'o':
+		    if(nowho)
+			mask = 01000;
+		    mask |= 0007;
+		    nowho = 0;
+		    s++;
+		    continue;
+		  case 'a':
+		    mask = 07777;
+		    nowho = 0;
+		    s++;
+		    continue;
+		}
+		break;
+	    }
+	    /* parse "op" */
+	    if(*s == '-' || *s == '=' || *s == '+')
+		op = *s++;
+	    else
+		/* silently ignore errors */
+		return def;
+	    if(*s == 'u') {
+		what = def & 0700;
+		what |= (what >> 3) | (what >> 6);
+		what |= (def & 04000) | ((def & 04000) >> 1);
+	    } else if(*s == 'g') {
+		what = def & 0070;
+		what |= (what << 3) | (what >> 3);
+		what |= (def & 02000) | ((def & 02000) << 1);
+	    } else if(*s == 'o') {
+		what = def & 0007;
+		what |= (what << 6) | (what << 3);
+	    } else {
+		while(*s && *s != ',') {
+		    switch(*s) {
+		      case 'r':
+			what |= 0444;
+			++s;
+			continue;
+		      case 'w':
+			what |= 0222;
+			++s;
+			continue;
+		      case 'x':
+			what |= 0111;
+			++s;
+			continue;
+		      case 'X':
+			if(isdir || (def & 0111))
+			    what |= 0111;
+			++s;
+			continue;
+		      case 's':
+			what |= 06000;
+			++s;
+			continue;
+		      case 't':
+			what |= 01000;
+			++s;
+			continue;
+		      default:
+			/* silently ignore errors */
+			return def;
+		    }
+		}
+	    }
+	    if(op == '+')
+		def |= what & mask;
+	    else if(op == '-')
+		def &= ~(what & mask);
+	    else
+		def = (def & ~mask) | (what & mask);
+	    if(*s == ',')
+		++s;
+	}
+	return def;
+    } else
+	return def;
+}
+
 /***
-Create a temporary file from a pattern.
+Change default file and directory creation permissions mask.
+This is a wrapper for the system `umask()` function, since there is no
+equivalent in GLib.
+@function umask
+@tparam string|number mask (Optional) The permissions mask.  Permissions set in
+ this mask are forced off in any newly created files and directories.
+ Either a numeric permissions mask or a POSIX-sytle mode string (e.g.
+ 'og=w', which is the default if this parameter is unspecified).
+@treturn number The previous mask.
+*/
+static int glib_umask(lua_State *L)
+{
+    lua_pushnumber(L, umask(getmode(L, 1, 0022, 0)));
+    return 1;
+}
+
+/***
+Create a unique temporary file from a pattern.
 This function is a wrapper for `g_mkstemp()`.  It creates a new, unique
 file by replacing the X characters in a template with six consecutive X
 characters.
 @function mkstemp
 @tparam string tmpl The template.
+@tparam string|number perm (Optional) File creation permissions.  Either a
+ numeric permission mask or a POSIX-style mode string (e.g. 'ug=rw').
 @treturn nil|file Returns nil on error, and a file descriptor on success.
 The file is open for reading and writing (w+b).
 @treturn string Returns an error message on error, or the modified file
@@ -3876,13 +4188,21 @@ name.
 */
 static int glib_mkstemp(lua_State *L)
 {
-    char *s = g_strdup(luaL_checkstring(L, 1));
+    int mode = getmode(L, 2, 0544, 0);
+    int gotmode = lua_isnoneornil(L, 2);
     FILE **f = mkfile(L);
-    gint ret = g_mkstemp(s);
+    char *s = g_strdup(luaL_checkstring(L, 1));
+    gint ret;
+    if(gotmode)
+	ret = g_mkstemp(s);
+    else
+	ret = g_mkstemp_full(s, O_RDWR | O_BINARY, mode);
     if(ret < 0) {
+	int en = errno;
+
 	lua_pop(L, 1);
 	lua_pushnil(L);
-	lua_pushstring(L, strerror(errno));
+	lua_pushstring(L, strerror(en));
 	g_free(s);
 	return 2;
     }
@@ -3892,9 +4212,13 @@ static int glib_mkstemp(lua_State *L)
 	g_free(s);
 	return 2;
     }
-    lua_pushnil(L);
-    lua_pushstring(L, strerror(errno));
-    lua_pushinteger(L, errno);
+    {
+	int en = errno;
+
+	lua_pushnil(L);
+	lua_pushstring(L, strerror(en));
+	lua_pushinteger(L, en);
+    }
     close(ret);
     g_remove(s);
     g_free(s);
@@ -3902,12 +4226,13 @@ static int glib_mkstemp(lua_State *L)
 }
 
 /***
-Create a temporary file in the standard temporary directory from a pattern.
+Create a unique temporary file in the standard temporary directory.
 This function is a wrapper for `g_file_open_tmp()`.  It creates a new,
 unique file by replacing the X characters in a template with six consecutive
 X characters.  The template may contain no directory separators.
 @function open_tmp
-@tparam string tmpl The template.
+@tparam string tmpl (Optional) The template.  If unspecified, a default
+ template will be used.
 @treturn nil|file Returns nil on error, and a file descriptor on success.
 The file is open for reading and writing (w+b).
 @treturn string returns an error message on error, or the full path to the
@@ -3915,15 +4240,17 @@ newly created file.
 */
 static int glib_open_tmp(lua_State *L)
 {
+    const char *t = lua_isnoneornil(L, 1) ? NULL : luaL_checkstring(L, 1);
     FILE **f = mkfile(L);
     gchar *s;
     GError *err = NULL;
-    gint ret = g_file_open_tmp(luaL_checkstring(L, 1), &s, &err);
+    gint ret = g_file_open_tmp(t, &s, &err);
 
     if(ret < 0) {
 	lua_pop(L, 1);
 	lua_pushnil(L);
 	lua_pushstring(L, err->message);
+	g_error_free(err);
 	return 2;
     }
     *f = fdopen(ret, "w+b");
@@ -3932,13 +4259,125 @@ static int glib_open_tmp(lua_State *L)
 	g_free(s);
 	return 2;
     }
-    lua_pushnil(L);
-    lua_pushstring(L, strerror(errno));
-    lua_pushinteger(L, errno);
+    {
+	int en = errno;
+
+	lua_pushnil(L);
+	lua_pushstring(L, strerror(en));
+	lua_pushinteger(L, en);
+    }
     close(ret);
     g_remove(s);
     g_free(s);
     return 3;
+}
+
+/***
+Read the contents of a soft link.
+This is a wrapper for `g_file_read_link()`
+@function read_link
+@tparam string name Link to read
+@treturn string|nil Link contents, or nil on error
+@treturn string Error message on error
+*/
+static int glib_read_link(lua_State *L)
+{
+    const char *f = luaL_checkstring(L, 1);
+    GError *err = NULL;
+    char *ret = g_file_read_link(f, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushstring(L, ret);
+    g_free(ret);
+    return 1;
+}
+
+/***
+Create a directory and any required parent directories.
+This is a wrapper for `g_mkdir_with_parents()`
+@function mkdir_with_parents
+@tparam string name Name of directory to create.
+@tparam string|number mode (Optional) File permissions.  Either a numeric
+ creation mode or a POSIX-style mode string (e.g. 'ug=rw').  If unspecified,
+ 'a=rx,u=w' is used (octal 755).
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful
+*/
+static int glib_mkdir_with_parents(lua_State *L)
+{
+    const char *n = luaL_checkstring(L, 1);
+    int mode = getmode(L, 2, 0755, 1);
+    int ret, en;
+
+    ret = g_mkdir_with_parents(n, mode);
+    en = errno;
+    lua_pushboolean(L, !ret);
+    if(ret) {
+	lua_pushstring(L, strerror(en));
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Create a unique tempoarary directory from a pattern.
+This is a wrapper for `g_mkdtemp`.  It replaces 6 consecutive Xs in the
+pattern with a unique string and creates a directory by that name.
+@function mkdtemp
+@tparam string tmpl The file name pattern
+@tparam string|number mode (Optional) File permissions.  Either a numeric
+ creation mode or a POSIX-style mode string (e.g. 'ug=rw').
+@treturn string|nil The name of the created directory, or nil on error.
+@treturn string The error message if an error occured.
+*/
+static int glib_mkdtemp(lua_State *L)
+{
+    const char *t = luaL_checkstring(L, 1);
+    int mode = getmode(L, 2, 0755, 1);
+    char *ret = g_strdup(t);
+    int en;
+
+    if(lua_isnoneornil(L, 2))
+	ret = g_mkdtemp(ret);
+    else
+	ret = g_mkdtemp_full(ret, mode);
+    en = errno;
+    lua_pushstring(L, ret);
+    if(!ret)
+	lua_pushstring(L, strerror(en));
+    return ret ? 1 : 2;
+}
+
+/***
+Create a unique temporary directory in the standard temporary directory.
+This is a wrapper for `g_dir_make_tmp()`.  It creates a new, unique
+directory in the standard temporary directory by replacing 6 consecutive
+Xs in the template.
+@function dir_make_tmp
+@tparam string tmpl (Optional) The template.  If unspecified, a default
+ template will be used.
+@treturn string|nil The name of the created directory, or nil on error.
+@treturn string An error message on error.
+*/
+static int glib_dir_make_tmp(lua_State *L)
+{
+    const char *t = lua_isnoneornil(L, 1) ? NULL : luaL_checkstring(L, 1);
+    GError *err = NULL;
+    char *ret = g_dir_make_tmp(t, &err);
+
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushstring(L, ret);
+    g_free(ret);
+    return 1;
 }
 
 typedef struct dir_state {
@@ -3986,693 +4425,3738 @@ static int glib_dir(lua_State *L)
     if(err) {
 	lua_pushnil(L);
 	lua_pushstring(L, err->message);
+	g_error_free(err);
 	return 2;
     }
     lua_pushcclosure(L, glib_diriter, 1);
     return 1;
 }
 
-/* gchar *g_file_read_linke(const char *fn, GError **err) */
-/* gint g_mkdir_with_parents(const gchar *fn, gint mode) */
-/* gchar *g_mkdtemp(gchar *tmpl) */
-/* gchar *g_dir_make_tmp(const gchar *tmpl, GError **err) */
-/* gboolean g_file_set_contents(const gchar *fn, const gchar *cont, gssize len, GError **err) */
-
-
-#if 0
-static int glib_fs_chdir(lua_State *L) {
-    gsize path_len;
-    const gchar *path = luaL_checklstring(L, 1, &path_len);
-    if(g_chdir(path)) {
-        lua_pushnil(L);
-        lua_pushfstring(L, "Could not change the working directory to %s", path);
-        return 2;
+/***
+Rename a file sytem entity.
+This is a wrapper for `g_rename()`
+@function rename
+@tparam string old The old name
+@tparam string new The new name
+@treturn boolean ok True on success.
+@treturn string msg Error message on failure.
+*/
+static int glib_rename(lua_State *L)
+{
+    int ret = g_rename(luaL_checkstring(L, 1), luaL_checkstring(L, 2));
+    if(ret < 0) {
+	int en = errno;
+	lua_pushboolean(L, 0);
+	lua_pushstring(L, strerror(en));
+	return 2;
     }
-
     lua_pushboolean(L, 1);
     return 1;
 }
 
-static int perm_from_char(gchar permc, int place, int wperm, int rperm) {
-    int perm = 0;
-    int permi = 0;
+/***
+Create a directory.
+This is a wrapper for `g_mkdir()`
+@function mkdir
+@tparam string name The name of the directory.
+@tparam string|number mode (Optional) File permissions.  Either a numeric
+ creation mode or a POSIX-style mode string (e.g. 'ug=rw').  The default
+ is 'a=rx,u=w' (octal 755).
+*/
+static int glib_mkdir(lua_State *L)
+{
+    int mode = getmode(L, 2, 0755, 1);
+    int ret = g_mkdir(luaL_checkstring(L, 1), mode);
 
-    if(permc == 'r') {
-        permi = rperm;
-    } else if(permc == 'w') {
-        permi = wperm;
-    } else if(permc == '-') {
-        permi = 0;
+    if(ret < 0) {
+	int en = errno;
+	lua_pushboolean(L, 0);
+	lua_pushstring(L, strerror(en));
+	return 2;
+    }
+    lua_pushboolean(L, 1);
+    return 1;
+}
+
+static void push_type(lua_State *L, int mode)
+{
+    switch(mode & S_IFMT) {
+      case S_IFREG:
+	lua_pushliteral(L, "file");
+	break;
+      case S_IFDIR:
+	lua_pushliteral(L, "dir");
+	break;
+      case S_IFIFO:
+	lua_pushliteral(L, "pipe");
+	break;
+      case S_IFSOCK:
+	lua_pushliteral(L, "socket");
+	break;
+      case S_IFLNK:
+	lua_pushliteral(L, "link");
+	break;
+      case S_IFBLK:
+	lua_pushliteral(L, "block");
+	break;
+      case S_IFCHR:
+	lua_pushliteral(L, "char");
+	break;
+      default:
+	lua_pushnil(L);
+	break;
+    }
+}
+
+static void push_owner(lua_State *L, int uid)
+{
+    struct passwd *pw = getpwuid(uid);
+    if(pw)
+	lua_pushstring(L, pw->pw_name);
+    else
+	lua_pushnumber(L, uid);
+}
+
+static void push_group(lua_State *L, int gid)
+{
+    struct group *gr = getgrgid(gid);
+    if(gr)
+	lua_pushstring(L, gr->gr_name);
+    else
+	lua_pushnumber(L, gid);
+}
+
+static void push_mode(lua_State *L, int mode)
+{
+    char buf[10];
+    switch(mode & S_IFMT) {
+      case S_IFDIR:
+	buf[0] = 'd';
+	break;
+      case S_IFIFO:
+	buf[0] = 'p';
+	break;
+      case S_IFSOCK:
+	buf[0] = 's';
+	break;
+      case S_IFLNK:
+	buf[0] = 'l';
+	break;
+      case S_IFBLK:
+	buf[0] = 'b';
+	break;
+      case S_IFCHR:
+	buf[0] = 'c';
+	break;
+      case S_IFREG:
+      default:
+	buf[0] = '-';
+	break;
+    }
+    buf[1] = (mode & 0400) ? 'r' : '-';
+    buf[2] = (mode & 0200) ? 'w' : '-';
+    if(mode & 04000)
+	buf[3] = (mode & 0100) ? 's' : 'S';
+    else
+	buf[3] = (mode & 0100) ? 'x' : '-';
+    buf[4] = (mode & 0040) ? 'r' : '-';
+    buf[5] = (mode & 0020) ? 'w' : '-';
+    if(mode & 02000)
+	buf[6] = (mode & 0010) ? 's' : 'S';
+    else
+	buf[6] = (mode & 0010) ? 'x' : '-';
+    buf[7] = (mode & 0004) ? 'r' : '-';
+    buf[8] = (mode & 0002) ? 'w' : '-';
+    if(mode & 01000)
+	buf[9] = (mode & 0001) ? 't' : 'T';
+    else
+	buf[9] = (mode & 0001) ? 'x' : '-';
+    lua_pushlstring(L, buf, 10);
+}
+
+/***
+Retrieve information on a file system entry.
+This is a wrapper for `g_stat()`.  If a table is given to specify fields,
+only those fields are returned (nil if not present) as multiple results.
+Otherwise, a table is returned with all known fields and their values.
+If the field named 'link' is requested, it is not an actual field, but an
+indicator to return information about a soft link rather than what it
+points to.
+@function stat
+@tparam string name The file system entry to query
+@tparam {string,...}|string,... fields (Optional) The fields to query, in
+ order.
+@treturn table A table whose keys are field names and whose values are
+ the value for that field, if either no specific values are requested or
+ the only value requested is the psuedo-value 'link'.
+@treturn number|string|nil The value of each field; multiple values may be
+ returned.
+@treturn nil First returned value if there was an error
+@treturn string Second returned value on error: an error message.
+*/
+/* FIXME: support nanosecond time stamps (no portable way to detect) */
+static int glib_stat(lua_State *L)
+{
+    const char *n = luaL_checkstring(L, 1);
+    gboolean is_link = FALSE;
+    int nret = 0, actret = 0;
+    GStatBuf sbuf;
+    int pstart;
+    int ok;
+
+    if(lua_istable(L, 2)) {
+	int i;
+	nret = lua_len(L, 2);
+	pstart = lua_gettop(L) + 1;
+	lua_checkstack(L, nret);
+	for(i = 1; i <= nret; i++) {
+	    lua_pushinteger(L, i);
+	    lua_gettable(L, 2);
+	    if(!strcasecmp(luaL_checkstring(L, -1), "link")) {
+		lua_pop(L, 1);
+		is_link = TRUE;
+	    } else
+		actret++;
+	}
+	nret = actret;
     } else {
-        permi = (int) permc - 48;
-        if(permi < 0 || permi > 9) permi = 0;
+	int i;
+	pstart = 2;
+	nret = lua_gettop(L) - 1;
+	for(i = 0; i < nret; i++) {
+	    const char *s = luaL_checkstring(L, 2 + i);
+	    if(!strcasecmp(s, "link"))
+		is_link = TRUE;
+	    else
+		++actret;
+	}
     }
-
-    if(permi > 0) {
-        if((permi & 4) == 4) perm |= 4 << ((2 - place) * 3);
-        if((permi & 2) == 2) perm |= 2 << ((2 - place) * 3);
-        if((permi & 1) == 1) perm |= 1 << ((2 - place) * 3);
+    if(is_link)
+	ok = g_lstat(n, &sbuf) == 0;
+    else
+	ok = g_stat(n, &sbuf) == 0;
+    if(!ok) {
+	int en = errno;
+	lua_pushnil(L);
+	lua_pushstring(L, strerror(en));
+	return 2;
     }
+    if(!actret) {
+	lua_createtable(L, 0, 17);
+	lua_pushnumber(L, sbuf.st_atime);
+	lua_setfield(L, -2, "atime");
+	lua_pushnumber(L, sbuf.st_ctime);
+	lua_setfield(L, -2, "ctime");
+	lua_pushnumber(L, sbuf.st_dev);
+	lua_setfield(L, -2, "dev");
+	lua_pushnumber(L, sbuf.st_ino);
+	lua_setfield(L, -2, "ino");
+	push_mode(L, sbuf.st_mode);
+	lua_setfield(L, -2, "mode");
+	push_type(L, sbuf.st_mode);
+	lua_setfield(L, -2, "type");
+	lua_pushnumber(L, sbuf.st_mode & 0x7777);
+	lua_setfield(L, -2, "perm");
+	lua_pushnumber(L, sbuf.st_mtime);
+	lua_setfield(L, -2, "mtime");
+	lua_pushnumber(L, sbuf.st_nlink);
+	lua_setfield(L, -2, "nlink");
+	lua_pushnumber(L, sbuf.st_rdev);
+	lua_setfield(L, -2, "rdev");
+	lua_pushnumber(L, sbuf.st_size);
+	lua_setfield(L, -2, "size");
+	lua_pushnumber(L, sbuf.st_uid); /* always 0 on Win */
+	lua_setfield(L, -2, "uid");
+	lua_pushnumber(L, sbuf.st_gid); /* always 0 on Win */
+	lua_setfield(L, -2, "gid");
+#ifdef G_OS_UNIX
+	push_owner(L, sbuf.st_uid);
+	lua_setfield(L, -2, "owner");
+	push_group(L, sbuf.st_gid);
+	lua_setfield(L, -2, "group");
+	lua_pushnumber(L, sbuf.st_blksize);
+	lua_setfield(L, -2, "blksize");
+	lua_pushnumber(L, sbuf.st_blocks);
+	lua_setfield(L, -2, "blocks");
+#endif
+	return 1;
+    }
+    /* annoyingly inefficient, but for now that's OK */
+    {
+	int i;
+	int popit = lua_istable(L, 2);
 
-    return perm;
+	for(i = 0; i < nret; i++) {
+	    const char *s = lua_tostring(L, pstart + i);
+	    if(!strcasecmp(s, "size"))
+		lua_pushnumber(L, sbuf.st_size);
+	    else if(!strcasecmp(s, "mtime"))
+		lua_pushnumber(L, sbuf.st_mtime);
+	    else if(!strcasecmp(s, "ctime"))
+		lua_pushnumber(L, sbuf.st_ctime);
+	    else if(!strcasecmp(s, "atime"))
+		lua_pushnumber(L, sbuf.st_atime);
+	    else if(!strcasecmp(s, "mode"))
+		push_mode(L, sbuf.st_mode);
+	    else if(!strcasecmp(s, "type"))
+		push_type(L, sbuf.st_mode);
+	    else if(!strcasecmp(s, "perm"))
+		lua_pushnumber(L, sbuf.st_mode & 0x7777);
+	    else if(!strcasecmp(s, "dev"))
+		lua_pushnumber(L, sbuf.st_dev);
+	    else if(!strcasecmp(s, "ino"))
+		lua_pushnumber(L, sbuf.st_ino);
+	    else if(!strcasecmp(s, "nlink"))
+		lua_pushnumber(L, sbuf.st_nlink);
+	    else if(!strcasecmp(s, "rdev"))
+		lua_pushnumber(L, sbuf.st_rdev);
+	    else if(!strcasecmp(s, "uid")) /* always 0 on Win */
+		lua_pushnumber(L, sbuf.st_uid);
+	    else if(!strcasecmp(s, "gid")) /* always 0 on Win */
+		lua_pushnumber(L, sbuf.st_gid);
+#ifdef G_OS_UNIX
+	    else if(!strcasecmp(s, "blksize"))
+		lua_pushnumber(L, sbuf.st_blksize);
+	    else if(!strcasecmp(s, "blocks"))
+		lua_pushnumber(L, sbuf.st_blocks);
+	    else if(!strcasecmp(s, "owner"))
+		push_owner(L, sbuf.st_uid);
+	    else if(!strcasecmp(s, "group"))
+		push_group(L, sbuf.st_gid);
+#endif
+	    else if(!strcasecmp(s, "link"))
+		; /* skip */
+	    else
+		lua_pushnil(L);
+	    if(popit)
+		lua_remove(L, -nret - 1);
+	}
+    }
+    return actret;
 }
 
-static int perms_from_luaarg(lua_State *L, int pos, int wperm, int rperm) {
-    gsize perm_len;
-    const gchar *lua_perms;
-    int perms = 0;
-
-    switch(lua_type(L, 2)) {
-        case LUA_TNIL:
-        case LUA_TNONE:
-            perms = 0755;
-            break;
-        case LUA_TSTRING:
-            lua_perms = lua_tolstring(L, 2, &perm_len);
-            if(perm_len == 0) {
-                perms = 0755;
-            } else {
-                if(perm_len != 3) {
-                    return -1;
-                }
-                int i;
-                for(i=0; i<=2; i++) {
-                    perms |= perm_from_char(lua_perms[i], i, wperm, rperm);
-                }
-            }
-            break;
-        default:
-            return -1;
+/***
+Remove a file sytem entity.
+This is a wrapper for `g_remove()`
+@function rename
+@tparam string name The entity to remove
+@treturn boolean ok True on success.
+@treturn string msg Error message on failure.  Note that the error message
+ is probably invalid if the entity was not a directory.
+*/
+static int glib_remove(lua_State *L)
+{
+    int ret = g_remove(luaL_checkstring(L, 1));
+    if(ret < 0) {
+	int en = errno;
+	lua_pushboolean(L, 0);
+	lua_pushstring(L, strerror(en));
+	return 2;
     }
-
-    return perms;
+    lua_pushboolean(L, 1);
+    return 1;
 }
 
-static int glib_fs_mkdir(lua_State *L) {
-    const gchar *path = luaL_checkstring(L, 1);
-    int perms = perms_from_luaarg(L, 2, 7, 5);
-    if(perms == -1) {
-        return luaL_argerror(L, 2, "Permissions must be nil or a three-character string of octal unix permissions");
-    }
-    
-    if(g_mkdir(path, perms)) {
-        lua_pushnil(L);
-        lua_pushstring(L, strerror(errno));
-        return 2;
-    }
+/***
+Change filesystem entry permissions.
+This is a wrapper for `g_chmod()`.  In addition, it will query the original
+file for information if a string-style permission is used.
+@function chmod
+@tparam string name The filesystem entry to modify
+@tparam string|number perm Permissions to set.
+@treturn boolean True if no error
+@treturn string Message if error
+*/
+static int glib_chmod(lua_State *L)
+{
+    const char *s = luaL_checkstring(L, 1);
+    int mode;
 
+    if(lua_isnumber(L, 2))
+	mode = lua_tonumber(L, 2);
+    else {
+	luaL_checkstring(L, 2);
+	GStatBuf sbuf;
+	if(g_stat(s, &sbuf) < 0) {
+	    int en = errno;
+	    lua_pushboolean(L, 0);
+	    lua_pushstring(L, strerror(en));
+	    return 2;
+	}
+	mode = getmode(L, 2, sbuf.st_mode & 07777, S_ISDIR(sbuf.st_mode));
+    }
+    if(g_chmod(s, mode) < 0) {
+	int en = errno;
+	lua_pushboolean(L, 0);
+	lua_pushstring(L, strerror(en));
+	return 2;
+    }
+    lua_pushboolean(L, 1);
+    return 1;
+}
+
+/***
+Test if fileystem object can be read.
+This is a wrapper for `g_access()`.  Note that this function does not
+necessarily check access control lists, so it may be better to just
+test open/read the file.
+@function can_read
+@tparam string name Name of object to test
+@treturn boolean true if *name* can be read.
+@treturn string message if *name* cannot be read.
+@treturn number error number if *name* cannot be read.
+*/
+static int glib_can_read(lua_State *L)
+{
+    const char *s = luaL_checkstring(L, 1);
+    gboolean ok = g_access(s, R_OK) == 0;
+    int en = errno;
+    lua_pushboolean(L, ok);
+    if(!ok) {
+	lua_pushstring(L, strerror(en));
+	lua_pushnumber(L, en);
+	return 3;
+    }
+    return 1;
+}
+
+/***
+Test if fileystem object can be written to.
+This is a wrapper for `g_access()`.  Note that this function does not
+necessarily check access control lists, so it may be better to just
+test open/write the file.
+@function can_write
+@tparam string name Name of object to test
+@treturn boolean true if *name* can be written to.
+@treturn string message if *name* cannot be written to.
+@treturn number error number if *name* cannot be written to.
+*/
+static int glib_can_write(lua_State *L)
+{
+    const char *s = luaL_checkstring(L, 1);
+    gboolean ok = g_access(s, W_OK) == 0;
+    int en = errno;
+    lua_pushboolean(L, ok);
+    if(!ok) {
+	lua_pushstring(L, strerror(en));
+	lua_pushnumber(L, en);
+	return 3;
+    }
+    return 1;
+}
+
+/***
+Change current working directory.
+This is a wrapper for `g_chdir()`
+@function chdir
+@tparam string dir Name of directory to change into
+@treturn boolean true if successful
+@treturn string message if unsuccessful
+*/
+static int glib_chdir(lua_State *L)
+{
+    gboolean ok = g_chdir(luaL_checkstring(L, 1)) == 0;
+    if(!ok) {
+	int en = errno;
+	lua_pushboolean(L, 0);
+	lua_pushstring(L, strerror(en));
+	return 2;
+    }
+    lua_pushboolean(L, 1);
+    return 1;
+}
+
+/***
+Change timestamp on filesystem object.
+This is a wrapper for `g_utime()`
+@function utime
+@tparam string name Name of entry to touch
+@tparam number|nil mtime (Optional) modification time; current time is used
+ if not present and *atime* not present; left alone if only *atime* is
+ present.
+@tparam number|nil atime (Optional) access time; modification time is
+ used if not present.
+@treturn boolean true on success
+@treturn string error message on failure
+*/
+/* FIXME: this function is pretty useless:
+ *   - it doesn't support even microsecond resolution (utimes)
+ *   - it doesn't define what the time stamps mean (seconds since when?)
+ *   - it doesn't create the file if it doesn't exist (i.e., not "touch")
+ */
+static int glib_utime(lua_State *L)
+{
+    struct utimbuf t;
+    const char *s = luaL_checkstring(L, 1);
+    gboolean has_mtime = !lua_isnoneornil(L, 2),
+	     has_atime = !lua_isnoneornil(L, 3);
+    int ret;
+
+    if(has_mtime)
+	t.modtime = lua_tonumber(L, 2);
+    else if(has_atime) {
+	GStatBuf sbuf;
+	if(!g_stat(s, &sbuf))
+	    t.modtime = sbuf.st_mtime;
+	else
+	    t.modtime = lua_tonumber(L, 3);
+    }
+    if(has_atime)
+	t.actime = lua_tonumber(L, 3);
+    else
+	t.actime = t.modtime;
+    if(has_atime || has_mtime)
+	ret = g_utime(s, &t);
+    else
+	ret = g_utime(s, NULL);
+    if(ret < 0) {
+	int en = errno;
+	lua_pushboolean(L, 0);
+	lua_pushstring(L, strerror(en));
+	return 2;
+    }
+    lua_pushboolean(L, 1);
+    return 1;
+}
+
+/*********************************************************************/
+/***
+URI Functions
+@section URI Functions
+*/
+
+/* defined below */
+/***
+Allowed characters in a path.
+@table uri_reserved_chars_allowed_in_path
+*/
+
+/***
+Allowed characters in path elements.
+@table uri_reserved_chars_allowed_in_path_element
+*/
+
+/***
+Allowed characters in userinfo (RFC 3986).
+@table uri_reserved_chars_allowed_in_userinfo
+*/
+
+/***
+Generic delimiter characters (RFC 3986).
+@table uri_reserved_chars_generic_delimiters
+*/
+
+/***
+Subcomponent delimiter characters (RFC 3986).
+@table uri_reserved_chars_subcomponent_delimiters
+*/
+
+/***
+Extract scheme from URI.
+@function uri_parse_scheme
+@tparam string uri The valid URI
+@treturn string|nil The scheme, or nil on error.
+*/
+static int glib_uri_parse_scheme(lua_State *L)
+{
+    lua_pushstring(L, g_uri_parse_scheme(luaL_checkstring(L, 1)));
+    return 1;
+}
+
+/***
+Escapes a string for use in a URI.
+@function uri_escape_string
+@tparam string s The string to esacape; nuls are not allowed.
+@tparam string allow (Optional) Reserved characters to leave unescaped anyway.
+@tparam boolean utf8 (Optional) Allow UTF-8 characters in result.
+@treturn string The escaped string.
+*/
+static int glib_uri_escape_string(lua_State *L)
+{
+    const char *allow = lua_isnoneornil(L, 2) ? NULL : luaL_checkstring(L, 2);
+    gboolean utf8 = lua_toboolean(L, 3);
+    char *res = g_uri_escape_string(luaL_checkstring(L, 1), allow, utf8);
+    lua_pushstring(L, res);
+    g_free(res);
+    return 1;
+}
+
+/***
+Unescapes an escaped string.
+@function uri_unescape_string
+@tparam string s The string to unescape
+@tparam string illegal (Optional) Characters which may not appear in the
+ result; nul characters are automatically illegal.
+@treturn string The unescaped string.
+*/
+static int glib_uri_unescape_string(lua_State *L)
+{
+    const char *ill = lua_isnoneornil(L, 2) ? NULL : luaL_checkstring(L, 2);
+    char *res = g_uri_unescape_string(luaL_checkstring(L, 1), ill);
+    lua_pushstring(L, res);
+    g_free(res);
+    return 1;
+}
+
+/***
+Splits an URI list conforming to the text/uri-list MIME type (RFC 2483).
+@function uri_list_extract_uris
+@tparam string list The URI list
+@treturn {string,...} A table containing the URIs
+*/
+static int glib_uri_list_extract_uris(lua_State *L)
+{
+    gchar **l = g_uri_list_extract_uris(luaL_checkstring(L, 1)), **p;
+    int nent;
+    for(nent = 0, p = l; *p; ++p, ++nent);
+    lua_createtable(L, nent, 0);
+    for(nent = 0, p = l; *p; ++p, ++nent) {
+	lua_pushstring(L, *p);
+	lua_rawseti(L, -2, nent + 1);
+    }
+    g_strfreev(l);
+    return 1;
+}
+
+/***
+Converts an ASCII-encoded URI to a local filename.
+@function filename_from_uri
+@tparam string uri The URI
+@treturn string|nil The file name, or nil on error.
+@treturn string|nil The host name, or nil if none, or error message if
+ error
+*/
+static int glib_filename_from_uri(lua_State *L)
+{
+    gchar *host;
+    GError *err = NULL;
+    gchar *n = g_filename_from_uri(luaL_checkstring(L, 1), &host, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushstring(L, n);
+    g_free(n);
+    lua_pushstring(L, host);
+    if(host)
+	g_free(host);
+    return 2;
+}
+
+/***
+Converts an absolute filename to an escaped ASCII-encoded URI.
+@function filename_to_uri
+@tparam string file The filename
+@tparam string host (Optional) The host name
+@treturn string|nil The URI, or nil on error.
+@treturn string The error message on error.
+*/
+static int glib_filename_to_uri(lua_State *L)
+{
+    GError *err = NULL;
+    gchar *uri = g_filename_to_uri(luaL_checkstring(L, 1),
+				   lua_isnoneornil(L, 2) ? NULL :
+				     luaL_checkstring(L, 2), &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushstring(L, uri);
+    g_free(uri);
+    return 1;
+}
+
+/*********************************************************************/
+/***
+Hostname Utilities.
+@section Hostname Utilities
+*/
+
+/***
+Convert a host name to its canonical ASCII form.
+@function hostname_to_ascii
+@tparam string hostname The name to convert
+@treturn string|nil The converted name, or nil on error
+*/
+static int glib_hostname_to_ascii(lua_State *L)
+{
+    char *ret = g_hostname_to_ascii(luaL_checkstring(L, 1));
+    lua_pushstring(L, ret);
+    if(ret)
+	g_free(ret);
+    return 1;
+}
+
+/***
+Convert a host name to its canonical Unicode form.
+@function hostname_to_unicode
+@tparam string hostname The name to convert
+@treturn string|nil The converted name, or nil on error
+*/
+static int glib_hostname_to_unicode(lua_State *L)
+{
+    char *ret = g_hostname_to_unicode(luaL_checkstring(L, 1));
+    lua_pushstring(L, ret);
+    if(ret)
+	g_free(ret);
+    return 1;
+}
+
+/***
+Check if a host name contains Unicode characters.
+@function hostname_is_non_ascii
+@tparam string hostname The name to check
+@treturn boolean True if the host name needs to be converted to ASCII for
+ non-IDN-aware contexts.
+*/
+static int glib_hostname_is_non_ascii(lua_State *L)
+{
+    lua_pushboolean(L, g_hostname_is_non_ascii(luaL_checkstring(L, 1)));
+    return 1;
+}
+
+/***
+Check if a host name contains ASCII-encoded Unicode characters.
+@function hostname_is_ascii_encoded
+@tparam string hostname The name to check
+@treturn boolean True if the host name needs to be converted to Unicode for
+ presentation and IDN-aware contexts.
+*/
+static int glib_hostname_is_ascii_encoded(lua_State *L)
+{
+    lua_pushboolean(L, g_hostname_is_ascii_encoded(luaL_checkstring(L, 1)));
+    return 1;
+}
+
+/***
+Check if a string is an IPv4 or IPv6 numeric address.
+@function hostname_is_ip_address
+@tparam string hostname The name to check
+@treturn boolean True if the host name is actually an IP address
+*/
+static int glib_hostname_is_ip_address(lua_State *L)
+{
+    lua_pushboolean(L, g_hostname_is_ip_address(luaL_checkstring(L, 1)));
+    return 1;
+}
+
+/*********************************************************************/
+/***
+Shell-related Utilities.
+@section Shell-related Utilities
+*/
+
+/***
+Parse a command line into an argument vector, but without variable and
+glob pattern expansion.
+@function shell_parse_argv
+@tparam string cmdline The command line to parse
+@treturn {string,...}|nil A table containing the command-line arguments, or
+ nil on error
+@treturn string An error message on error
+*/
+static int glib_shell_parse_argv(lua_State *L)
+{
+    GError *err = NULL;
+    gint argc;
+    gchar **argv, **ap;
+    if(!g_shell_parse_argv(luaL_checkstring(L, 1), &argc, &argv, &err)) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_createtable(L, argc, 0);
+    for(ap = argv, argc = 1; *ap; ap++, argc++) {
+	lua_pushstring(L, *ap);
+	lua_rawseti(L, -2, argc);
+    }
+    return 1;
+}
+
+/***
+Quote a string so it is interpreted unmodified as a shell argument.
+@function shell_quote
+@tparam string s The string to quote
+@treturn string The quoted string
+*/
+static int glib_shell_quote(lua_State *L)
+{
+    char *ret = g_shell_quote(luaL_checkstring(L, 1));
+    lua_pushstring(L, ret);
+    g_free(ret);
+    return 1;
+}
+
+/***
+Unquote a string quoted for use as a shell argument.
+@function shell_unquote
+@tparam string s The string to unquote
+@treturn string|nil The unquoted string, or nil on error.
+@treturn string An error message on error
+*/
+static int glib_shell_unquote(lua_State *L)
+{
+    GError *err = NULL;
+    char *ret = g_shell_unquote(luaL_checkstring(L, 1), &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushstring(L, ret);
+    g_free(ret);
+    return 1;
+}
+
+/*********************************************************************/
+/***
+Perl-compatible Regular Expressions
+@section Perl-compatible Regular Expressions
+*/
+
+typedef struct regex_state {
+    GRegex *rex;
+    gboolean do_all;
+} regex_state;
+
+typedef struct rex_flag {
+    const char *name;
+    int flag;
+} rex_flag;
+
+static rex_flag comp_flags[] = {
+    { "anchored", G_REGEX_ANCHORED },
+    { "caseless", G_REGEX_CASELESS },
+    { "dollar_endonly", G_REGEX_DOLLAR_ENDONLY },
+    { "dotall", G_REGEX_DOTALL },
+    { "dupnames", G_REGEX_DUPNAMES },
+    { "extended", G_REGEX_EXTENDED },
+    { "multiline", G_REGEX_MULTILINE },
+    { "newline_cr", G_REGEX_NEWLINE_CR },
+    { "newline_crlf", G_REGEX_NEWLINE_CRLF },
+    { "newline_lf", G_REGEX_NEWLINE_LF },
+    { "no_auto_capture", G_REGEX_NO_AUTO_CAPTURE },
+    { "optimize", G_REGEX_OPTIMIZE },
+    { "raw", G_REGEX_RAW },
+    { "ungreedy", G_REGEX_UNGREEDY }
+};
+#define NUM_COMP_FLAGS (sizeof(comp_flags)/sizeof(comp_flags[0]))
+
+static rex_flag exec_flags[] = {
+    { "all", -1 },
+    { "anchored", G_REGEX_MATCH_ANCHORED },
+    { "newline_any", G_REGEX_MATCH_NEWLINE_ANY },
+    { "newline_cr", G_REGEX_MATCH_NEWLINE_CR },
+    { "newline_crlf", G_REGEX_MATCH_NEWLINE_CRLF },
+    { "newline_lf", G_REGEX_MATCH_NEWLINE_LF },
+    { "notbol", G_REGEX_MATCH_NOTBOL },
+    { "notempty", G_REGEX_MATCH_NOTEMPTY },
+    { "noteol", G_REGEX_MATCH_NOTEOL },
+    { "partial", G_REGEX_MATCH_PARTIAL }
+};
+#define NUM_EXEC_FLAGS (sizeof(exec_flags)/sizeof(exec_flags[0]))
+
+static gboolean get_mfl(lua_State *L, int index, GRegexMatchFlags *mfl,
+			gboolean *do_all)
+{
+    *mfl = 0;
+    if(!lua_isnoneornil(L, index)) {
+	int i;
+	luaL_checktype(L, index, LUA_TTABLE);
+	for(i = lua_len(L, index); i > 0; --i) {
+	    const char *s;
+	    rex_flag *rf;
+	    lua_pushinteger(L, i);
+	    lua_gettable(L, index);
+	    s = luaL_checkstring(L, -1);
+	    rf = bsearch(s, exec_flags, NUM_EXEC_FLAGS, sizeof(exec_flags[0]), ns_cmp);
+	    if(rf && rf->flag != -1)
+		*mfl |= rf->flag;
+	    else if(rf)
+		*do_all = TRUE;
+	    else {
+		lua_pushnil(L);
+		lua_pushliteral(L, "Unknown exec flag: ");
+		lua_pushvalue(L, -3);
+		lua_concat(L, 2);
+		lua_remove(L, -3);
+		lua_remove(L, -3);
+		return FALSE;
+	    }
+	    lua_pop(L, 1);
+	}
+    }
+    return TRUE;
+}
+
+/***
+Compile a regular expression for use in matching functions.
+@function regex_new
+@tparam string pattern The regular expression.  Note that embedded NUL
+ characters are supported.
+@tparam {string,...} cflags (Optional) Compile flags: 'caseless',
+ 'multiline', 'dotall', 'extended', 'anchored', 'dollar\_endonly',
+ 'ungreedy', 'raw', 'no\_auto\_capture', 'optimize', 'dupnames',
+ 'newline\_cr', 'newline\_lf', 'newline\_crlf'
+@tparam {string,...} mflags (Optional) Match flags:
+ 'anchored', 'notbol', 'noteol', 'notempty', 'partial', 'newline\_cr',
+ 'newline\_lf', 'newline\_crlf', 'newline\_any', 'all'.  'all' changes the
+ behavior of matches from returning captures to returning all potential
+ matches.
+@treturn regex|nil The compiled regular expression, or nil on error
+@treturn string The error message on error
+*/
+static int glib_regex_new(lua_State *L)
+{
+    GError *err = NULL;
+    GRegexCompileFlags cfl = 0;
+    GRegexMatchFlags mfl = 0;
+    size_t len;
+    const char *rex;
+    int stop = lua_gettop(L);
+    alloc_udata(L, st, regex_state);
+    rex = luaL_checklstring(L, 1, &len);
+    if(stop > 1 && !lua_isnoneornil(L, 2)) {
+	int i;
+	luaL_checktype(L, 2, LUA_TTABLE);
+	for(i = lua_len(L, 2); i > 0; --i) {
+	    const char *s;
+	    rex_flag *rf;
+	    lua_pushinteger(L, i);
+	    lua_gettable(L, 2);
+	    s = luaL_checkstring(L, -1);
+	    rf = bsearch(s, comp_flags, NUM_COMP_FLAGS, sizeof(comp_flags[0]), ns_cmp);
+	    if(rf)
+		cfl |= rf->flag;
+	    else {
+		lua_pushnil(L);
+		lua_pushliteral(L, "Unknown comp flag: ");
+		lua_pushvalue(L, -3);
+		lua_concat(L, 2);
+		lua_remove(L, -3);
+		lua_remove(L, -3);
+		return 2;
+	    }
+	    lua_pop(L, 1);
+	}
+    }
+    if(stop > 2 && !get_mfl(L, 3, &mfl, &st->do_all))
+	return 2;
+    if(memchr(rex, 0, len)) {
+	gchar *esc = g_regex_escape_nul(rex, len);
+	st->rex = g_regex_new(esc, cfl, mfl, &err);
+	g_free(esc);
+    } else
+	st->rex = g_regex_new(rex, cfl, mfl, &err);
+    if(err) {
+	lua_pop(L, 1);
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Escapes a string so it is a literal in a regular expression.
+@function regex_escape_string
+@tparam string s The string to escape
+@treturn string The escaped string.
+*/
+static int glib_regex_escape_string(lua_State *L)
+{
+    size_t len;
+    const char *s = luaL_checklstring(L, 1, &len);
+    gchar *ret = g_regex_escape_string(s, len);
+    lua_pushstring(L, ret);
+    g_free(ret);
+    return 1;
+}
+
+/***
+@type regex
+*/
+
+static int free_regex_state(lua_State *L)
+{
+    get_udata(L, 1, st, regex_state);
+    if(st->rex) {
+	g_regex_unref(st->rex);
+	st->rex = NULL;
+    }
     return 0;
 }
 
-static int glib_fs_mktree(lua_State *L) {
-    const gchar *path = luaL_checkstring(L, 1);
-    int perms = perms_from_luaarg(L, 2, 7, 5);
-    if(perms == -1) {
-        return luaL_argerror(L, 2, "Permissions must be nil or a three-character string of octal unix permissions");
-    }
+/***
+Get the pattern string used to create this regex.
+@function regex:get_pattern
+@treturn string The pattern string
+*/
+static int regex_get_pattern(lua_State *L)
+{
+    get_udata(L, 1, st, regex_state);
+    lua_pushstring(L, g_regex_get_pattern(st->rex));
+    return 1;
+}
 
-    if(g_mkdir_with_parents(path, perms)) {
-        lua_pushnil(L);
-        lua_pushstring(L, strerror(errno));
-        return 2;
-    }
+/***
+Get the highest back reference in the pattern.
+@function regex:get_max_backref
+@treturn number The number of the highest backreference, or 0 if there are
+ none.
+*/
+static int regex_get_max_backref(lua_State *L)
+{
+    get_udata(L, 1, st, regex_state);
+    lua_pushnumber(L, g_regex_get_max_backref(st->rex));
+    return 1;
+}
 
+/***
+Get the number of capturing subpatterns in the pattern.
+@function regex:get_capture_count
+@treturn number The number of capturing subpatterns.
+*/
+static int regex_get_capture_count(lua_State *L)
+{
+    get_udata(L, 1, st, regex_state);
+    lua_pushnumber(L, g_regex_get_capture_count(st->rex));
+    return 1;
+}
+
+/***
+Get the number of the capturing subexpression with the given name.
+@function regex:get_string_number
+@tparam string name The subexpression name
+@treturn number The subexpression number, or -1 if *name* does not exist
+*/
+static int regex_get_string_number(lua_State *L)
+{
+    get_udata(L, 1, st, regex_state);
+    lua_pushnumber(L, g_regex_get_string_number(st->rex, luaL_checkstring(L, 2)));
+    return 1;
+}
+
+/***
+Get the names of all compile flags set when regex was created.
+@function regex:get_compile_flags
+@treturn {string,...} The names of any flags set when regex was created.
+*/
+static int regex_get_compile_flags(lua_State *L)
+{
+    GRegexCompileFlags cf;
+    int nfl, i;
+    get_udata(L, 1, st, regex_state);
+    cf = g_regex_get_compile_flags(st->rex);
+    for(i = nfl = 0; i < NUM_COMP_FLAGS; i++)
+	if(comp_flags[i].flag & cf)
+	    ++nfl;
+    lua_createtable(L, nfl, 0);
+    for(i = nfl = 0; i < NUM_COMP_FLAGS; i++)
+	if(comp_flags[i].flag & cf) {
+	    ++nfl;
+	    lua_pushstring(L, comp_flags[i].name);
+	    lua_rawseti(L, -2, nfl);
+	}
+    return 1;
+}
+
+/***
+Get the names of all matching flags set when regex was created.
+@function regex:get_match_flags
+@treturn {string,...} The names of any flags set when regex was created.
+*/
+static int regex_get_match_flags(lua_State *L)
+{
+    GRegexMatchFlags mf;
+    int nfl, i;
+    get_udata(L, 1, st, regex_state);
+    mf = g_regex_get_match_flags(st->rex);
+    for(i = nfl = 0; i < NUM_COMP_FLAGS; i++)
+	if(exec_flags[i].flag & mf)
+	    ++nfl;
+    lua_createtable(L, nfl, 0);
+    for(i = nfl = 0; i < NUM_COMP_FLAGS; i++)
+	if(exec_flags[i].flag & mf) {
+	    ++nfl;
+	    lua_pushstring(L, exec_flags[i].name);
+	    lua_rawseti(L, -2, nfl);
+	}
+    return 1;
+}
+
+static int regex_search(lua_State *L, gboolean *matched, gboolean *partial,
+			GMatchInfo **mi, const char **s)
+{
+    GError *err = NULL;
+    size_t len;
+    int sp = lua_isnoneornil(L, 3) ? 0 : luaL_checkinteger(L, 3) - 1;
+    GRegexMatchFlags mfl;
+    gboolean do_all;
+    get_udata(L, 1, st, regex_state);
+
+    *s = luaL_checklstring(L, 2, &len);
+    do_all = st->do_all;
+    if(!get_mfl(L, 4, &mfl, &do_all))
+	return 2;
+    *partial = (mfl & G_REGEX_MATCH_PARTIAL) ||
+	       (g_regex_get_match_flags(st->rex) & G_REGEX_MATCH_PARTIAL);
+    if(do_all)
+	*matched = g_regex_match_all_full(st->rex, *s, len, sp, mfl, mi, &err);
+    else
+	*matched = g_regex_match_full(st->rex, *s, len, sp, mfl, mi, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    if(!*matched && *partial) {
+	if(!g_match_info_is_partial_match(*mi)) {
+	    g_match_info_free(*mi);
+	    lua_pushnil(L);
+	    return 1;
+	}
+    } else if(!*matched) {
+	g_match_info_free(*mi);
+	lua_pushnil(L);
+	return 1;
+    }
     return 0;
 }
 
-static int glib_fs_chmod(lua_State *L) {
-    const gchar *path = luaL_checkstring(L, 1);
-    int perms = -1;
+/***
+Search for a match in a string.
+@function regex:find
+@see string.find
+@tparam string s The string to search
+@tparam number start (Optional) The start position.
+@tparam {string,...} mflags (Optional) Additional match flags:
+ 'anchored', 'notbol', 'noteol', 'notempty', 'partial', 'newline\_cr',
+ 'newline\_lf', 'newline\_crlf', 'newline\_any', 'all'.  'all' changes the
+ behavior of matches from returning captures to returning all potential
+ matches.
+@treturn number|nil The location of the start of the first match, or nil
+ if there are no matches or an error occurred.
+@treturn number|string The location of the last character of the first
+ match, or an error message if an error occurred.
+@treturn boolean Present only if the 'partial' flag is set: true if the
+ match was full; false if only partial.
+@treturn string,... On a successful match, all captures are returned as
+ well
+*/
+static int regex_find(lua_State *L)
+{
+    gboolean matched, partial;
+    GMatchInfo *mi;
+    const char *s;
+    int nret = regex_search(L, &matched, &partial, &mi, &s);
+    if(nret)
+	return nret;
+    {
+	gint start, end;
 
-    if(g_file_test(path, G_FILE_TEST_IS_DIR) || (g_file_test(path, G_FILE_TEST_EXISTS) && lua_toboolean(L, 3))) {
-        perms = perms_from_luaarg(L, 2, 7, 5);
-    } else if(g_file_test(path, G_FILE_TEST_EXISTS)) {
-        perms = perms_from_luaarg(L, 2, 6, 4);
-    } else {
-        lua_pushnil(L);
-        lua_pushfstring(L, "An error occurred accessing %s: file/directory does not exist", path);
-        return 2;
+	g_match_info_fetch_pos(mi, 0, &start, &end);
+	lua_pushinteger(L, start + 1);
+	lua_pushinteger(L, end);
     }
-    
-    if(perms == -1) {
-        return luaL_argerror(L, 2, "Permissions must be nil or a three-character string of octal unix permissions");
+    if(partial)
+	lua_pushboolean(L, matched);
+    {
+	int nmatch = g_match_info_get_match_count(mi), i;
+	for(i = 1; i < nmatch; i++) {
+	    gint start, end;
+	    g_match_info_fetch_pos(mi, i, &start, &end);
+	    lua_pushlstring(L, s + start, end - start);
+	}
+	g_match_info_free(mi);
+	return nmatch + 1 + (partial ? 1 : 0);
     }
-
-    if(g_chmod(path, perms)) {
-        lua_pushnil(L);
-        lua_pushstring(L, strerror(errno));
-        return 2;
-    }
-
-    lua_pushboolean(L, 1);
-    return 1;
 }
 
-static int glib_fs_chown(lua_State *L) {
-    const gchar *path = luaL_checkstring(L, 1);
+/***
+Search for a match in a string.
+@function regex:match
+@see string.match
+@tparam string s The string to search
+@tparam number start (Optional) The start position.
+@tparam {string,...} mflags (Optional) Additional match flags:
+ 'anchored', 'notbol', 'noteol', 'notempty', 'partial', 'newline\_cr',
+ 'newline\_lf', 'newline\_crlf', 'newline\_any', 'all'.  'all' changes the
+ behavior of matches from returning captures to returning all potential
+ matches.
+@treturn boolean Present only if the 'partial' flag is set: true if the
+ match was full; false if only partial.
+@treturn string|nil The first capture, or the full match if there are no
+ captures, or nil if there are no matches or an error occurred.
+@treturn string|nil  The second caputre, or an error message if an error
+ occurred.
+@treturn string,... On a successful match, all remaining captures are
+ returned as well
+*/
+static int regex_match(lua_State *L)
+{
+    gboolean matched, partial;
+    GMatchInfo *mi;
+    const char *s;
+    int nret = regex_search(L, &matched, &partial, &mi, &s);
+    if(nret)
+	return nret;
+    if(partial)
+	lua_pushboolean(L, matched);
+    {
+	int nmatch = g_match_info_get_match_count(mi), i;
+	if(nmatch > 1) {
+	    for(i = 1; i < nmatch; i++) {
+		gint start, end;
+		g_match_info_fetch_pos(mi, i, &start, &end);
+		lua_pushlstring(L, s + start, end - start);
+	    }
+	    g_match_info_free(mi);
+	    return nmatch - 1 + (partial ? 1 : 0);
+	} else {
+	    gint start, end;
 
-    int uid = -1;
-    int gid = -1;
-    struct passwd *pw;
-    struct group *gr;
-    struct stat finfo;
-
-    if(lua_type(L, 2) == LUA_TNUMBER) {
-        uid = lua_tointeger(L, 2);
-    } else if(lua_type(L, 2) == LUA_TSTRING) {
-        pw = getpwnam(lua_tostring(L, 2));
-        if(!pw) {
-            lua_pushnil(L);
-            lua_pushfstring(L, "User %s does not exist", lua_tostring(L, 2));
-            return 2;
-        }
-
-        uid = (int) (pw->pw_uid);
+	    g_match_info_fetch_pos(mi, 0, &start, &end);
+	    lua_pushlstring(L, s + start, end - start);
+	    g_match_info_free(mi);
+	    return 1;
+	}
     }
-
-    if(lua_type(L, 3) == LUA_TNUMBER) {
-        gid = lua_tointeger(L, 3);
-    } else if(lua_type(L, 3) == LUA_TSTRING) {
-        gr = getgrnam(lua_tostring(L, 3));
-        if(!gr) {
-            lua_pushnil(L);
-            lua_pushfstring(L, "Group %s does not exist", lua_tostring(L, 3));
-            return 2;
-        }
-
-        gid = (int) (gr->gr_gid);
-    }
-
-    if(!g_file_test(path, G_FILE_TEST_EXISTS)) {
-        lua_pushnil(L);
-        lua_pushfstring(L, "Path %s does not exist", path);
-        return 2;
-    }
-
-    int rc = g_stat(path, &finfo);
-    if(rc) {
-        lua_pushnil(L);
-        lua_pushfstring(L, "An error occurred getting info for %s", path);
-        return 2;
-    }
-
-    if(chown(path, uid == -1 ? finfo.st_uid : uid, gid == -1 ? finfo.st_gid : gid)) {
-        lua_pushnil(L);
-        lua_pushstring(L, strerror(errno));
-        return 2;
-    }
-    
-    lua_pushboolean(L, 1);
-    return 1;
 }
 
-static int glib_fs_rmdir(lua_State *L) {
-    const gchar *path = luaL_checkstring(L, 1);
-    if(g_rmdir(path)) {
-        lua_pushnil(L);
-        lua_pushfstring(L, "Unable to delete directory %s", path);
-        return 2;
+typedef struct regex_iter_state {
+    GMatchInfo *mi;
+    const char *s;
+    gboolean partial;
+} regex_iter_state;
+
+static int free_regex_iter_state(lua_State *L)
+{
+    get_udata(L, 1, st, regex_iter_state);
+    if(st->mi) {
+	g_match_info_free(st->mi);
+	st->mi = NULL;
     }
-
-    lua_pushboolean(L, 1);
-    return 1;
-}
-
-static int recursive_remove(const gchar *path) {
-    if(!g_file_test(path, G_FILE_TEST_EXISTS)) {
-        return -1;
-    }
-
-    if(g_file_test(path, G_FILE_TEST_IS_REGULAR)) {
-        return g_remove(path);
-    }
-
-    if(g_file_test(path, G_FILE_TEST_IS_DIR)) {
-        GDir *dir = g_dir_open(path, 0, NULL);
-        if(dir == NULL) return -1;
-
-        const gchar *entry;
-        gchar *entry_path;
-
-        while((entry = g_dir_read_name(dir)) != NULL) {
-            entry_path = g_build_filename(path, entry, NULL);
-            if(recursive_remove(entry_path)) {
-                g_free(entry_path);
-                g_dir_close(dir);
-                return -1;
-            }
-            g_free(entry_path);
-        }
-
-        g_dir_close(dir);
-        return g_remove(path);
-    }
-
     return 0;
 }
 
-static int glib_fs_rmtree(lua_State *L) {
-    const gchar *path = luaL_checkstring(L, 1);
-    if(recursive_remove(path)) {
-        lua_pushnil(L);
-        lua_pushfstring(L, "Unable to delete directory tree %s", path);
+static int regex_iter(lua_State *L)
+{
+    gboolean matched;
+    get_udata(L, lua_upvalueindex(1), st, regex_iter_state);
+    if(!st->mi) {
+	lua_pushnil(L);
+	return 1;
     }
+    matched = g_match_info_matches(st->mi);
+    if(!matched && (!st->partial || !g_match_info_is_partial_match(st->mi))) {
+	g_match_info_free(st->mi);
+	st->mi = NULL;
+	lua_pushnil(L);
+	return 1;
+    }
+    if(st->partial)
+	lua_pushboolean(L, matched);
+    {
+	int nmatch = g_match_info_get_match_count(st->mi), i;
+	if(nmatch > 1) {
+	    for(i = 1; i < nmatch; i++) {
+		gint start, end;
+		g_match_info_fetch_pos(st->mi, i, &start, &end);
+		lua_pushlstring(L, st->s + start, end - start);
+	    }
+	    g_match_info_next(st->mi, NULL);
+	    return nmatch - 1 + (st->partial ? 1 : 0);
+	} else {
+	    gint start, end;
 
-    lua_pushboolean(L, 1);
-    return 1;
+	    g_match_info_fetch_pos(st->mi, 0, &start, &end);
+	    lua_pushlstring(L, st->s + start, end - start);
+	    g_match_info_next(st->mi, NULL);
+	    return 1;
+	}
+    }
 }
-
-static int glib_fs_join(lua_State *L) {
-    int len = lua_gettop(L);
-    if(!len) {
-        return 0;
-    }
-
-    gchar **file_stack = (gchar **) g_malloc(sizeof(gchar *) * (len + 1));
-    int i = 0;
-    for(i=0; i<len; i++) {
-        file_stack[i] = (gchar *) lua_tostring(L, i + 1);
-    }
-    file_stack[len] = NULL;
-
-    gchar *joined = g_build_filenamev(file_stack);
-    lua_pushstring(L, joined);
-    g_free(joined);
-    g_free(file_stack);
-
-    return 1;
-}
-
-static int glib_fs_gfiletest(lua_State *L, GFileTest test) {
-    const gchar *path = luaL_checkstring(L, 1);
-    if(g_file_test(path, test) == TRUE) {
-        lua_pushboolean(L, 1);
-    } else {
-        lua_pushboolean(L, 0);
-    }
-
-    return 1;
-}
-
-static int glib_fs_exists(lua_State *L) {
-    return glib_fs_gfiletest(L, G_FILE_TEST_EXISTS);
-}
-
-static int glib_fs_isdir(lua_State *L) {
-    return glib_fs_gfiletest(L, G_FILE_TEST_IS_DIR);
-}
-
-static int glib_fs_isfile(lua_State *L) {
-    return glib_fs_gfiletest(L, G_FILE_TEST_IS_REGULAR);
-}
-
-static int glib_fs_listdir(lua_State *L) {
-    const gchar *path = luaL_checkstring(L, 1);
-    GDir *dir = g_dir_open(path, 0, NULL);
-    if(dir == NULL) {
-        lua_pushnil(L);
-        lua_pushfstring(L, "Error opening directory %s", path);
-        return 2;
-    }
-
-    const gchar *entry;
-    lua_newtable(L);
-
-    int i = 0;
-    while((entry = g_dir_read_name(dir)) != NULL) {
-        lua_pushstring(L, entry);
-        lua_rawseti(L, -2, ++i);
-    }
-
-    g_dir_close(dir);
-    return 1;
-}
-
-static int glib_fs_glob(lua_State *L) {
-    const gchar *pat = luaL_checkstring(L, 1);
-    glob_t buf;
-    buf.gl_offs = 0;
-    int err = glob(pat, GLOB_NOSORT | GLOB_BRACE | GLOB_TILDE_CHECK, NULL, &buf);
-    if(err == GLOB_NOSPACE) {
-        return luaL_error(L, "out of memory");
-    } else if(err == GLOB_ABORTED) {
-        return luaL_error(L, "read aborted");
-    } else if(err == GLOB_NOMATCH) {
-        lua_newtable(L);
-        return 1;
-    } else if(err) {
-        return luaL_error(L, strerror(errno));
-    }
-
-    lua_createtable(L, buf.gl_pathc, 0);
-    int i;
-    for(i=1; i<=buf.gl_pathc; i++) {
-        lua_pushstring(L, buf.gl_pathv[i-1]);
-        lua_rawseti(L, -2, i);
-    }
     
-    globfree(&buf);
+/***
+Search for all matches in a string.
+@function regex:gmatch
+@see string.gmatch
+@see regex:match
+@tparam string s The string to search
+@tparam number start (Optional) The start position.
+@tparam {string,...} mflags (Optional) Additional match flags:
+ 'anchored', 'notbol', 'noteol', 'notempty', 'partial', 'newline\_cr',
+ 'newline\_lf', 'newline\_crlf', 'newline\_any', 'all'.  'all' changes the
+ behavior of matches from returning captures to returning all potential
+ matches.
+@treturn function An iterator function which, on each iteration,
+ returns the same as regex:match would have for the next match in the
+ string.
+*/
+static int regex_gmatch(lua_State *L)
+{
+    gboolean matched, partial;
+    GMatchInfo *mi;
+    const char *s;
+    int nret = regex_search(L, &matched, &partial, &mi, &s);
+    if(nret > 1)
+	return nret;
+    {
+	alloc_udata(L, st, regex_iter_state);
+	lua_pushvalue(L, 1); /* save string reference */
+	lua_pushcclosure(L, regex_iter, 2);
+	if(nret)
+	    return 1;
+	st->partial = partial;
+	st->mi = mi;
+	st->s = s;
+	return 1;
+    }
+}
+
+/***
+Split a string with a regular expression separator.
+@function regex:split
+@tparam string s The string to split
+@tparam number start (Optional) The start position.
+@tparam {string,...} mflags (Optional) Additional match flags:
+ 'anchored', 'notbol', 'noteol', 'notempty', 'newline\_cr',
+ 'newline\_lf', 'newline\_crlf', 'newline\_any'
+@tparam number max (Optional) The maximum number of elements to return.  If
+ unspecified or less than 1, all elements are returned.
+@treturn {string,...}  The elements separated by the regular expression.
+ Each element is separated by any capture strings from the separator, if
+ present.  For example:
+
+     rx = glib.regex_new('\\|(.?)\\|')
+     spl = rx:split('abc||def|!|ghi')
+      -- { 'abc', '', 'def', '!', 'ghi' }
+*/
+static int regex_split(lua_State *L)
+{
+    GError *err = NULL;
+    size_t len;
+    const char *s = luaL_checklstring(L, 2, &len);
+    int sp = lua_isnoneornil(L, 3) ? 0 : luaL_checkinteger(L, 3) - 1;
+    GRegexMatchFlags mfl;
+    gboolean do_all, partial;
+    int max = lua_isnoneornil(L, 5) ? 0 : luaL_checkinteger(L, 5);
+    gchar **ret;
+    int nret;
+    get_udata(L, 1, st, regex_state);
+
+    do_all = st->do_all;
+    if(!get_mfl(L, 4, &mfl, &do_all))
+	return 2;
+    if(do_all) {
+	lua_pushnil(L);
+	lua_pushliteral(L, "all mode not supported for split");
+	return 2;
+    }
+    partial = (mfl & G_REGEX_MATCH_PARTIAL) ||
+	      (g_regex_get_match_flags(st->rex) & G_REGEX_MATCH_PARTIAL);
+    if(partial) {
+	lua_pushnil(L);
+	lua_pushliteral(L, "partial mode not supported for split");
+	return 2;
+    }
+    ret = g_regex_split_full(st->rex, s, len, sp, mfl, max, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    for(nret = 0; ret[nret]; ++nret);
+    lua_createtable(L, nret, 0);
+    for(nret = 0; ret[nret]; ++nret) {
+	lua_pushstring(L, ret[nret]);
+	lua_rawseti(L, -2, nret + 1);
+    }
+    g_strfreev(ret);
     return 1;
 }
 
-static int glib_fs_walk_close(lua_State *L) {
-    GQueue *queue = *(GQueue **) luaL_checkudata(L, lua_upvalueindex(1), "glib.fs.queue");
-    const gchar *old_root = luaL_checkstring(L, lua_upvalueindex(3));
-    int tblindex = lua_upvalueindex(2);
-    lua_pushnil(L);
-    while(lua_next(L, tblindex) != 0) {
-        g_queue_push_tail(queue, (gpointer) g_build_filename(old_root, lua_tostring(L, -1), NULL));
-        lua_pop(L, 1);
-        lua_pushvalue(L, -1);
-        lua_pushnil(L);
-        lua_settable(L, tblindex);
+typedef struct repl_state {
+    lua_State *L;
+    int tr, tn;
+    int nmatch, nsub;
+} repl_state;
+
+static gboolean regex_repl(const GMatchInfo *mi, GString *res, gpointer data)
+{
+    repl_state *rs = data;
+    lua_State *L = rs->L;
+    int tr = rs->tr;
+    int tn = rs->tn;
+    int nmatch = g_match_info_get_match_count(mi);
+    gint start, end;
+    const char *s = g_match_info_get_string(mi);
+
+    ++rs->nmatch;
+    switch(tr) {
+      case LUA_TTABLE:
+	g_match_info_fetch_pos(mi, nmatch > 1, &start, &end);
+	lua_pushlstring(L, s + start, end - start);
+	lua_gettable(L, 3);
+	break;
+      case LUA_TFUNCTION:
+	lua_pushvalue(L, 3);
+	if(nmatch > 1) {
+	    int i;
+	    for(i = 1; i < nmatch; i++) {
+		gint start, end;
+		g_match_info_fetch_pos(mi, i, &start, &end);
+		lua_pushlstring(L, s + start, end - start);
+	    }
+	    lua_call(L, nmatch - 1, 1);
+	} else {
+	    gint start, end;
+
+	    g_match_info_fetch_pos(mi, 0, &start, &end);
+	    lua_pushlstring(L, s + start, end - start);
+	    lua_call(L, 1, 1);
+	}
+      default: {
+	  const char *rt = lua_tostring(L, 3);
+	  gchar *repl = g_match_info_expand_references(mi, rt, NULL);
+	  if(!repl)
+	      lua_pushliteral(L, "");
+	  else {
+	      lua_pushstring(L, repl);
+	      g_free(repl);
+	  }
+	  break;
+      }
     }
-    
-    if(g_queue_is_empty(queue)) return 0;
-
-    gchar *root = (gchar *) g_queue_pop_head(queue);
-    gchar *path;
-    lua_pushstring(L, root);
-    lua_replace(L, lua_upvalueindex(3));
-    lua_pushstring(L, root);
-    lua_pushvalue(L, tblindex);
-    lua_newtable(L);
-
-    GDir *iter = g_dir_open(root, 0, NULL);
-    if(iter != NULL) {
-        const gchar *entry;
-
-        int dirsi = 0;
-        int filesi = 0;
-        while((entry = g_dir_read_name(iter)) != NULL) {
-            path = g_build_filename(root, entry, NULL);
-            lua_pushstring(L, entry);
-
-            if(g_file_test(path, G_FILE_TEST_IS_DIR)) {
-                lua_rawseti(L, tblindex, ++dirsi);
-            } else {
-                lua_rawseti(L, -2, ++filesi);
-            }
-            g_free(path);
-        }
-
-        g_dir_close(iter);
+    if(tn == LUA_TFUNCTION) {
+	gboolean do_repl;
+	lua_pushvalue(L, 5);
+	g_match_info_fetch_pos(mi, 0, &start, &end);
+	lua_pushinteger(L, start + 1);
+	lua_pushinteger(L, end);
+	lua_pushvalue(L, -4);
+	lua_call(L, 3, 2);
+	if(lua_isboolean(L, -2) || lua_isnil(L, -2))
+	    do_repl = lua_toboolean(L, -2);
+	else {
+	    lua_pushvalue(L, -2);
+	    lua_replace(L, -4);
+	    do_repl = TRUE;
+	}
+	if(lua_isnumber(L, -1)) {
+	    lua_pushvalue(L, -1);
+	    lua_replace(L, 5);
+	    rs->tn = LUA_TNUMBER;
+	} else {
+	    if(lua_toboolean(L, -1))
+		rs->tn = LUA_TNIL;
+	}
+	lua_pop(L, 2);
+	if(!do_repl) {
+	    lua_pop(L, 1);
+	    lua_pushboolean(L, 0);
+	}
     }
+    {
+	int rt = lua_type(L, -1);
+	if(rt == LUA_TSTRING || rt == LUA_TNUMBER) {
+	    size_t len;
+	    const char *reps = lua_tolstring(L, -1, &len);
+	    g_string_append_len(res, reps, len);
+	    ++rs->nsub;
+	} else if(!lua_toboolean(L, -1)) {
+	    g_match_info_fetch_pos(mi, 0, &start, &end);
+	    g_string_append_len(res, s + start, end - start);
+	} else
+	    /* else what?  presumably replace w/ blank */
+	    ++rs->nsub;
+	lua_pop(L, 1);
+    }
+    if(tn != LUA_TNONE && tn != LUA_TNIL && tn != LUA_TFUNCTION) {
+	int max = lua_tonumber(L, 5);
+	if(max > 0) {
+	    if(--max) {
+		lua_pushinteger(L, max);
+		lua_replace(L, 5);
+	    } else
+		return TRUE;
+	}
+    }
+    return FALSE;
+}
 
-    g_free(root);
+/***
+Replace occurrences of regular expression in string.
+@function regex:gsub
+@tparam string s The string to modify.  Note that zeroes are not supported
+ in the final result string, whether they stem from *s* or *repl*.
+@tparam string|table|function repl The replacement.  If this is a string,
+ the string is the replacement text, which supports backslash-escapes for
+ capture substitution and case conversion.  If it is a table, the first
+ capture (or entire match if there are no captures) is used as a key into
+ the table; if the value is a string or number, it is the literal replacement
+ text; otherwise, if the value is faluse or nil, no substitution is made.
+ If it is a function, the function is called for every match, with all
+ captures (or the entire match if there are no captures) as arguments;
+ the return value is treated like the table entries.  For literal
+ interpretation of a string, call regex\_escape\_string on it first.
+@see regex_escape_string
+@tparam number start (Optional) The start position.
+@tparam number|function n (Optional) The maximum number of replacements, if
+ specified as a number greater than 0.  If specified as a function, the
+ function is called after determining the potential replacement text.  Its
+ parameters are the full match start position, the full match end position,
+ and the potential replacement text (or false/nil if no replacement is to be
+ made).  The function must return two values:  the first is the replacement
+ operation:  true if normal replacement is to be made, false if no replacement
+ is to be made, and a string if an alternate replacement is to be made.
+ The second is the conintuation flag:  if absent, nil, or false, continue
+ replacement, and if true, continue globally without checking *n*, and if
+ a number, continue that many iterations maximum without checking *n*.
+@tparam {string,...} mflags (Optional) Additional match flags:
+ 'anchored', 'notbol', 'noteol', 'notempty', 'newline\_cr',
+ 'newline\_lf', 'newline\_crlf', 'newline\_any'
+@treturn string|nil The substituted string, if successful; nil if not.
+@treturn number|string The number of matches, if successful; an error
+ message if not.
+@treturn number The number of substitutions, if successful
+*/
+/* note: function interpretation of n parameter is stolen from lrexlib */
+/* note: nsub return value also stolen from lrexlib */
+static int regex_gsub(lua_State *L)
+{
+    GError *err = NULL;
+    size_t len;
+    const char *s = luaL_checklstring(L, 2, &len);
+    gchar *ret;
+    repl_state rs;
+    int sp = lua_isnoneornil(L, 4) ? 0 : luaL_checkinteger(L, 4) - 1;
+    GRegexMatchFlags mfl;
+    gboolean do_all, partial;
+    get_udata(L, 1, st, regex_state);
+
+    rs.L = L;
+    rs.tr = lua_type(L, 3);
+    rs.tn = lua_type(L, 5);
+    rs.nmatch = rs.nsub = 0;
+    if(rs.tr != LUA_TTABLE && rs.tr != LUA_TFUNCTION) {
+	g_regex_check_replacement(luaL_checkstring(L, 3), NULL, &err);
+	if(err) {
+	    lua_pushnil(L);
+	    lua_pushstring(L, err->message);
+	    g_error_free(err);
+	    return 2;
+	}
+	rs.tr = LUA_TSTRING;
+    }
+    if(rs.tn != LUA_TFUNCTION && rs.tn != LUA_TNONE && rs.tn != LUA_TNIL)
+	luaL_checknumber(L, 5);
+    do_all = st->do_all;
+    if(!get_mfl(L, 4, &mfl, &do_all))
+	return 2;
+    if(do_all) {
+	lua_pushnil(L);
+	lua_pushliteral(L, "all mode not supported for gsub");
+	return 2;
+    }
+    partial = (mfl & G_REGEX_MATCH_PARTIAL) ||
+	      (g_regex_get_match_flags(st->rex) & G_REGEX_MATCH_PARTIAL);
+    if(partial) {
+	lua_pushnil(L);
+	lua_pushliteral(L, "partial mode not supported for gsub");
+	return 2;
+    }
+    ret = g_regex_replace_eval(st->rex, s, len, sp, mfl, regex_repl, &rs, &err);
+    if(!ret) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushstring(L, ret);
+    g_free(ret);
+    lua_pushinteger(L, rs.nmatch);
+    lua_pushinteger(L, rs.nsub);
     return 3;
 }
 
-static int glib_fs_walk(lua_State *L) {
-    const gchar *path = luaL_checkstring(L, 1);
-    GQueue **queue = (GQueue **) lua_newuserdata(L, sizeof(GQueue *));
-    luaL_getmetatable(L, "glib.fs.queue");
-    lua_setmetatable(L, -2);
+static luaL_Reg regex_state_funcs[] = {
+    { "get_pattern", regex_get_pattern },
+    { "get_max_backref", regex_get_max_backref },
+    { "get_capture_count", regex_get_capture_count },
+    { "get_string_number", regex_get_string_number },
+    { "get_compile_flags", regex_get_compile_flags },
+    { "get_match_flags", regex_get_match_flags },
+    { "find", regex_find },
+    { "match", regex_match },
+    { "gmatch", regex_gmatch },
+    { "split", regex_split },
+    { "gsub", regex_gsub },
+    { "__gc", free_regex_state },
+    { NULL, NULL }
+};
 
-    *queue = g_queue_new();
-    g_queue_push_tail(*queue, (gpointer) g_strdup(path));
-    
+/*********************************************************************/
+/***
+Simple XML Subset Parser.
+The following functions use varargs, and are not supported:
+
+g\_markup\_\*printf\_escaped: emulate using string concat and renaming of
+ escaper to shorter name:
+     e = glib.markup_escape_text
+     output = '<purchase>' ..
+              '<store>' .. e(store) .. '</store>' ..
+              '<item>' .. e(item) .. '</item>' ..
+              '</purchase>'
+
+g\_markup\_collect\_attributes: the only useful bit here that is for
+some reason not exposed independently is the boolean parser.  Otherwise,
+it's best to emulate using lua:
+    -- usage:
+    attrs, msg = collect_attrs(attr_names, attr_vals,
+                               {a='str', b='bool', c='?bool', ...})
+    if not attrs then print("error: " .. msg) end
+
+    -- only allocate/parse once
+    local bool_rx = glib.regex_new('^(false|f|no|n|0)|(true|t|yes|y|1)$', {'caseless'})
+    -- could pass in el_name for better error message
+    function collect_attrs(attr_names, attr_vals, req_parms)
+      -- return attr=value table
+      local attrs = {}
+      -- put attrs i table, checking for duplicates
+      local i, v
+      for i, v in ipairs(attr_names) do
+        if attrs[v] then return nil, "duplicate attribute " .. v end
+        attrs[v] = attr_vals[i]
+      end
+      -- parse values, ensuring they are in req_parms as well
+      local n
+      for n, v in pairs(attrs) do
+        local isreq = req_parms[n]
+        if not isreq then return nil, "unknown attribute " .. n end
+        if isreq:sub(1, 1) == '?' then isreq = isreq:sub(2) end
+        if req_parms[n] == 'bool' then
+          local f = bool_rx:match(v)
+          if not f then return nil, "invalid boolean " .. n end
+          attrs[n] = f == ''
+        end
+      end
+      -- ensure that only optional values are missing
+      for n, v in pairs(req_parms) do
+        if v:sub(1, 1) ~= '?' and attrs[n] == nil then
+          return nil, "missing attr " .. n
+        end
+      end
+      return attrs
+    end
+@section Simple XML Subset Parser
+*/
+
+/***
+Escape text so GMarkup XML parsing will return it to original.
+@function markup_escape_text
+@tparam string s The string to escape
+@treturn string The escaped string
+*/
+static int glib_markup_escape_text(lua_State *L)
+{
+    size_t len;
+    const char *s = luaL_checklstring(L, 1, &len);
+    char *ret = g_markup_escape_text(s, len);
+    lua_pushstring(L, ret);
+    g_free(ret);
+    return 1;
+}
+
+typedef struct markup_parse_state {
+    GMarkupParseContext *ctx;
+    lua_State *L;
+    struct markup_parse_state *next;
+} markup_parse_state;
+
+static gboolean pop_parser(markup_parse_state *st, gboolean is_end)
+{
+    if(st->next) {
+	lua_State *L = st->L;
+	/* recursive call should never be needed, but better to do it than to
+	 * accidentially leak memory */
+	pop_parser(st->next, FALSE);
+	g_markup_parse_context_pop(st->ctx);
+	g_free(st->next);
+	st->next = NULL;
+	lua_getfield(L, -1, "next");
+	lua_pushvalue(L, -1);
+	lua_setuservalue(L, 1);
+	if(is_end) { /* leave pop on stack */
+	    lua_getfield(L, -2, "pop");
+	    lua_remove(L, -3);
+	} else
+	    lua_remove(L, -2);
+	return TRUE;
+    }
+    return FALSE;
+}
+
+/***
+The function called when an opening tag of an element is seen.
+@function _gmarkup_start_element_
+Pass a function like this in the *start\_element* parameter for a parser.
+@tparam markup_parse_context ctx The context in which this was called
+@tparam string name The name of the element being started
+@tparam {string,...} attr_names The names of the attributes in this tag,
+ in order
+@tparam {string,...} attr_values The values of the attributes in this tag,
+ in the same order as the names.
+@treturn nil|string Nothing or nil on success; an error message on error.
+@see markup_parse_context_new
+@see markup_parse_context:push
+*/
+static void gmp_start_element(GMarkupParseContext *ctx,
+			      const gchar *element_name,
+			      const gchar **attr_names,
+			      const gchar **attr_values,
+			      gpointer user_data,
+			      GError **error)
+{
+    int nattr;
+    markup_parse_state *st = user_data;
+    lua_State *L = st->L;
+    lua_getuservalue(L, 1);
+    lua_getfield(L, -1, "start_element");
+    lua_pushstring(L, element_name);
+    for(nattr = 0; attr_names[nattr]; nattr++);
+    lua_createtable(L, nattr, 0);
+    lua_createtable(L, nattr, 0);
+    for(nattr = 0; attr_names[nattr]; nattr++) {
+	lua_pushstring(L, attr_names[nattr]);
+	lua_rawseti(L, -3, nattr + 1);
+	lua_pushstring(L, attr_values[nattr]);
+	lua_rawseti(L, -2, nattr + 1);
+    }
+    lua_call(L, 3, 1);
+    if(!lua_isnil(L, -1)) {
+	const char *msg = lua_tostring(L, -1);
+	/* FIXME: maybe support error codes in the future... */
+	*error = g_error_new(G_MARKUP_ERROR, G_MARKUP_ERROR_INVALID_CONTENT,
+			     "%s", msg);
+    }
+    lua_pop(L, 1);
+}
+
+/***
+The function called when an ending tag of an element is seen.
+@function _gmarkup_end_element_
+Pass a function like this in the *end\_element* parameter for a parser.
+@tparam markup_parse_context ctx The context in which this was called
+@tparam string name The name of the element being started
+@tparam any pop If the context was previously pushed, and this is called
+ for the terminating element of that context, this is the `pop` element
+ which was passed in to `markup_parse_context:push`.
+@treturn nil|string Nothing or nil on success; an error message on error.
+@see markup_parse_context_new
+@see markup_parse_context:push
+*/
+static void gmp_end_element(GMarkupParseContext *ctx,
+			    const gchar *element_name,
+			    gpointer user_data,
+			    GError **error)
+{
+    markup_parse_state *st = user_data;
+    lua_State *L = st->L;
+    gboolean did_pop;
+    lua_getuservalue(L, 1);
+    did_pop = pop_parser(st, TRUE);
+    lua_getfield(L, did_pop ? -2 : -1, "end_element");
+    if(lua_isnil(L, -1)) {
+	lua_pop(L, 2);
+	return;
+    }
+    lua_pushstring(L, element_name);
+    if(did_pop) {
+	lua_pushvalue(L, -3);
+	lua_remove(L, -4);
+	lua_call(L, 2, 1);
+    } else
+	lua_call(L, 1, 1);
+    if(!lua_isnil(L, -1)) {
+	const char *msg = lua_tostring(L, -1);
+	/* FIXME: maybe support error codes in the future... */
+	*error = g_error_new(G_MARKUP_ERROR, G_MARKUP_ERROR_INVALID_CONTENT,
+			     "%s", msg);
+    }
+    lua_pop(L, 1);
+}
+
+/***
+The function called when text within an element is seen.
+@function _gmarkup_text_
+Pass a function like this in the *text* parameter for a parser.
+@tparam markup_parse_context ctx The context in which this was called
+@tparam string text The text.
+@treturn nil|string Nothing or nil on success; an error message on error.
+@see markup_parse_context_new
+@see markup_parse_context:push
+*/
+static void gmp_text(GMarkupParseContext *ctx,
+		     const gchar *text,
+		     gsize text_len,
+		     gpointer user_data,
+		     GError **error)
+{
+    markup_parse_state *st = user_data;
+    lua_State *L = st->L;
+    lua_getuservalue(L, 1);
+    lua_getfield(L, -1, "text");
+    lua_pushlstring(L, text, text_len);
+    lua_call(L, 1, 1);
+    if(!lua_isnil(L, -1)) {
+	const char *msg = lua_tostring(L, -1);
+	/* FIXME: maybe support error codes in the future... */
+	*error = g_error_new(G_MARKUP_ERROR, G_MARKUP_ERROR_INVALID_CONTENT,
+			     "%s", msg);
+    }
+    lua_pop(L, 1);
+}
+
+/***
+The function called when unprocessed text is seen.
+@function _gmarkup_passthrough_
+Pass a function like this in the *passthrough* parameter for a parser.
+When copying XML, this text is intended to be output literally, assuming
+all other function calls output their tags immediately.
+@tparam markup_parse_context ctx The context in which this was called
+@tparam string text The text.
+@treturn nil|string Nothing or nil on success; an error message on error.
+@see markup_parse_context_new
+@see markup_parse_context:push
+*/
+static void gmp_passthrough(GMarkupParseContext *ctx,
+			    const gchar *text,
+			    gsize text_len,
+			    gpointer user_data,
+			    GError **error)
+{
+    markup_parse_state *st = user_data;
+    lua_State *L = st->L;
+    lua_getuservalue(L, 1);
+    lua_getfield(L, -1, "passthrough");
+    lua_pushlstring(L, text, text_len);
+    lua_call(L, 1, 1);
+    if(!lua_isnil(L, -1)) {
+	const char *msg = lua_tostring(L, -1);
+	/* FIXME: maybe support error codes in the future... */
+	*error = g_error_new(G_MARKUP_ERROR, G_MARKUP_ERROR_INVALID_CONTENT,
+			     "%s", msg);
+    }
+    lua_pop(L, 1);
+}
+
+/***
+The function called when an error occurs during parsing.
+@function _gmarkup_error_
+Pass a function like this in the *error* parameter for a parser.
+@tparam markup_parse_context ctx The context in which this was called
+@tparam string text The error text.
+@see markup_parse_context_new
+@see markup_parse_context:push
+*/
+static void gmp_error(GMarkupParseContext *ctx,
+		      GError *error,
+		      gpointer user_data)
+{
+    markup_parse_state *st = user_data;
+    lua_State *L = st->L;
+    lua_getuservalue(L, 1);
+    pop_parser(st, FALSE);
+    lua_getfield(L, -1, "error");
+    if(lua_isnil(L, -1)) {
+	lua_pop(L, 2);
+	return;
+    }
+    lua_pushstring(L, error->message);
+    lua_call(L, 1, 0);
+}
+
+/***
+Create GMarkup parser.
+@function markup_parse_context_new
+@tparam {string=value,...} options Context creation options:
+
+   * **start\_element**: a function like `_gmarkup_start_element_`.
+   * **end\_element**: a function like `_gmarkup_end_element_`.
+   * **text**: a function like `_gmarkup_text_`.
+   * **passthrough**: a function like `_gmarkup_passthrough_`.
+   * **error**: a function like `_gmarkup_error_`.
+   * **treat\_cdata\_as\_text**: If set and not false, return CDATA sections
+     as text instead of passthrough.
+   * **prefix\_error\_position**: If set and not false, prefix error messages
+     returned by the above functions with line and column information.
+@see _gmarkup_start_element_
+@see _gmarkup_end_element_
+@see _gmarkup_text_
+@see _gmarkup_passthrough_
+@see _gmarkup_error_
+*/
+static int glib_markup_parse_context_new(lua_State *L)
+{
+    GMarkupParser parser;
+    GMarkupParseFlags fl = 0;
+
+    luaL_checktype(L, 1, LUA_TTABLE);
+    {
+	alloc_udata(L, st, markup_parse_state);
+	memset(&parser, 0, sizeof(parser));
+	lua_newtable(L);
+#define getfun(n, p) do { \
+    lua_getfield(L, p, #n); \
+    if(!lua_isnil(L, -1)) { \
+	luaL_checktype(L, -1, LUA_TFUNCTION); \
+	parser.n = gmp_##n; \
+	lua_setfield(L, -2, #n); \
+    } \
+} while(0)
+	getfun(start_element, 1);
+	getfun(end_element, 1);
+	getfun(text, 1);
+	getfun(passthrough, 1);
+	getfun(error, 1);
+	/* to support push/pop, end_element and error always present */
+	parser.end_element = gmp_end_element;
+	parser.error = gmp_error;
+	lua_setuservalue(L, -2);
+	lua_getfield(L, 1, "treat_cdata_as_text");
+	if(lua_toboolean(L, -1))
+	    fl |= G_MARKUP_TREAT_CDATA_AS_TEXT;
+	lua_getfield(L, 1, "prefix_error_position");
+	if(lua_toboolean(L, -1))
+	    fl |= G_MARKUP_PREFIX_ERROR_POSITION;
+	lua_pop(L, 2);
+	st->ctx = g_markup_parse_context_new(&parser, fl, L, NULL);
+	return 1;
+    }
+}
+
+/***
+@type markup_parse_context
+*/
+
+/***
+Finish parsing.
+@function markup_parse_context:end_parse
+Call this after all data has been passed to the parser to finish parsing.
+@treturn boolean True if successful.
+@treturn string Error message if unsuccessful.
+*/
+static int markup_end_parse(lua_State *L)
+{
+    GError *err = NULL;
+    get_udata(L, 1, st, markup_parse_state);
+    lua_pushboolean(L, g_markup_parse_context_end_parse(st->ctx, &err));
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Obtain current position in source text.
+@function markup_parse_context:get_position
+@treturn number The line number
+@treturn number The column number
+*/
+static int markup_get_position(lua_State *L)
+{
+    gint l, c;
+    get_udata(L, 1, st, markup_parse_state);
+    g_markup_parse_context_get_position(st->ctx, &l, &c);
+    lua_pushinteger(L, l);
+    lua_pushinteger(L, c);
+    return 2;
+}
+
+/***
+Obtain the name of the current element being processed.
+@function markup_parse_context:get_element
+@treturn string The element name.
+*/
+static int markup_get_element(lua_State *L)
+{
+    get_udata(L, 1, st, markup_parse_state);
+    lua_pushstring(L, g_markup_parse_context_get_element(st->ctx));
+    return 1;
+}
+
+/***
+Obtain the complete path of element names to the current element being
+processed.
+@function markup_parse_context:get_element_stack
+@treturn {string,...} The element names, starting with the most deeply nested.
+*/
+static int markup_get_element_stack(lua_State *L)
+{
+    guint nel;
+    const GSList *els, *p;
+    int i;
+    get_udata(L, 1, st, markup_parse_state);
+    els = g_markup_parse_context_get_element_stack(st->ctx);
+    nel = g_slist_length((GSList *)els); /* why would els need to be writable??*/
+    lua_createtable(L, nel, 0);
+    for(p = els, i = 1; p; p = p->next, ++i) {
+	lua_pushstring(L, p->data);
+	lua_rawseti(L, -2, i);
+    }
+    return 1;
+}
+
+/***
+Parse some text.
+@function markup_parse_context:parse
+Call this with chunks of text, in order, as often as needed to process
+entire text.
+@tparam string s The next chunk of text to process
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful
+*/
+static int markup_parse(lua_State *L)
+{
+    GError *err = NULL;
+    size_t len;
+    const char *s = luaL_checklstring(L, 2, &len);
+    get_udata(L, 1, st, markup_parse_state);
+    lua_pushboolean(L, g_markup_parse_context_parse(st->ctx, s, len, &err));
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Push the parse context.
+@function markup_parse_context:push
+This may only be called from *start\_element* handler. It creates a new
+parser just for the text from the started element to its end tag.  When
+the end tag is found, the previous parser is restored, and the
+*end\_element* handler receives one additional argument:  the *pop* parameter
+to this function.
+@tparam {string=value,...} options Context creation options:
+
+   * **start\_element**: a function like `_gmarkup_start_element_`.
+   * **end\_element**: a function like `_gmarkup_end_element_`.
+   * **text**: a function like `_gmarkup_text_`.
+   * **passthrough**: a function like `_gmarkup_passthrough_`.
+   * **error**: a function like `_gmarkup_error_`.
+   * **pop**: a value to pass to the parent's *end\_element* handler when finished.
+     It may be any value, but a function is probably most suitable.
+     There is no guarantee that this value will ever be used, since it
+     requires that no errors occur and that the parent's *end\_element*
+     handler actually uses it.
+@see _gmarkup_start_element_
+@see _gmarkup_end_element_
+@see _gmarkup_text_
+@see _gmarkup_passthrough_
+@see _gmarkup_error_
+*/
+static int markup_push(lua_State *L)
+{
+    GMarkupParser parser;
+    markup_parse_state *p;
+    get_udata(L, 1, st, markup_parse_state);
+
+    luaL_checktype(L, 2, LUA_TTABLE);
+    memset(&parser, 0, sizeof(parser));
     lua_newtable(L);
-    lua_pushstring(L, path);
-    lua_pushcclosure(L, glib_fs_walk_close, 3);
-    return 1;
+    getfun(start_element, 2);
+    getfun(end_element, 2);
+    getfun(text, 2);
+    getfun(passthrough, 2);
+    getfun(error, 2);
+    /* to support push/pop, end_element and error always present */
+    parser.end_element = gmp_end_element;
+    parser.error = gmp_error;
+    lua_getfield(L, 2, "pop");
+    lua_setfield(L, -2, "pop");
+    lua_getuservalue(L, 1);
+    lua_setfield(L, -2, "next");
+    lua_setuservalue(L, 1);
+    for(p = st; p->next; p = p->next);
+    p->next = g_malloc(sizeof(*p));
+    p = p->next;
+    memcpy(p, st, sizeof(*p));
+    p->next = NULL;
+    g_markup_parse_context_push(st->ctx, &parser, p);
+    return 0;
 }
 
-static int glib_fs_copyfile(const gchar *from, const gchar *to, gchar **errstr) {
-    FILE *in, *out;
-    int stat;
-    char buf[LGLIB_IO_BUFSIZE];
-    size_t bytes_read;
-    size_t bytes_written;
-
-    if(g_file_test(from, G_FILE_TEST_IS_REGULAR) != TRUE) {
-        *errstr = g_strdup_printf("%s must be a regular file", from);
-        return -1;
+static int free_markup_parse_state(lua_State *L)
+{
+    markup_parse_state *p;
+    get_udata(L, 1, st, markup_parse_state);
+    while(st->next) {
+	p = st->next;
+	st->next = p->next;
+	g_free(p);
     }
-
-    in = g_fopen(from, "r");
-    if(in == NULL) {
-        *errstr = g_strdup_printf("Unable to open file %s: %s", from, strerror(errno));
-        return -1;
-    }
-
-    out = g_fopen(to, "w");
-    if(out == NULL) {
-        *errstr = g_strdup_printf("Unable to open file %s: %s", to, strerror(errno));
-        return -1;
-    }
-    
-    while(!feof(in)) {
-        bytes_read = fread(buf, 1, LGLIB_IO_BUFSIZE, in);
-        if(ferror(in)) {
-            *errstr = g_strdup_printf("Unable to read from %s", from);
-            return -1;
-        }
-
-        if(!bytes_read) continue;
-        bytes_written = fwrite(buf, 1, bytes_read, out);
-
-        if(!bytes_written || ferror(out)) {
-            *errstr = g_strdup_printf("Unable to write to %s", to);
-            return -1;
-        }
-    }
-
-    fclose(in);
-    fclose(out);
-    /* If the original file is executable, change the permissions of the copied file to 0755 */
-    if(g_file_test(from, G_FILE_TEST_IS_EXECUTABLE) == TRUE) {
-        g_chmod(to, 0755);
+    if(st->ctx) {
+	g_markup_parse_context_free(st->ctx);
+	st->ctx = NULL;
     }
     return 0;
 }
 
-static int glib_fs_copy(lua_State *L) {
-    const gchar *from = luaL_checkstring(L, 1);
-    const gchar *to = luaL_checkstring(L, 2);
-    gchar *err = NULL;
-
-    if(glib_fs_copyfile(from, to, &err)) {
-        lua_pushnil(L);
-        lua_pushstring(L, err);
-        g_free(err);
-        return 2;
-    }
-
-    lua_pushboolean(L, 1);
-    return 1;
-}
-
-static int recursive_copy(const gchar *from, const gchar *to, gchar **errstr) {
-    if(g_file_test(from, G_FILE_TEST_IS_REGULAR)) {
-        return glib_fs_copyfile(from, to, errstr);
-    } else if(g_file_test(from, G_FILE_TEST_IS_DIR)) {
-        GDir *dir = g_dir_open(from, 0, NULL);
-        if(dir == NULL) {
-            *errstr = g_strdup_printf("An error occurred copying %s to %s: Could not open directory", from, to);
-            return -1;
-        }
-
-        g_mkdir(to, 0755);
-
-        const gchar *entry;
-        gchar *from_entry, *to_entry;
-
-        while((entry = g_dir_read_name(dir)) != NULL) {
-            from_entry = g_build_filename(from, entry, NULL);
-            to_entry = g_build_filename(to, entry, NULL);
-            if(recursive_copy(from_entry, to_entry, errstr)) {
-                g_free(from_entry);
-                g_free(to_entry);
-                g_dir_close(dir);
-                return -1;
-            }
-            g_free(from_entry);
-            g_free(to_entry);
-        }
-
-        g_dir_close(dir);
-    }
-
-    return 0;
-}
-
-static int glib_fs_copytree(lua_State *L) {
-    const gchar *from = luaL_checkstring(L, 1);
-    const gchar *to = luaL_checkstring(L, 2);
-    gchar *err = NULL;
-
-    if(!g_file_test(from, G_FILE_TEST_EXISTS)) {
-        lua_pushnil(L);
-        lua_pushfstring(L, "An error occurred copying %s: file/directory does not exist", from);
-        return 2;
-    }
-
-    if(recursive_copy(from, to, &err)) {
-        lua_pushnil(L);
-        lua_pushstring(L, err);
-        g_free(err);
-        return 2;
-    }
-    lua_pushboolean(L, 1);
-    return 1;
-}
-
-static int glib_fs_dir_gc(lua_State *L) {
-    GDir *dir = *(GDir **) luaL_checkudata(L, 1, "glib.fs.dir");
-    if(dir) g_dir_close(dir);
-    return 0;
-}
-
-static int glib_fs_queue_gc(lua_State *L) {
-    GQueue *queue = *(GQueue **) luaL_checkudata(L, 1, "glib.fs.queue");
-    if(queue) {
-        guint len = g_queue_get_length(queue);
-        if(len > 0) {
-            guint i = 0;
-            gpointer item;
-            for(i = 0; i < len; i++) {
-                item = g_queue_pop_tail(queue);
-                g_free(item);
-            }
-        }
-        g_queue_free(queue);
-    }
-
-    return 0;
-}
-
-static int glib_fs_stat(lua_State *L) {
-    const gchar *path = luaL_checkstring(L, 1);
-    if(!g_file_test(path, G_FILE_TEST_EXISTS)) {
-        lua_pushnil(L);
-        lua_pushfstring(L, "An error occurred getting info for %s: file/directory does not exist", path);
-        return 2;
-    }
-    
-    struct stat finfo;
-    int rc = g_stat(path, &finfo);
-    if(rc) {
-        lua_pushnil(L);
-        lua_pushfstring(L, "An error occurred getting info for %s", path);
-        return 2;
-    }
-
-    lua_newtable(L);
-    lua_pushnumber(L, (lua_Number) finfo.st_size);
-    lua_setfield(L, -2, "size");
-
-    lua_pushnumber(L, (lua_Number) finfo.st_ino);
-    lua_setfield(L, -2, "inode");
-
-    lua_pushnumber(L, (lua_Number) finfo.st_uid);
-    lua_setfield(L, -2, "uid");
-
-    lua_pushnumber(L, (lua_Number) finfo.st_gid);
-    lua_setfield(L, -2, "gid");
-
-    lua_pushnumber(L, (lua_Number) finfo.st_atime);
-    lua_setfield(L, -2, "atime");
-
-    lua_pushnumber(L, (lua_Number) finfo.st_ctime);
-    lua_setfield(L, -2, "ctime");
-
-    lua_pushnumber(L, (lua_Number) finfo.st_mtime);
-    lua_setfield(L, -2, "mtime");
-
-    const char *type = "file";
-    if(S_ISLNK(finfo.st_mode)) {
-        type = "symlink";
-    } else if(S_ISREG(finfo.st_mode)) {
-        type = "file";
-    } else if(S_ISDIR(finfo.st_mode)) {
-        type = "directory";
-    }
-    lua_pushstring(L, type);
-    lua_setfield(L, -2, "type");
-
-    lua_pushnumber(L, (lua_Number) finfo.st_mode);
-    lua_setfield(L, -2, "mode");
-
-    char perms[4] = "---";
-    if(finfo.st_mode & S_IWUSR) {
-        perms[0] = 'w';
-    } else if(finfo.st_mode & S_IRUSR) {
-        perms[0] = 'r';
-    }
-
-    if(finfo.st_mode & S_IWGRP) {
-        perms[1] = 'w';
-    } else if(finfo.st_mode & S_IRGRP) {
-        perms[1] = 'r';
-    }
-
-    if(finfo.st_mode & S_IWOTH) {
-        perms[2] = 'w';
-    } else if(finfo.st_mode & S_IROTH) {
-        perms[2] = 'r';
-    }
-    lua_pushstring(L, (const char *) perms);
-    lua_setfield(L, -2, "perms");
-
-    return 1;
-}
-
-static const struct luaL_Reg glib_fs_reg [] = {
-    {"getcwd", glib_fs_getcwd},
-    {"chdir", glib_fs_chdir},
-    {"gettmpdir", glib_fs_gettmpdir},
-    {"gethomedir", glib_fs_gethomedir},
-    {"getenvdir", glib_fs_getenvdir},
-    {"mkdir", glib_fs_mkdir},
-    {"mktree", glib_fs_mktree},
-    {"rmdir", glib_fs_rmdir},
-    {"rmtree", glib_fs_rmtree},
-    {"copy", glib_fs_copy},
-    {"copytree", glib_fs_copytree},
-    {"join", glib_fs_join},
-    {"exists", glib_fs_exists},
-    {"isdir", glib_fs_isdir},
-    {"isfile", glib_fs_isfile},
-    {"listdir", glib_fs_listdir},
-    {"iterdir", glib_fs_iterdir},
-    {"glob", glib_fs_glob},
-    {"walk", glib_fs_walk},
-    {"dirname", glib_fs_dirname},
-    {"basename", glib_fs_basename},
-    {"stat", glib_fs_stat},
-    {"chown", glib_fs_chown},
-    {"chmod", glib_fs_chmod},
+static luaL_Reg markup_parse_state_funcs[] = {
+    {"end_parse", markup_end_parse},
+    {"get_position", markup_get_position},
+    {"get_element", markup_get_element},
+    {"get_element_statck", markup_get_element_stack},
+    {"parse", markup_parse},
+    {"push", markup_push},
+    {"__gc", free_markup_parse_state},
     {NULL, NULL}
 };
 
-int luaopen_glib_fs(lua_State *L) {
-    luaL_newmetatable(L, "glib.fs.dir");
-    lua_pushliteral(L, "__gc");
-    lua_pushcfunction(L, glib_fs_dir_gc);
-    lua_settable(L, -3);
+/*********************************************************************/
+/***
+Key-value file parser.
+@section Key-value file parser
+*/
 
-    luaL_newmetatable(L, "glib.fs.queue");
-    lua_pushliteral(L, "__gc");
-    lua_pushcfunction(L, glib_fs_queue_gc);
-    lua_settable(L, -3);
+typedef struct key_file_state {
+    GKeyFile *kf;
+} key_file_state;
 
-    luaL_register(L, "glib.fs", glib_fs_reg);
-
-    lua_getglobal(L, "os");
-    lua_pushliteral(L, "remove");
-    lua_getfield(L, -2, "remove");
-    lua_settable(L, -4);
-
-    lua_pushliteral(L, "move");
-    lua_getfield(L, -2, "rename");
-    lua_settable(L, -4);
-    lua_pop(L, 1);
+/***
+Create a new, empty key file.
+@function key_file_new
+@treturn key_file The empty key file
+*/
+static int glib_key_file_new(lua_State *L)
+{
+    alloc_udata(L, st, key_file_state);
+    st->kf = g_key_file_new();
     return 1;
 }
 
-#endif
+/***
+@type key_file
+*/
 
+static int free_key_file_state(lua_State *L)
+{
+    get_udata(L, 1, st, key_file_state);
+    if(st->kf) {
+	g_key_file_free(st->kf);
+	st->kf = NULL;
+    }
+    return 0;
+}
+
+/***
+Sets character to separate values in lists.
+@function key_file:set_list_separator
+@tparam string sep The separator (only the first byte is used).
+*/
+static int key_file_set_list_separator(lua_State *L)
+{
+    const char *s = luaL_checkstring(L, 2);
+    get_udata(L, 1, st, key_file_state);
+    g_key_file_set_list_separator(st->kf, *s);
+    return 0;
+}
+
+/***
+Load a file.
+@function key_file:load_from_file
+@tparam string f File name
+@tparam boolean|{string,...} dirs (Optional) If true, search relative to
+ standard configuration file directories.  If a table, search realtive to
+ all directories in the table.  Otherwise, the file name is absolute or
+ relative to the current directory.
+@tparam boolean keep_com (Optional) If true, keep comments so they are
+ written by `key_file:to_data`.
+@tparam boolean keep_trans (Optional) If true, keep all translations so they
+ are written by `key_file:to_data`.
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful, or the actual file name if
+ a directory search was done.
+*/
+static int key_file_load_from_file(lua_State *L)
+{
+    GError *err = NULL;
+    GKeyFileFlags fl = 0;
+    gboolean do_search = lua_toboolean(L, 3);
+    const gchar **search_path = NULL;
+    gchar *ret = NULL;
+    const char *s = luaL_checkstring(L, 2);
+    get_udata(L, 1, st, key_file_state);
+
+    if(lua_istable(L, 3)) {
+	int len = lua_len(L, 3);
+	search_path = g_malloc((len + 1) * sizeof(*search_path));
+	search_path[len] = NULL;
+	while(len > 0) {
+	    lua_pushinteger(L, len);
+	    lua_gettable(L, 3);
+	    search_path[--len] = lua_tostring(L, -1);
+	    lua_pop(L, 1);
+	}
+    }
+    if(lua_toboolean(L, 4))
+	fl |= G_KEY_FILE_KEEP_COMMENTS;
+    if(lua_toboolean(L, 5))
+	fl |= G_KEY_FILE_KEEP_TRANSLATIONS;
+    if(!do_search)
+	lua_pushboolean(L, g_key_file_load_from_file(st->kf, s, fl, &err));
+    else if(search_path)
+	lua_pushboolean(L, g_key_file_load_from_dirs(st->kf, s, search_path,
+						     &ret, fl, &err));
+    else
+	lua_pushboolean(L, g_key_file_load_from_data_dirs(st->kf, s, &ret, fl,
+							  &err));
+    if(search_path)
+	g_free(search_path);
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    if(do_search) {
+	lua_pushstring(L, ret);
+	g_free(ret);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Load data.
+@function key_file:load_from_data
+@tparam string s The data
+@tparam boolean keep_com (Optional) If true, keep comments so they are
+ written by `key_file:to_data`.
+@tparam boolean keep_trans (Optional) If true, keep all translations so they
+ are written by `key_file:to_data`.
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful
+*/
+static int key_file_load_from_data(lua_State *L)
+{
+    GError *err = NULL;
+    GKeyFileFlags fl = 0;
+    size_t len;
+    const char *s = luaL_checklstring(L, 2, &len);
+    get_udata(L, 1, st, key_file_state);
+
+    if(lua_toboolean(L, 3))
+	fl |= G_KEY_FILE_KEEP_COMMENTS;
+    if(lua_toboolean(L, 4))
+	fl |= G_KEY_FILE_KEEP_TRANSLATIONS;
+    lua_pushboolean(L, g_key_file_load_from_data(st->kf, s, len, fl, &err));
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Convert entire key file to a string.
+@function key_file:to_data
+@treturn string|nil The key file contents, if successful
+@treturn string An error message if unsuccessful
+*/
+static int key_file_to_data(lua_State *L)
+{
+    GError *err = NULL;
+    gsize len;
+    gchar *ret;
+    get_udata(L, 1, st, key_file_state);
+    ret = g_key_file_to_data(st->kf, &len, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	return 2;
+    }
+    lua_pushlstring(L, ret, len);
+    g_free(ret);
+    return 1;
+}
+
+/***
+Get the start group of the key file.
+@function key_file:get_start_group
+@treturn string The name of the start group
+*/
+static int key_file_get_start_group(lua_State *L)
+{
+    gchar *ret;
+    get_udata(L, 1, st, key_file_state);
+    ret = g_key_file_get_start_group(st->kf);
+    lua_pushstring(L, ret);
+    g_free(ret);
+    return 1;
+}
+
+/***
+Get the names of all groups in the key file.
+@function key_file:get_groups
+@treturn {string,...} A table containing the names of all the groups.
+*/
+static int key_file_get_groups(lua_State *L)
+{
+    gchar **ret;
+    gsize len;
+    get_udata(L, 1, st, key_file_state);
+    ret = g_key_file_get_groups(st->kf, &len);
+    lua_createtable(L, len, 0);
+    while(len > 0) {
+	lua_pushstring(L, ret[len - 1]);
+	lua_rawseti(L, -2, len);
+	--len;
+    }
+    g_strfreev(ret);
+    return 1;
+}
+
+/***
+Get the names of all keys in a group.
+@function key_file:get_keys
+@tparam string group The name of a group to query
+@treturn {string,...}|nil A table containing the names of all keys in the
+ *group*, or nil if unsuccessful
+@treturn string An error message if unsuccessful
+*/
+static int key_file_get_keys(lua_State *L)
+{
+    GError *err = NULL;
+    gchar **ret;
+    gsize len;
+    const char *gr = luaL_checkstring(L, 2);
+    get_udata(L, 1, st, key_file_state);
+    ret = g_key_file_get_keys(st->kf, gr, &len, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_createtable(L, len, 0);
+    while(len > 0) {
+	lua_pushstring(L, ret[len - 1]);
+	lua_rawseti(L, -2, len);
+	--len;
+    }
+    g_strfreev(ret);
+    return 1;
+}
+
+/***
+Check if group exists.
+@function key_file:has_group
+@tparam string group The group name
+@treturn boolean True if group exists in key file.
+*/
+static int key_file_has_group(lua_State *L)
+{
+    get_udata(L, 1, st, key_file_state);
+    lua_pushboolean(L, g_key_file_has_group(st->kf, luaL_checkstring(L, 2)));
+    return 1;
+}
+
+/***
+Check if key exists.
+@function key_file:has_key
+@tparam string group The group name
+@tparam string key The key name
+@treturn boolean True if key exists in key file.
+@treturn string An error message if an error occurred
+*/
+/* glib manual says "use ...get_value() to test", but ...get_value() does
+   an unnecessary malloc, so that seems pointless. */
+static int key_file_has_key(lua_State *L)
+{
+    GError *err = NULL;
+    get_udata(L, 1, st, key_file_state);
+    lua_pushboolean(L, g_key_file_has_key(st->kf, luaL_checkstring(L, 2),
+					  luaL_checkstring(L, 3), &err));
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Obtain raw value of a key.
+@function key_file:raw_get
+@tparam string group The group name
+@tparam string key The key name
+@treturn string|nil The value, or nil on error
+@treturn string An error message on error
+*/
+static int key_file_raw_get(lua_State *L)
+{
+    GError *err = NULL;
+    char *ret;
+    get_udata(L, 1, st, key_file_state);
+    ret = g_key_file_get_value(st->kf, luaL_checkstring(L, 2),
+			       luaL_checkstring(L, 3), &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushstring(L, ret);
+    g_free(ret);
+    return 1;
+}
+
+/***
+Obtain value of a key.
+@function key_file:get
+@tparam string group The group name
+@tparam string key The key
+@tparam string locale (Optional) If specified, get value translated into this
+ locale, if available
+@treturn string|nil The parsed UTF-8 value, or nil on error
+@treturn string An error message on error
+*/
+static int key_file_get(lua_State *L)
+{
+    GError *err = NULL;
+    char *ret;
+    const char *locale = lua_isstring(L, 4) ? lua_tostring(L, 4) : NULL;
+    get_udata(L, 1, st, key_file_state);
+    ret = g_key_file_get_locale_string(st->kf, luaL_checkstring(L, 2),
+				       luaL_checkstring(L, 3), locale, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushstring(L, ret);
+    g_free(ret);
+    return 1;
+}
+
+/***
+Obtain value of a boolean key.
+@function key_file:get_boolean
+@tparam string group The group name
+@tparam string key The key
+@treturn boolean The value, or false on error
+@treturn string An error message on error
+*/
+static int key_file_get_boolean(lua_State *L)
+{
+    GError *err = NULL;
+    get_udata(L, 1, st, key_file_state);
+    lua_pushboolean(L, g_key_file_get_boolean(st->kf,
+					      luaL_checkstring(L, 2),
+					      luaL_checkstring(L, 3),
+					      &err));
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Obtain value of a numeric key.
+@function key_file:get_number
+@tparam string group The group name
+@tparam string key The key
+@treturn number|nil The value, or nil on error
+@treturn string An error message on error
+*/
+static int key_file_get_number(lua_State *L)
+{
+    GError *err = NULL;
+    gdouble val;
+    get_udata(L, 1, st, key_file_state);
+    val = g_key_file_get_double(st->kf, luaL_checkstring(L, 2),
+				luaL_checkstring(L, 3), &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushnumber(L, val);
+    return 1;
+}
+
+/***
+Obtain value of a string list key.
+@function: key_file:get_list
+@tparam string group The group name
+@tparam string key The key
+@tparam string locale (Optional) If specified, get value translated into this
+ locale, if available
+@treturn {string,...}|nil The list of parsed UTF-8 values, or nil on error.
+@treturn string An error message on error.
+*/
+static int key_file_get_list(lua_State *L)
+{
+    GError *err = NULL;
+    gsize len;
+    char **ret;
+    const char *locale = lua_isstring(L, 4) ? lua_tostring(L, 4) : NULL;
+    get_udata(L, 1, st, key_file_state);
+    ret = g_key_file_get_locale_string_list(st->kf, luaL_checkstring(L, 2),
+					    luaL_checkstring(L, 3), locale,
+					    &len, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_createtable(L, len, 0);
+    while(len > 0) {
+	lua_pushstring(L, ret[len - 1]);
+	lua_rawseti(L, -2, len);
+	--len;
+    }
+    g_strfreev(ret);
+    return 1;
+}
+
+/***
+Obtain value of a boolean list key.
+@function: key_file:get_boolean_list
+@tparam string group The group name
+@tparam string key The key
+@treturn {boolean,...}|nil The list of values, or nil on error.
+@treturn string An error message on error.
+*/
+static int key_file_get_boolean_list(lua_State *L)
+{
+    GError *err = NULL;
+    gsize len;
+    gboolean *ret;
+    get_udata(L, 1, st, key_file_state);
+    ret = g_key_file_get_boolean_list(st->kf, luaL_checkstring(L, 2),
+				      luaL_checkstring(L, 3), &len, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_createtable(L, len, 0);
+    while(len > 0) {
+	lua_pushboolean(L, ret[len - 1]);
+	lua_rawseti(L, -2, len);
+	--len;
+    }
+    g_free(ret);
+    return 1;
+}
+
+/***
+Obtain value of a number list key.
+@function: key_file:get_boolean_list
+@tparam string group The group name
+@tparam string key The key
+@treturn {number,...}|nil The list of values, or nil on error.
+@treturn string An error message on error.
+*/
+static int key_file_get_number_list(lua_State *L)
+{
+    GError *err = NULL;
+    gsize len;
+    gdouble *ret;
+    get_udata(L, 1, st, key_file_state);
+    ret = g_key_file_get_double_list(st->kf, luaL_checkstring(L, 2),
+				     luaL_checkstring(L, 3), &len, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_createtable(L, len, 0);
+    while(len > 0) {
+	lua_pushboolean(L, ret[len - 1]);
+	lua_rawseti(L, -2, len);
+	--len;
+    }
+    g_free(ret);
+    return 1;
+}
+
+/***
+Obtain comment above a key or group.
+@function key_file:get_comment
+@tparam string group (Optional) The group name; if unspecified, the first
+ group is used, and *key* is ignored.
+@tparam string key (Optional) The key name; if specified, obtain comment
+ above the key; otherwise, obtain comment above group
+@treturn string|nil The comment string, or nil on error
+@treturn string An error message on error
+*/
+static int key_file_get_comment(lua_State *L)
+{
+    GError *err = NULL;
+    char *ret;
+    const char *gr = lua_isnoneornil(L, 2) ? NULL : luaL_checkstring(L, 2);
+    const char *key = !gr || lua_isnoneornil(L, 3) ? NULL : luaL_checkstring(L, 3);
+    get_udata(L, 1, st, key_file_state);
+    ret = g_key_file_get_comment(st->kf, gr, key, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushstring(L, ret);
+    g_free(ret);
+    return 1;
+}
+
+/***
+Set raw value of a key.
+@function key_file:raw_set
+@tparam string group The group name
+@tparam string key The key name
+@tparam string value The value
+*/
+static int key_file_raw_set(lua_State *L)
+{
+    get_udata(L, 1, st, key_file_state);
+    g_key_file_set_value(st->kf, luaL_checkstring(L, 2),
+			 luaL_checkstring(L, 3), luaL_checkstring(L, 4));
+    return 0;
+}
+
+/***
+Set value of a key.
+@function key_file:set
+@tparam string group The group name
+@tparam string key The key
+@tparam string value The value
+@tparam string|boolean locale (Optional) If a string, set value translated
+ into this locale.  Otherwise, if true, set value translated into current
+ locale.
+*/
+static int key_file_set(lua_State *L)
+{
+    gboolean has_locale = lua_toboolean(L, 5);
+    const char *locale = lua_isstring(L, 5) ? lua_tostring(L, 5) : NULL;
+    get_udata(L, 1, st, key_file_state);
+    if(has_locale)
+	g_key_file_set_locale_string(st->kf, luaL_checkstring(L, 2),
+				     luaL_checkstring(L, 3), locale,
+				     luaL_checkstring(L, 4));
+    else
+	g_key_file_set_string(st->kf, luaL_checkstring(L, 2),
+			      luaL_checkstring(L, 3), luaL_checkstring(L, 4));
+    return 0;
+}
+
+/***
+Set value of a boolean key.
+@function key_file:set_boolean
+@tparam string group The group name
+@tparam string key The key
+@tparam boolean value The value
+*/
+static int key_file_set_boolean(lua_State *L)
+{
+    get_udata(L, 1, st, key_file_state);
+    g_key_file_set_boolean(st->kf, luaL_checkstring(L, 2),
+			   luaL_checkstring(L, 3), lua_toboolean(L, 4));
+    return 0;
+}
+
+/***
+Set value of a numeric key.
+@function key_file:set_number
+@tparam string group The group name
+@tparam string key The key
+@tparam number value The value
+*/
+static int key_file_set_number(lua_State *L)
+{
+    get_udata(L, 1, st, key_file_state);
+    g_key_file_set_double(st->kf, luaL_checkstring(L, 2),
+			  luaL_checkstring(L, 3), luaL_checknumber(L, 4));
+    return 0;
+}
+
+/***
+Set value of a string list key.
+@function: key_file:set_list
+@tparam string group The group name
+@tparam string key The key
+@tparam {string,...} value The value
+@tparam string|boolean locale (Optional) If a string, set value translated
+ into this locale.  Otherwise, if true, set value translated into current
+ locale.
+*/
+static int key_file_set_list(lua_State *L)
+{
+    const char *gr = luaL_checkstring(L, 2);
+    const char *key = luaL_checkstring(L, 3);
+    gsize len, i;
+    const char **strs;
+    gboolean has_locale = lua_toboolean(L, 5);
+    const char *locale = lua_isstring(L, 5) ? lua_tostring(L, 5) : NULL;
+    get_udata(L, 1, st, key_file_state);
+    luaL_checktype(L, 4, LUA_TTABLE);
+    len = lua_len(L, 4);
+    strs = g_malloc((len + 1) * sizeof(*strs));
+    strs[len] = NULL;
+    for(i = 0; i < len; i++) {
+	lua_pushinteger(L, i + 1);
+	lua_gettable(L, 4);
+	strs[i] = lua_tostring(L, -1);
+	lua_pop(L, 1);
+    }
+    if(has_locale)
+	g_key_file_set_locale_string_list(st->kf, gr, key, locale, strs, len);
+    else
+	g_key_file_set_string_list(st->kf, gr, key, strs, len);
+    g_free(strs);
+    return 0;
+}
+
+/***
+Set value of a boolean list key.
+@function: key_file:set_boolean_list
+@tparam string group The group name
+@tparam string key The key
+@tparam {boolean,...} value The value
+*/
+static int key_file_set_boolean_list(lua_State *L)
+{
+    const char *gr = luaL_checkstring(L, 2);
+    const char *key = luaL_checkstring(L, 3);
+    gsize len, i;
+    gboolean *bools;
+    get_udata(L, 1, st, key_file_state);
+    luaL_checktype(L, 4, LUA_TTABLE);
+    len = lua_len(L, 4);
+    bools = g_malloc(len * sizeof(*bools));
+    for(i = 0; i < len; i++) {
+	lua_pushinteger(L, i + 1);
+	lua_gettable(L, 4);
+	bools[i] = lua_toboolean(L, -1);
+	lua_pop(L, 1);
+    }
+    g_key_file_set_boolean_list(st->kf, gr, key, bools, len);
+    g_free(bools);
+    return 0;
+}
+
+/***
+Set value of a number list key.
+@function: key_file:set_boolean_list
+@tparam string group The group name
+@tparam string key The key
+*/
+static int key_file_set_number_list(lua_State *L)
+{
+    const char *gr = luaL_checkstring(L, 2);
+    const char *key = luaL_checkstring(L, 3);
+    gsize len, i;
+    gdouble *vals;
+    get_udata(L, 1, st, key_file_state);
+    luaL_checktype(L, 4, LUA_TTABLE);
+    len = lua_len(L, 4);
+    vals = g_malloc(len * sizeof(*vals));
+    for(i = 0; i < len; i++) {
+	lua_pushinteger(L, i + 1);
+	lua_gettable(L, 4);
+	vals[i] = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+    }
+    g_key_file_set_double_list(st->kf, gr, key, vals, len);
+    g_free(vals);
+    return 0;
+}
+
+/***
+Set comment above a key or group.
+@function key_file:set_comment
+@tparam string comment The comment
+@tparam string group (Optional) The group name; if unspecified, the first
+ group is used, and *key* is ignored.
+@tparam string key (Optional) The key name; if specified, obtain comment
+ above the key; otherwise, obtain comment above group
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful
+*/
+static int key_file_set_comment(lua_State *L)
+{
+    GError *err = NULL;
+    const char *gr = lua_isnoneornil(L, 3) ? NULL : luaL_checkstring(L, 3);
+    const char *key = !gr || lua_isnoneornil(L, 4) ? NULL : luaL_checkstring(L, 4);
+    get_udata(L, 1, st, key_file_state);
+    lua_pushboolean(L, g_key_file_set_comment(st->kf, gr, key,
+					      luaL_checkstring(L, 2), &err));
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Remove a group or key.
+@function key_file:remove
+@tparam string group The group
+@tparam string key (Optional) The key.  If specified, remove that key.
+ Otherwise, remove the group *group*.
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful
+*/
+static int key_file_remove(lua_State *L)
+{
+    GError *err = NULL;
+    const char *gr = luaL_checkstring(L, 2);
+    const char *key = lua_isnoneornil(L, 3) ? NULL : luaL_checkstring(L, 3);
+    get_udata(L, 1, st, key_file_state);
+    if(key)
+	lua_pushboolean(L, g_key_file_remove_key(st->kf, gr, key, &err));
+    else
+	lua_pushboolean(L, g_key_file_remove_group(st->kf, gr, &err));
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Remove comment above a key or group.
+@function key_file:remove_comment
+@tparam string group (Optional) The group name; if unspecified, the first
+ group is used, and *key* is ignored.
+@tparam string key (Optional) The key name; if specified, obtain comment
+ above the key; otherwise, obtain comment above group
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful
+*/
+static int key_file_remove_comment(lua_State *L)
+{
+    GError *err = NULL;
+    const char *gr = lua_isnoneornil(L, 2) ? NULL : luaL_checkstring(L, 2);
+    const char *key = !gr || lua_isnoneornil(L, 3) ? NULL : luaL_checkstring(L, 3);
+    get_udata(L, 1, st, key_file_state);
+    lua_pushboolean(L, g_key_file_remove_comment(st->kf, gr, key, &err));
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+static luaL_Reg key_file_state_funcs[] = {
+    {"set_list_separator", key_file_set_list_separator},
+    {"load_from_file", key_file_load_from_file},
+    {"load_from_data", key_file_load_from_data},
+    {"to_data", key_file_to_data},
+    {"get_start_group", key_file_get_start_group},
+    {"get_groups", key_file_get_groups},
+    {"get_keys", key_file_get_keys},
+    {"has_group", key_file_has_group},
+    {"has_key", key_file_has_key},
+    {"raw_get", key_file_raw_get},
+    {"get", key_file_get},
+    {"get_boolean", key_file_get_boolean},
+    {"get_number", key_file_get_number},
+    {"get_list", key_file_get_list},
+    {"get_boolean_list", key_file_get_boolean_list},
+    {"get_number_list", key_file_get_number_list},
+    {"get_comment", key_file_get_comment},
+    {"raw_set", key_file_raw_set},
+    {"set", key_file_set},
+    {"set_boolean", key_file_set_boolean},
+    {"set_number", key_file_set_number},
+    {"set_list", key_file_set_list},
+    {"set_boolean_list", key_file_set_boolean_list},
+    {"set_number_list", key_file_set_number_list},
+    {"set_comment", key_file_set_comment},
+    {"remove", key_file_remove},
+    {"remove_comment", key_file_remove_comment},
+    {"__gc", free_key_file_state},
+    {NULL, NULL}
+};
+
+
+/*********************************************************************/
+/***
+Bookmark file parser.
+@section bookmark file parser
+*/
+
+typedef struct bookmark_file_state {
+    GBookmarkFile *bmf;
+} bookmark_file_state;
+
+/***
+Create a new, empty bookmark file.
+@function bookmark_file_new
+@treturn bookmark_file The empty bookmark file.
+*/
+static int glib_bookmark_file_new(lua_State *L)
+{
+    alloc_udata(L, st, bookmark_file_state);
+    st->bmf = g_bookmark_file_new();
+    return 1;
+}
+
+/***
+@type bookmark_file
+*/
+
+static int free_bookmark_file_state(lua_State *L)
+{
+    get_udata(L, 1, st, bookmark_file_state);
+    if(st->bmf) {
+	g_bookmark_file_free(st->bmf);
+	st->bmf = NULL;
+    }
+    return 0;
+}
+
+/***
+Load a file.
+@function bookmark_file:load_from_file
+@tparam string f File name
+@tparam boolean use_dirs (Optional) If true, search relative to
+ standard configuration file directories.
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful, or the actual file name if
+ a directory search was done.
+*/
+static int bookmark_file_load_from_file(lua_State *L)
+{
+    GError *err = NULL;
+    gboolean do_search = lua_toboolean(L, 3);
+    gchar *ret = NULL;
+    const char *s = luaL_checkstring(L, 2);
+    get_udata(L, 1, st, bookmark_file_state);
+
+    if(!do_search)
+	lua_pushboolean(L, g_bookmark_file_load_from_file(st->bmf, s, &err));
+    else
+	lua_pushboolean(L, g_bookmark_file_load_from_data_dirs(st->bmf, s, &ret,
+							  &err));
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    if(do_search) {
+	lua_pushstring(L, ret);
+	g_free(ret);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Load data.
+@function bookmark_file:load_from_data
+@tparam string s The data
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful
+*/
+static int bookmark_file_load_from_data(lua_State *L)
+{
+    GError *err = NULL;
+    size_t len;
+    const char *s = luaL_checklstring(L, 2, &len);
+    get_udata(L, 1, st, bookmark_file_state);
+
+    lua_pushboolean(L, g_bookmark_file_load_from_data(st->bmf, s, len, &err));
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Convert bookmark file to a string.
+@function bookmark_file:to_data
+@treturn string|nil The bookmark file contents, if successful
+@treturn string An error message if unsuccessful
+*/
+static int bookmark_file_to_data(lua_State *L)
+{
+    GError *err = NULL;
+    gsize len;
+    gchar *ret;
+    get_udata(L, 1, st, bookmark_file_state);
+    ret = g_bookmark_file_to_data(st->bmf, &len, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	return 2;
+    }
+    lua_pushlstring(L, ret, len);
+    g_free(ret);
+    return 1;
+}
+
+/***
+Write bookmark file to a file.
+@function bookmark_file:to_file
+@tparam string f The file name
+@treturn boolean True if successful
+@treturn string An error message if unsuccessful
+*/
+static int bookmark_file_to_file(lua_State *L)
+{
+    GError *err = NULL;
+    get_udata(L, 1, st, bookmark_file_state);
+    lua_pushboolean(L, g_bookmark_file_to_file(st->bmf, luaL_checkstring(L, 2),
+					       &err));
+    if(err) {
+	lua_pushstring(L, err->message);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Check if bookmark file has given URI.
+@function bookmark_file:has_item
+@tparam string uri The URI to find
+@treturn boolean True if present
+*/
+static int bookmark_file_has_item(lua_State *L)
+{
+    get_udata(L, 1, st, bookmark_file_state);
+    lua_pushboolean(L, g_bookmark_file_has_item(st->bmf, luaL_checkstring(L, 2)));
+    return 1;
+}
+
+/***
+Check if bookmark file has given URI in a given group.
+@function bookmark_file:has_group
+@tparam string uri The URI to find
+@tparam string group The group to find
+@treturn boolean True if present in group
+@treturn string Error message if error
+*/
+static int bookmark_file_has_group(lua_State *L)
+{
+    GError *err = NULL;
+    get_udata(L, 1, st, bookmark_file_state);
+    lua_pushboolean(L, g_bookmark_file_has_group(st->bmf,
+						 luaL_checkstring(L, 2),
+						 luaL_checkstring(L, 3),
+						 &err));
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Check if bookmark file has given URI registered by a given application.
+@function bookmark_file:has_application
+@tparam string uri The URI to find
+@tparam string app The application
+@treturn boolean True if registed by application
+*/
+static int bookmark_file_has_application(lua_State *L)
+{
+    GError *err = NULL;
+    get_udata(L, 1, st, bookmark_file_state);
+    lua_pushboolean(L, g_bookmark_file_has_application(st->bmf,
+						       luaL_checkstring(L, 2),
+						       luaL_checkstring(L, 3),
+						       &err));
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Get the number of bookmarks.
+This is the standard Lua # operator, applied to a bookmark file.
+@function bookmark_file:__len
+@treturn number The number of bookmarks.
+*/
+static int bookmark_file_len(lua_State *L)
+{
+    get_udata(L, 1, st, bookmark_file_state);
+    lua_pushnumber(L, g_bookmark_file_get_size(st->bmf));
+    return 1;
+}
+
+/***
+Get all URIs.
+@function bookmark_file:uris
+@treturn {string,...} All URIs.
+*/
+static int bookmark_file_uris(lua_State *L)
+{
+    gsize len;
+    gchar **res;
+    get_udata(L, 1, st, bookmark_file_state);
+    res = g_bookmark_file_get_uris(st->bmf, &len);
+    lua_createtable(L, len, 0);
+    while(len > 0) {
+	lua_pushstring(L, res[len - 1]);
+	lua_rawseti(L, -2, len);
+	--len;
+    }
+    g_strfreev(res);
+    return 1;
+}
+
+/***
+Get title for URI
+@function bookmark_file:title
+@tparam string uri The URI
+@treturn string|nil Its title if successful
+@treturn string Error message if unsuccessful
+*/
+static int bookmark_file_title(lua_State *L)
+{
+    GError *err = NULL;
+    char *res;
+    get_udata(L, 1, st, bookmark_file_state);
+    res = g_bookmark_file_get_title(st->bmf, luaL_checkstring(L, 2), &err);
+    lua_pushstring(L, res);
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    g_free(res);
+    return 1;
+}
+
+/***
+Get description for URI
+@function bookmark_file:description
+@tparam string uri The URI
+@treturn string|nil Its description if successful
+@treturn string Error message if unsuccessful
+*/
+static int bookmark_file_description(lua_State *L)
+{
+    GError *err = NULL;
+    char *res;
+    get_udata(L, 1, st, bookmark_file_state);
+    res = g_bookmark_file_get_description(st->bmf, luaL_checkstring(L, 2), &err);
+    lua_pushstring(L, res);
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    g_free(res);
+    return 1;
+}
+
+/***
+Get MIME type for URI
+@function bookmark_file:mime_type
+@tparam string uri The URI
+@treturn string|nil Its MIME type if successful
+@treturn string Error message if unsuccessful
+*/
+static int bookmark_file_mime_type(lua_State *L)
+{
+    GError *err = NULL;
+    char *res;
+    get_udata(L, 1, st, bookmark_file_state);
+    res = g_bookmark_file_get_mime_type(st->bmf, luaL_checkstring(L, 2), &err);
+    lua_pushstring(L, res);
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    g_free(res);
+    return 1;
+}
+
+/***
+Get private flag for URI
+@function bookmark_file:is_private
+@tparam string uri The URI
+@treturn boolean True if private flag set
+@treturn string Error message on error
+*/
+static int bookmark_file_is_private(lua_State *L)
+{
+    GError *err = NULL;
+    get_udata(L, 1, st, bookmark_file_state);
+    lua_pushboolean(L, g_bookmark_file_get_is_private(st->bmf,
+						      luaL_checkstring(L, 2),
+						      &err));
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Get icon for URI.
+@function bookmark_file:icon
+@tparam string uri The URI
+@treturn string|nil The icon URL if successful
+@treturn string The icon's MIME type if successful, or an error message if
+ unsuccessful.
+*/
+static int bookmark_file_icon(lua_State *L)
+{
+    GError *err = NULL;
+    char *res, *mt;
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_get_icon(st->bmf, luaL_checkstring(L, 2), &res, &mt, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushstring(L, res);
+    g_free(res);
+    lua_pushstring(L, mt);
+    g_free(mt);
+    return 1;
+}
+
+/***
+Get time URI was added.
+@function bookmark_file:added
+@tparam string uri The URI
+@treturn number|nil The time stamp, as seconds from epoch, if successful.
+@treturn string An error message if unsuccessful.
+*/
+static int bookmark_file_added(lua_State *L)
+{
+    GError *err = NULL;
+    time_t t;
+    get_udata(L, 1, st, bookmark_file_state);
+    t = g_bookmark_file_get_added(st->bmf, luaL_checkstring(L, 2), &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushnumber(L, t);
+    return 1;
+}
+
+/***
+Get time URI was last modified.
+@function bookmark_file:modified
+@tparam string uri The URI
+@treturn number|nil The time stamp, as seconds from epoch, if successful.
+@treturn string An error message if unsuccessful.
+*/
+static int bookmark_file_modified(lua_State *L)
+{
+    GError *err = NULL;
+    time_t t;
+    get_udata(L, 1, st, bookmark_file_state);
+    t = g_bookmark_file_get_modified(st->bmf, luaL_checkstring(L, 2), &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushnumber(L, t);
+    return 1;
+}
+
+/***
+Get time URI was last visited.
+@function bookmark_file:visited
+@tparam string uri The URI
+@treturn number|nil The time stamp, as seconds from epoch, if successful.
+@treturn string An error message if unsuccessful.
+*/
+static int bookmark_file_visited(lua_State *L)
+{
+    GError *err = NULL;
+    time_t t;
+    get_udata(L, 1, st, bookmark_file_state);
+    t = g_bookmark_file_get_visited(st->bmf, luaL_checkstring(L, 2), &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushnumber(L, t);
+    return 1;
+}
+
+/***
+Get list of groups to which URI belongs.
+@function bookmark_file:groups
+@tparam string uri The URI
+@treturn {string,...}|nil The list of groups, if successful
+@treturn string An error message, if unsuccessful
+*/
+static int bookmark_file_groups(lua_State *L)
+{
+    GError *err = NULL;
+    gsize len;
+    gchar **res;
+    get_udata(L, 1, st, bookmark_file_state);
+    res = g_bookmark_file_get_groups(st->bmf, luaL_checkstring(L, 2), &len, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_createtable(L, len, 0);
+    while(len > 0) {
+	lua_pushstring(L, res[len - 1]);
+	lua_rawseti(L, -2, len);
+	--len;
+    }
+    g_strfreev(res);
+    return 1;
+}
+
+/***
+Get list of applications which registered this URI.
+@function bookmark_file:applications
+@tparam string uri The URI
+@treturn {string,...}|nil The list of applications, if successful
+@treturn string An error message, if unsuccessful
+*/
+static int bookmark_file_applications(lua_State *L)
+{
+    GError *err = NULL;
+    gsize len;
+    gchar **res;
+    get_udata(L, 1, st, bookmark_file_state);
+    res = g_bookmark_file_get_applications(st->bmf, luaL_checkstring(L, 2),
+					   &len, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_createtable(L, len, 0);
+    while(len > 0) {
+	lua_pushstring(L, res[len - 1]);
+	lua_rawseti(L, -2, len);
+	--len;
+    }
+    g_strfreev(res);
+    return 1;
+}
+
+/***
+Obtain registration information for application which registered URI.
+@function boomark_file:app_info
+@tparam string uri The URI
+@tparam string app Application name
+@treturn string|nil The command to invoke *app* on *uri* (or nil on error)
+@treturn number|string The number of times *app* registered *uri* (or
+ error message on error)
+@treturn number|nil The last time *app* registered *uri* (or not present on
+ error)
+*/
+static int bookmark_file_app_info(lua_State *L)
+{
+    GError *err = NULL;
+    time_t t;
+    guint count;
+    gchar *exec;
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_get_app_info(st->bmf, luaL_checkstring(L, 2),
+				 luaL_checkstring(L, 3), &exec, &count,
+				 &t, &err);
+    if(err) {
+	lua_pushnil(L);
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    lua_pushstring(L, exec);
+    g_free(exec);
+    lua_pushnumber(L, count);
+    lua_pushnumber(L, t);
+    return 1;
+}
+
+/***
+Set title for URI
+@function bookmark_file:set_title
+@tparam string uri (Optional) The URI.  If nil, the title of the bookmark
+ file is set.
+@tparam string title The new title
+*/
+static int bookmark_file_set_title(lua_State *L)
+{
+    const char *uri = lua_isnoneornil(L, 2) ? NULL : luaL_checkstring(L, 2);
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_set_title(st->bmf, uri, luaL_checkstring(L, 3));
+    return 0;
+}
+
+/***
+Set description for URI
+@function bookmark_file:set_description
+@tparam string uri (Optional) The URI.  If nil, the title of the bookmark
+ file is set.
+@tparam string desc The new description
+*/
+static int bookmark_file_set_description(lua_State *L)
+{
+    const char *uri = lua_isnoneornil(L, 2) ? NULL : luaL_checkstring(L, 2);
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_set_description(st->bmf, uri, luaL_checkstring(L, 3));
+    return 0;
+}
+
+/***
+Set MIME type for URI
+@function bookmark_file:set_mime_type
+@tparam string uri The URI
+@tparam string mime_type The new MIME type
+*/
+static int bookmark_file_set_mime_type(lua_State *L)
+{
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_set_mime_type(st->bmf, luaL_checkstring(L, 2),
+				  luaL_checkstring(L, 3));
+    return 0;
+}
+
+/***
+Set private flag for URI
+@function bookmark_file:set_is_private
+@tparam string uri The URI
+@tparam boolean private The new flag
+*/
+static int bookmark_file_set_is_private(lua_State *L)
+{
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_set_is_private(st->bmf, luaL_checkstring(L, 2),
+				   lua_toboolean(L, 3));
+    return 0;
+}
+
+/***
+Set icon for URI.
+@function bookmark_file:set_icon
+@tparam string uri The URI
+@tparam string icon The icon URL
+@tparam string mime_type The icon's MIME type
+*/
+static int bookmark_file_set_icon(lua_State *L)
+{
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_set_icon(st->bmf, luaL_checkstring(L, 2),
+			     luaL_checkstring(L, 3), luaL_checkstring(L, 4));
+    return 0;
+}
+
+/***
+Set time URI was added.
+@function bookmark_file:set_added
+@tparam string uri The URI
+@tparam number time The time stamp, as seconds from epoch
+*/
+static int bookmark_file_set_added(lua_State *L)
+{
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_set_added(st->bmf, luaL_checkstring(L, 2),
+			      luaL_checknumber(L, 3));
+    return 0;
+}
+
+/***
+Set time URI was modified.
+@function bookmark_file:set_modified
+@tparam string uri The URI
+@tparam number time The time stamp, as seconds from epoch
+*/
+static int bookmark_file_set_modified(lua_State *L)
+{
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_set_modified(st->bmf, luaL_checkstring(L, 2),
+			      luaL_checknumber(L, 3));
+    return 0;
+}
+
+/***
+Set time URI was visited.
+@function bookmark_file:set_visited
+@tparam string uri The URI
+@tparam number time The time stamp, as seconds from epoch
+*/
+static int bookmark_file_set_visited(lua_State *L)
+{
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_set_visited(st->bmf, luaL_checkstring(L, 2),
+			      luaL_checknumber(L, 3));
+    return 0;
+}
+
+/***
+Set list of groups to which URI belongs.
+@function bookmark_file:set_groups
+@tparam string uri The URI
+@treturn {string,...} The list of groups
+*/
+static int bookmark_file_set_groups(lua_State *L)
+{
+    gsize len;
+    const gchar **gr;
+    const char *uri = luaL_checkstring(L, 2);
+    get_udata(L, 1, st, bookmark_file_state);
+    luaL_checktype(L, 3, LUA_TTABLE);
+    len = lua_len(L, 3);
+    gr = g_malloc(len * sizeof(*gr));
+    while(len > 0) {
+	lua_pushinteger(L, len);
+	lua_gettable(L, 3);
+	gr[--len] = lua_tostring(L, -1);
+	lua_pop(L, 1);
+    }
+    g_bookmark_file_set_groups(st->bmf, uri, gr, len);
+    g_free(gr);
+    return 0;
+}
+
+/***
+Set registration information for application which registered URI.
+@function boomark_file:set_app_info
+@tparam string uri The URI
+@tparam string app Application name
+@tparam string exec The command to invoke *app* on *uri* (%f == file, %u == uri)
+@tparam number rcount (Optional) The number of times *app* registered *uri*
+ (absent, nil, or less than 0 to simply increment, or 0 to remove)
+@tparam number stamp (Optional) The last time *app* registered *uri*
+ (or -1, nil, or absent for current time)
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful
+*/
+static int bookmark_file_set_app_info(lua_State *L)
+{
+    GError *err = NULL;
+    gint rcount = lua_isnoneornil(L, 5) ? -1 : luaL_checknumber(L, 5);
+    time_t stamp = lua_isnoneornil(L, 6) ? -1 : luaL_checknumber(L, 6);
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_set_app_info(st->bmf, luaL_checkstring(L, 2),
+				 luaL_checkstring(L, 3),
+				 luaL_checkstring(L, 4), rcount, stamp, &err);
+    lua_pushboolean(L, !err);
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Add a group to the list of groups URI belongs to.
+@function bookmark_file:add_group
+@tparam string uri The URI
+@tparam string group The group
+*/
+static int bookmark_file_add_group(lua_State *L)
+{
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_add_group(st->bmf, luaL_checkstring(L, 2),
+			      luaL_checkstring(L, 3));
+    return 0;
+}
+
+/***
+Add an application to the list of applications that registered this URI.
+@function bookmark_file:add_application
+@tparam string uri The URI
+@tparam string app The application name
+@tparam string exec The command line to invoke application on URI (%f = file,
+ %u = URI)
+*/
+static int bookmark_file_add_application(lua_State *L)
+{
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_add_application(st->bmf, luaL_checkstring(L, 2),
+				    luaL_checkstring(L, 3),
+				    luaL_checkstring(L, 4));
+    return 0;
+}
+
+/***
+Remove a group from the list of groups URI belongs to.
+@function bookmark_file:remove_group
+@tparam string uri The URI
+@tparam string group The group
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful
+*/
+static int bookmark_file_remove_group(lua_State *L)
+{
+    GError *err = NULL;
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_remove_group(st->bmf, luaL_checkstring(L, 2),
+				 luaL_checkstring(L, 3), &err);
+    lua_pushboolean(L, !err);
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Remove an application from the list of applications that registered this URI.
+@function bookmark_file:remove_application
+@tparam string uri The URI
+@tparam string app The application name
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful
+*/
+static int bookmark_file_remove_application(lua_State *L)
+{
+    GError *err = NULL;
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_remove_application(st->bmf, luaL_checkstring(L, 2),
+				       luaL_checkstring(L, 3), &err);
+    lua_pushboolean(L, !err);
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Remove URI.
+@function bookmark_file:remove
+@tparam string uri The URI
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful
+*/
+static int bookmark_file_remove(lua_State *L)
+{
+    GError *err = NULL;
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_remove_item(st->bmf, luaL_checkstring(L, 2), &err);
+    lua_pushboolean(L, !err);
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+/***
+Change URI, retaining group and application information.
+@function bookmark_file:move
+@tparam string uri The URI
+@tparam string new The new URI
+@treturn boolean True if successful
+@treturn string Error message if unsuccessful
+*/
+static int bookmark_file_move(lua_State *L)
+{
+    GError *err = NULL;
+    get_udata(L, 1, st, bookmark_file_state);
+    g_bookmark_file_move_item(st->bmf, luaL_checkstring(L, 2),
+			      luaL_checkstring(L, 3), &err);
+    lua_pushboolean(L, !err);
+    if(err) {
+	lua_pushstring(L, err->message);
+	g_error_free(err);
+	return 2;
+    }
+    return 1;
+}
+
+static luaL_Reg bookmark_file_state_funcs[] = {
+    {"load_from_file", bookmark_file_load_from_file},
+    {"load_from_data", bookmark_file_load_from_data},
+    {"to_data", bookmark_file_to_data},
+    {"to_file", bookmark_file_to_file},
+    {"has_item", bookmark_file_has_item},
+    {"has_group", bookmark_file_has_group},
+    {"has_application", bookmark_file_has_application},
+    {"__len", bookmark_file_len},
+    {"uris", bookmark_file_uris},
+    {"title", bookmark_file_title},
+    {"description", bookmark_file_description},
+    {"mime_type", bookmark_file_mime_type},
+    {"is_private", bookmark_file_is_private},
+    {"icon", bookmark_file_icon},
+    {"added", bookmark_file_added},
+    {"modified", bookmark_file_modified},
+    {"visited", bookmark_file_visited},
+    {"groups", bookmark_file_groups},
+    {"applications", bookmark_file_applications},
+    {"app_info", bookmark_file_app_info},
+    {"set_title", bookmark_file_set_title},
+    {"set_description", bookmark_file_set_description},
+    {"set_mime_type", bookmark_file_set_mime_type},
+    {"set_is_private", bookmark_file_set_is_private},
+    {"set_icon", bookmark_file_set_icon},
+    {"set_added", bookmark_file_set_added},
+    {"set_modified", bookmark_file_set_modified},
+    {"set_visited", bookmark_file_set_visited},
+    {"set_groups", bookmark_file_set_groups},
+    {"set_app_info", bookmark_file_set_app_info},
+    {"add_group", bookmark_file_add_group},
+    {"add_application", bookmark_file_add_application},
+    {"remove_group", bookmark_file_remove_group},
+    {"remove_application", bookmark_file_remove_application},
+    {"remove", bookmark_file_remove},
+    {"move", bookmark_file_move},
+    {"__gc", free_bookmark_file_state},
+    {NULL, NULL}
+};
+
+/*********************************************************************/
 #define fent(n) {#n, glib_##n}
 static luaL_Reg lua_funcs[] = {
     /* no support for Atomic Operations */
@@ -4804,32 +8288,74 @@ static luaL_Reg lua_funcs[] = {
     /* Spawning Processes */
     fent(spawn),
     /* File Utilities */
+    fent(file_get),
+    fent(file_set),
     fent(is_dir),
     fent(is_file),
     fent(is_symlink),
     fent(is_exec),
     fent(exists),
+    fent(umask),
     fent(mkstemp),
     fent(open_tmp),
+    fent(read_link),
+    fent(mkdir_with_parents),
+    fent(mkdtemp),
+    fent(dir_make_tmp),
     fent(dir),
+    /* no support for mem-mapped files */
+    /* no support for I/O descriptor matching utilities */
+    /* there is no way to force glib's I/O descriptors to match lua's */
+    fent(rename),
+    fent(mkdir),
+    fent(stat),
+    fent(chmod),
+    fent(remove),
+    fent(can_read),
+    fent(can_write),
+    fent(chdir),
+    fent(utime),
+    /* URI Functions */
+    fent(uri_parse_scheme),
+    fent(uri_escape_string),
+    fent(uri_unescape_string),
+    fent(uri_list_extract_uris),
+    fent(filename_from_uri),
+    fent(filename_to_uri),
+    /* Hostname Utilities */
+    fent(hostname_to_ascii),
+    fent(hostname_to_unicode),
+    fent(hostname_is_non_ascii),
+    fent(hostname_is_ascii_encoded),
+    fent(hostname_is_ip_address),
+    /* Shell-related Utilities */
+    fent(shell_parse_argv),
+    fent(shell_quote),
+    fent(shell_unquote),
+    /* No support for Commandline option parser */
+    /* No support for Glob-style pattern matching */
+    /* Perl-compatible regular expressions */
+    fent(regex_new),
+    fent(regex_escape_string),
+    /* Simple XML Subset Parser */
+    fent(markup_escape_text),
+    fent(markup_parse_context_new),
+    /* Key-value file parser */
+    fent(key_file_new),
+    /* Bookmark file parser */
+    fent(bookmark_file_new),
     {NULL, NULL}
 };
 
 int luaopen_glib(lua_State *L)
 {
-    luaL_register(L, "glib", lua_funcs);
+    /* extra: version, os, dir_separator, searchpath_separator (4) */
+    /*        uri_reserved_chars_* (5) */
+    /*        key_file_desktop (1) */
+    /* remove: NULL at end (1) */
+    lua_createtable(L, 0, sizeof(lua_funcs)/sizeof(lua_funcs[0]) + 10 - 1);
+    luaL_setfuncs(L, lua_funcs, 0);
 
-/* there does not appear to be a way to move this up to the top in ldoc */
-/***
-Version Information.
-@section Version Information
-*/
-
-/***
-GLib version string.
-@table version
-Version of running glib (not the one it was compiled against)
-*/
     {
 	char ver[80];
 	snprintf(ver, 80, "%u.%u.%u", glib_major_version, glib_minor_version,
@@ -4837,16 +8363,6 @@ Version of running glib (not the one it was compiled against)
 	lua_pushstring(L, ver);
 	lua_setfield(L, -2, "version");
     }
-/***
-Standard Macros.
-@section Standard Macros
-*/
-/***
-Operating system.
-@table os
-A string representing the operating system: 'win32', 'beos', 'unix',
- 'unknown'
-*/
     {
 #ifdef G_OS_WIN32
 	lua_pushliteral(L, "win32");
@@ -4863,12 +8379,6 @@ A string representing the operating system: 'win32', 'beos', 'unix',
 #endif
 	lua_setfield(L, -2, "os");
     }
-/***
-Directory separator.
-@table dir_separator
-Unlike GLib's directory separator, this includes both valid values under
-Win32.
-*/
     {
 	char sep[3];
 
@@ -4881,10 +8391,6 @@ Win32.
 	lua_pushstring(L, sep);
 	lua_setfield(L, -2, "dir_separator");
     }
-/***
-Path list separator
-@table searchpath_separator
-*/
     lua_pushstring(L, G_SEARCHPATH_SEPARATOR_S);
     lua_setfield(L, -2, "searchpath_separator");
     /* no support for other standard macros */
@@ -4893,6 +8399,68 @@ Path list separator
     /* no support for Numerical Definitions */
     /* no support for Miscellaneous Macros */
     /* see lua_funcs[] for rest */
+
+    /* uri #defines */
+    lua_pushliteral(L, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH);
+    lua_setfield(L, -2, "uri_reserved_chars_allowed_in_path");
+    lua_pushliteral(L, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH_ELEMENT);
+    lua_setfield(L, -2, "uri_reserved_chars_allowed_in_path_element");
+    lua_pushliteral(L, G_URI_RESERVED_CHARS_ALLOWED_IN_USERINFO);
+    lua_setfield(L, -2, "uri_reserved_chars_allowed_in_userinfo");
+    lua_pushliteral(L, G_URI_RESERVED_CHARS_GENERIC_DELIMITERS);
+    lua_setfield(L, -2, "uri_reserved_chars_generic_delimiters");
+    lua_pushliteral(L, G_URI_RESERVED_CHARS_SUBCOMPONENT_DELIMITERS);
+    lua_setfield(L, -2, "uri_reserved_chars_subcomponent_delimiters");
+
+    /* key_file #defines */
+    lua_createtable(L, 0, 23);
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_GROUP);
+    lua_setfield(L, -2, "group");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_TYPE);
+    lua_setfield(L, -2, "key_type");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_VERSION);
+    lua_setfield(L, -2, "key_version");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_NAME);
+    lua_setfield(L, -2, "key_name");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_GENERIC_NAME);
+    lua_setfield(L, -2, "key_generic_name");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_NO_DISPLAY);
+    lua_setfield(L, -2, "key_no_display");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_COMMENT);
+    lua_setfield(L, -2, "key_comment");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_ICON);
+    lua_setfield(L, -2, "key_icon");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_HIDDEN);
+    lua_setfield(L, -2, "key_hidden");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_ONLY_SHOW_IN);
+    lua_setfield(L, -2, "key_only_show_in");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_NOT_SHOW_IN);
+    lua_setfield(L, -2, "key_not_show_in");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_TRY_EXEC);
+    lua_setfield(L, -2, "key_try_exec");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_EXEC);
+    lua_setfield(L, -2, "key_exec");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_PATH);
+    lua_setfield(L, -2, "key_path");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_TERMINAL);
+    lua_setfield(L, -2, "key_terminal");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_MIME_TYPE);
+    lua_setfield(L, -2, "key_mime_type");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_CATEGORIES);
+    lua_setfield(L, -2, "key_categories");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_STARTUP_NOTIFY);
+    lua_setfield(L, -2, "key_startup_notify");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_STARTUP_WM_CLASS);
+    lua_setfield(L, -2, "key_startup_wm_class");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_KEY_URL);
+    lua_setfield(L, -2, "key_url");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_TYPE_APPLICATION);
+    lua_setfield(L, -2, "type_application");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_TYPE_LINK);
+    lua_setfield(L, -2, "type_link");
+    lua_pushliteral(L, G_KEY_FILE_DESKTOP_TYPE_DIRECTORY);
+    lua_setfield(L, -2, "type_directory");
+    lua_setfield(L, -2, "key_file_desktop");
 
     /* data types */
 #define newt(t) do { \
@@ -4907,7 +8475,7 @@ Path list separator
 } while(0)
 #define newt_tab(t) do { \
     luaL_newmetatable(L, "glib."#t); \
-    luaL_register(L, NULL, t##_funcs); \
+    luaL_setfuncs(L, t##_funcs, 0); \
     lua_pushvalue(L, -1); \
     lua_setfield(L, -1, "__index"); \
     lua_pop(L, 1); \
@@ -4920,6 +8488,11 @@ Path list separator
     newt_tab(timer_state);
     newt_tab(spawn_state);
     newt_free(dir_state);
+    newt_tab(regex_state);
+    newt_free(regex_iter_state);
+    newt_tab(markup_parse_state);
+    newt_tab(key_file_state);
+    newt_tab(bookmark_file_state);
 
     /* Internationalization */
     /* gettext macros are globals */
@@ -4929,6 +8502,7 @@ Path list separator
     lua_register(L, "N_", glib_ngettext);
     lua_register(L, "NC_", glib_ndpgettext4);
 
+#if LUA_VERSION_NUM <= 501
     /* lua does special magic to allow pclose/fclose to be the same */
     /* create special fenv */
     lua_createtable(L, 0, 1);
@@ -4944,6 +8518,7 @@ Path list separator
     lua_pushvalue(L, -2);
     lua_setfenv(L, -2);
     lua_pop(L, 2);
+#endif
     return 1;
 }
 

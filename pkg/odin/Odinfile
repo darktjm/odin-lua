@@ -36,11 +36,11 @@ glib.so == %glib-so
 
 %src-files == %exe :depend :ls +match='ODIN|os9|boot|dg/if|h$' +hide_match :regsub
 
-%exe == %odin.c.sm +ignore=\\.hh\$ +(%extra-lib) +(%glib) :exe
+%exe == %odin.c.sm +ignore=\\.hh\$ +(%extra-lib) :exe
 
-%rbs-exe == %rbs.c.sm +ignore=\\.hh\$ +(%extra-lib) +(%glib) :exe
+%rbs-exe == %rbs.c.sm +ignore=\\.hh\$ +(%extra-lib) :exe
 
-%glib-so == lua-glib.c +cc_flags=-fPIC -Werror +(%glib) +ld_flags=-shared +debug :exe
+%glib-so == lua-glib.c +cc_flags=-fPIC -Werror +(%glib) +(%lua) +ld_flags=-shared +debug :exe
 
 %glib-doc! ==(.) +cmd='ldoc.lua -p lua-glib -o lua-glib -d /tmp -f markdown -t' \
                   '"Lua GLib Library"' (lua-glib.c) :run
@@ -56,9 +56,21 @@ glib.so == %glib-so
 	 break
       end
    end
+   io.write('+(%lua)')
+   io.write('+(%glib)')
+
+%lua-script == <<
+if false then
+   io.write("+lib_sp='/usr/local/lib'")
+   io.write("+inc_sp='/usr/local/include/lua-5.2'")
+   lua = 'lua52'
+else
    lua = getenv('LUA_LIBNAME')
    if lua == '' then lua = 'lua' end
    io.write('+lib=' .. lua)
+end
+
+%lua == () +cmdfile=(%lua-script) :lua_stdout
 
 %glib == () +cmd='io.write(pkg_cflags("glib-2.0") or "")' :lua_stdout
 

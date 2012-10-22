@@ -270,7 +270,8 @@ void *Lua_Init(void)
       SysCallError(StdOutFD, "lua_open");
       return NULL;
    }
-   if (lua_cpcall(L, &lua_init, NULL)) {
+   lua_pushcfunction(L, lua_init);
+   if (lua_pcall(L, 0, 0, 0)) {
       if (!lua_isnil(L, -1)) {
 	 const char *msg = lua_tostring(L, -1);
 	 if (msg)
@@ -327,8 +328,9 @@ SystemExec(const char *Tool, char *const *ArgV, const char *LogFileName)
       /* otherwise, let execv report the error */
       if (run_lua) {
          int ret;
-         if ((ret = lua_cpcall(L, &lua_run, (void *) ArgV))
-             && !lua_isnil(L, -1)) {
+	 lua_pushcfunction(L, lua_run);
+	 lua_pushlightuserdata(L, ArgV);
+         if ((ret = lua_pcall(L, 1, 0, 0)) && !lua_isnil(L, -1)) {
             const char *msg = lua_tostring(L, -1);
             if (msg)
                fprintf((FILE *) StdOutFD, "*** %s\n", msg);

@@ -9,7 +9,7 @@ tregrm.exe == %exe
 %odin-install! == <<
    %exe > $ODINPKG/tregrm.exe
 
-%exe == %tregrm.c.sm +ignore=\\.hh\$ :exe
+%exe == %tregrm.c.sm +ignore=\\.hh\$ +(../odin%glib) :exe
 
 %debug! == %tregrm.c.sm +debug +ignore=\\.hh\$ +gnu :dbx
 

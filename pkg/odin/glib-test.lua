@@ -1,4 +1,4 @@
-require 'glib'
+glib = require 'glib'
 
 print("Version Information")
 print(glib.version)

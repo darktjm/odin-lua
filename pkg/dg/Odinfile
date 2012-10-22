@@ -1,4 +1,4 @@
-%exe == %dg.c.sm +ignore=\\.hh\$ :exe
+%exe == %dg.c.sm +ignore=\\.hh\$ +(../odin%glib) :exe
 
 dg.exe == %exe
 

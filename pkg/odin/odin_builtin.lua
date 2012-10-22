@@ -1,6 +1,7 @@
 -- APR provides portable setenv, basename, and others
 apr = require 'apr'
--- require 'glib'
+-- GLib provides portable setenv, basename, and others
+glib = require 'glib'
 
 -- some convenient aliases for often-used functions
 
