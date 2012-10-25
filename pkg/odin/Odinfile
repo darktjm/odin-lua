@@ -6,11 +6,9 @@
 
 odin.exe == %exe
 rbs.exe == %rbs-exe
-glib.so == %glib-so
 
 %install! == <<
    %exe >$THORPKGS/odin/odin.exe
-   %glib-so >$THORPKGS/odin/glib.so
    ../dg%install
 
 %install-rbs! == <<
@@ -39,11 +37,6 @@ glib.so == %glib-so
 %exe == %odin.c.sm +ignore=\\.hh\$ +(%extra-lib) :exe
 
 %rbs-exe == %rbs.c.sm +ignore=\\.hh\$ +(%extra-lib) :exe
-
-%glib-so == lua-glib.c +cc_flags=-fPIC -Werror +(%glib) +(%lua) +ld_flags=-shared +debug :exe
-
-%glib-doc! ==(.) +cmd='ldoc.lua -p lua-glib -o lua-glib -d /tmp -f markdown -t' \
-                  '"Lua GLib Library"' (lua-glib.c) :run
 
 %extra-lib == () +cmdfile=(%el-script) :lua_stdout
 
