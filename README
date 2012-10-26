@@ -1,7 +1,7 @@
 This directory contains the Odin software build system.  Users upgrading
 from older Odin versions should consult the file "etc/CHANGES".
 
-This version of Odin differes from the official one on Sourceforge.  See
+This version of Odin differs from the official one on Sourceforge.  See
 etc/CHANGES for details.  Any questions/comments regarding those changes
 should be sent to the author, darktjm@gmail.net, instead of the mailing
 list below.  I have not participated in that mailing list as it
