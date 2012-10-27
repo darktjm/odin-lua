@@ -38,7 +38,9 @@ rbs.exe == %rbs-exe
 
 %rbs-exe == %rbs.c.sm +ignore=\\.hh\$ +(%extra-lib) :exe
 
-%extra-lib == () +cmdfile=(%el-script) :lua_stdout
+%extra-lib == () +cmdfile=(%el-script) \
+                 +cmd='cat(trim[['(%lua)']])' \
+                      'cat(trim[['(%glib)']])' :lua_stdout
 
 %el-script == <<
    if getenv("ODINBOOT_CONFIG") ~= "" then
@@ -49,8 +51,6 @@ rbs.exe == %rbs-exe
 	 break
       end
    end
-   io.write('+(%lua)')
-   io.write('+(%glib)')
 
 %lua-script == <<
 if false then
