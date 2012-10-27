@@ -19,7 +19,7 @@ sis = io.open('so_inc_spec', 'w')
 for l in io.lines(ODIN_FILE) do
    m = l:match('^%.so[ \t]*(.*)$')
    if m then
-      if not apr.filepath_root(m, 'native') then
+      if not glib.path_is_absolute(m) then
 	 m = pathcat(ODIN_home, m)
 	 sis:write(m .. '\n')
       end

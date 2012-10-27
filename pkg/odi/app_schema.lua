@@ -13,12 +13,12 @@ end
 
 ODIN_dbdir, ODIN_objs, ODIN_libs = unpack(arg)
 
-path = apr.filepath_list_split(getenv("PATH"));
+path = split_path(getenv("PATH"));
 table.insert(path, getenv("OS_ROOTDIR") .. '/bin')
-setenv("PATH", apr.filepath_list_merge(path))
-path = apr.filepath_list_split(getenv("LD_LIBRARY_PATH"))
+setenv("PATH", build_path(path))
+path = split_path(getenv("LD_LIBRARY_PATH"))
 table.insert(path, getenv("OS_ROOTDIR") .. '/lib')
-setenv("LD_LIBRARY_PATH", apr.filepath_list_merge(path))
+setenv("LD_LIBRARY_PATH", build_path(path))
 
 if ODIN_dbdir == "" then
    touch('schema.C')

@@ -35,7 +35,7 @@ for name in io.lines(ODIN_view) do
       vss:write(fpcat(fpcat(dir, 'SCCS'), 's.' .. file) .. '\n')
       vss:write(fpcat(dir, 's.' .. file) .. '\n')
    end
-   if not apr.filepath_root(name, 'native') then
+   if not glib.path_is_absolute(name) then
       for base in viewsp:gmatch('%S+') do
 	 vss:write(fpcat(base, name) .. '\n')
 	 if do_rcs then

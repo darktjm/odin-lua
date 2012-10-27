@@ -15,14 +15,14 @@ ODIN_o, ODIN_lib, ODIN_home,
 ODIN_gnu, ODIN_purify, ODIN_debug,
 ODIN_prof, ODIN_eprof, ODIN_cc, ODIN_flags = unpack(arg)
 
-path = apr.filepath_list_split(getenv("PATH"));
+path = split_path(getenv("PATH"));
 if getenv("ODIN_CC_HOME") ~= "" then
    table.insert(path, getenv("ODIN_CC_HOME"))
-   setenv("PATH", apr.filepath_list_merge(path))
+   setenv("PATH", build_path(path))
 end
 if ODIN_home ~= "" then
    table.insert(path, ODIN_home)
-   setenv("PATH", apr.filepath_list_merge(path))
+   setenv("PATH", build_path(path))
 end
 
 compiler = getenv("ODIN_CC")
@@ -34,8 +34,7 @@ end
 
 args={}
 objs=''
-for o in apr.glob(pathcat(ODIN_o, "*")) do
-   o = basename(o)
+for o in glib.dir(ODIN_o) do
    objs = objs .. ' ' .. o
    table.insert(args, o)
 end
@@ -58,10 +57,9 @@ args.chdir = ODIN_o
 runcmd(compiler .. flags .. libs, args)
 
 if ODIN_purify ~= "" then
-   odir = apr.dir_open(ODIN_o)
-   for endle in odir:entries('type', 'path') do
-      if endle.type ~= 'link' then
-	 rm(endle.path)
+   for endle in glib.dir(ODIN_o) do
+      if is_link(pathcat(ODIN_o, endle)) then
+	 rm(pathcat(ODIN_o, endle))
       end
    end
 end

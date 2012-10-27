@@ -22,7 +22,7 @@ if ODIN_texsearch == '' then
    texsp:write(ODIN_dir .. '\n')
 elseif ODIN_texsearch ~= '' then
    for d in io.lines(ODIN_texsearch) do
-      if not apr.filepath_root(d, 'native') then
+      if not glib.path_is_absolute(d) then
 	 odin_error(d .. ' must be an absolute path name')
       else
 	 texsp:write(d .. '\n')

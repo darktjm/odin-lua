@@ -16,14 +16,14 @@ ODIN_home, ODIN_gnu, ODIN_debug,
 ODIN_prof, ODIN_optimize, ODIN_define,
 ODIN_cc, ODIN_flags = unpack(arg)
 
-path = apr.filepath_list_split(getenv("PATH"));
+path = split_path(getenv("PATH"));
 if getenv("ODIN_CC_HOME") ~= "" then
    table.insert(path, getenv("ODIN_CC_HOME"))
-   setenv("PATH", apr.filepath_list_merge(path))
+   setenv("PATH", build_path(path))
 end
 if ODIN_home ~= "" then
    table.insert(path, ODIN_home)
-   setenv("PATH", apr.filepath_list_merge(path))
+   setenv("PATH", build_path(path))
 end
 
 compiler = getenv("ODIN_CC")

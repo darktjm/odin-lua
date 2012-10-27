@@ -12,7 +12,7 @@
         }
 \author{Geoffrey M. Clemm}
 \date{
-*** Odin Version 1.17 ***\\
+*** Odin Version 1.18 ***\\
 The Odin System is a simpler, more powerful, and more reliable
 replacement for Make.  It computes complete dependency information
 automatically, making the build scripts shorter and easier to manage.
@@ -1084,7 +1084,7 @@ You exit the Odin interpreter by typing an end-of-file,
 commonly the control-D character.
 \begin{verbatim}
    1% odin
-   Odin Version 1.17
+   Odin Version 1.18.0
    -> ^D
    2%
 \end{verbatim}
@@ -2744,26 +2744,34 @@ the Odin distribution.  Each section documents a single package.
 When Lua code is executed directly by Odin, it first defines some
 utility functions for convenience and portability.
 
-\section{Apache Portable Runtime}
+\section{GLib}
 
 Portability to other operating systems is supported by including the
-lua-apr package in the table {\ex apr}.  See
-\url{http://peterodding.com/code/lua/apr} for details.  Some of its
+lua-glib package in the table {\ex glib}.  See
+\url{https://github.com/darktjm/lua-glib} for details.  Some of its
 commonly used functions are aliased globally to shorten scripts: 
 
 \begin{description}
-\item[basename(name{[}, ext{]})] {\ex apr.filepath\_name} --- get last path
-element, and optionally return extension separately
-\item[pathcat(dir,name)] {\ex apr.filepath\_merge} with the {\ex
-native} option set. --- add path elements portably
-\item[getcwd()] {\ex apr.filepath\_get} with the {\ex native} option
-set. --- return current directory
-\item[chdir(dir)] {\ex apr.filepath\_set} --- change working directory
-\item[mkdir(dir)] {\ex apr.dir\_make\_recursive} --- create directory and
-any missing intervening directories
-\item[mv(src, dest)] {\ex apr.file\_rename} --- file rename
-\item[cp(src, dest)] {\ex apr.file\_copy} --- file copy
-\item[rm(name)] {\ex apr.file\_remove} --- recursive delete
+\item[pathcat(dir,name, {\ldots})] {\ex glib.build\_filename} --- add path
+elements portably
+\item[getcwd()] {\ex glib.get\_current\_directory} --- return current directory
+\item[chdir(dir)] {\ex glib.chdir} --- change working directory
+\item[mkdir(dir{[}, perm{]})] {\ex glib.mkdir\_with\_parents} --- create
+directory and any missing intervening directories
+\item[mv(src, dest)] {\ex glib.rename} --- file rename
+\item[exists(name)] {\ex glib.exists} --- return true if \emph{name} exists
+in the file system.
+\item[is\_dir(name)] {\ex glib.is\_dir} --- return true if \emph{name} is a
+directory or a soft link to a directory.
+\item[is\_file(name)] {\ex glib.is\_file} --- return true if \emph{name} is a
+file or a soft link to a file.
+\item[is\_exec(name)] {\ex glib.is\_exec} --- return true if \emph{name} is a
+file and executable permission is set for that file.  Note that on Windows,
+a heuristic is applied to \emph{name} determine if a file is executable,
+since otherwise all files would be executable by that logic.
+\item[is\_link(name)] {\ex glib.is\_symlink} --- return true if \emph{name} is
+a soft link.  Note that pseudo-soft link files (\ex{ *.lnk}) on Windows are
+not covered by this, so it always returns false on Windows.
 \end{description}
 
 In addition, light wrappers are available for a few functions:
@@ -2772,30 +2780,32 @@ In addition, light wrappers are available for a few functions:
 \item[getenv(v)] --- return the given environment variable's value, or
 blank if unset (in comparison to {\ex nil} as returned by {\ex
 apr.env\_get})
-\item[exists(name)] --- return true if \emph{name} exists in the file
-system.
-\item[is\_dir(name)] --- return true if \emph{name} is a directory or a
-soft link to a directory.
-\item[is\_file(name)] --- return true if \emph{name} is a file or a
-soft link to a file.
-\item[is\_exec(name)] --- return true if \emph{name} is a file and
-executable permission is set for that file.  Note that on Windows, all
-files are considered executable by this logic.
+\item[setenv(name, val)] --- overwrite env var \emph{name} with
+\emph{val}
+\item[basename(name[, split])] {\ex glib.path\_get\_basename} --- get last
+path element, and split off last dot-separated extension and return
+separately
 \item[is\_empty(name)] --- return true if \emph{name} either does not
 exist or is an empty file.
 \item[touch(name{[}, date{]})] --- if \emph{name} does not exist, it is
-created as an empty file.  Otherwise, this is the same as {\ex
-apr.file\_mtime\_set}.
+created as an empty file.  Otherwise, it sets the modification time to
+the given parameter (seconds past epoch).
 \end{description}
 
 \section{File Commands}
 
-Some additional file commands not provided by APR are provided here:
+Some additional file commands not provided by GLib are provided here:
 
 \begin{description}
+\item[cp(src, dest{[}, mode{]})] --- copy file \emph{src} to \emph{dest}.
+\emph{src} and \emph{dest} may be a file descriptor or a file name.  If
+\emph{dest} is a file name, protection attributes are set to \emph{mode},
+if provided.  If \emph{src} and \emph{dest} are both file names, and
+\emph{mode} is not provided, permissios are copied from \emph{src}.
+\item[rm(name)] --- recursive delete
 \item[cmp(f1, f2)] --- recursively compare two files or directories,
 returning true if they match.  Only contents are compared; differences
-in file modification times and permissions are ignore.  Soft links are
+in file modification times and permissions are ignored.  Soft links are
 resolved before comparison.
 \item[cp\_RpL(src, dest{[}, plus\_w{]})] --- copy source to destination
 recursively, copying permissions if possible.  If \emph{plus\_w} is
@@ -2811,6 +2821,30 @@ files.
 \item[append\_line(f, msg)] --- append \emph{msg} and a newline to the
 file \emph{f}.  \emph{f} may be either the name of a file or a Lua
 file descriptor.
+\item[build\_path({\ldots})] --- create a search path using the system
+separator out arguments.  Arguments may be a single table
+of strings or zero or more strings.
+\item[split\_path(p)] --- split a search path into its elements;
+unlike some such utilities, blank elements are returned as well.
+Elements are returned as a table of strings.
+\item[glob\_to\_regex(g)] --- turn a glob-style pattern to a regular
+expression.  This supports {\ex ?}, {\ex *}, characater classes in
+square brackets, and backslash to escape the special meaning of these
+characters.  None of the above patterns can be used to match directory
+separators.  It also supports curly braces, but unlike the shell,
+only matching alternatives are returned (e.g. {\ex \{a,b,c*\}} will match
+a or b or c*, but in the shell it would return a and b regardless of whether
+or not a or b were present).  Like the shell, mismatched curly
+brackets and curly brackets without unescaped commas are ignored.
+Directory separators are supported within curly braces.
+\item[dir\_regex({[}dir,{]} regex)] --- Return directory entries matching
+\emph{regex}.  If \emph{dir} is not specified, search the current
+directory.  The \emph{regex} parameter may either by a regular
+expression string or a compiled regular expression (from {\ex
+glib.regex\_new}.
+\item[dir\_glob({[}dir,{]} glob)] -- Return directory entries matching
+glob-style pattern \emph{glob}.  If \emph{dir} is not specified,
+search the current directory.
 \end{description}
 
 \section{Odin Support Utilities}
@@ -2821,6 +2855,8 @@ The following functions are for common things done in Odin scripts:
 \item[odin\_error(msg{[}, ret{]})] --- append \emph{msg} to {\ex ERRORS}
 and, if \emph{ret} is provided, exit the script with \emph{ret} as the
 result.
+\item[ODINVERBOSE] --- true if ODINVERBOSE is set in environment
+\item[ODINRBSHOST] -- shortcut for {\ex getenv('ODINRBSHOST')}
 \item[odin\_log(msg)] --- print \emph{msg} if ODINVERBOSE is set in
 the environment, and prepend ODINRBSHOST if it is set in the
 environment.  This is intended for printing the command to execute
@@ -2859,6 +2895,52 @@ indicating failure of the command is appended to {\ex ERRORS}, both to
 inform the user what command failed and to ensure that the file is
 non-empty.  If no standard error output is produced, {\ex WARNINGS} is
 removed as well.
+\end{description}
+
+\section{Configuration Support}
+
+The following support tasks traditionally done by a configuration
+script:
+
+\begin{description}
+\item[parse\_ldflags(fl)] --- Parse \emph{fl} as standard UNIX C
+linker flags, and return as Odin {\ex +lib\_sp}, {\ex +lib}, and
+{+ld\_flags} options.
+\item [parse\_cflags(fl)] --- Parse \emph{fl} as standard UNIX C
+compiler flags, and return as Odin {\ex +inc\_sp}, {\ex +define}, and
+{+cc\_flags} options.
+\item[pkgconfig] --- The expected name of the {\ex pkg-config}
+command ({\ex pkg-config} unless PKGCONFIG is set in environment).  Note that
+this can be set to something different before calling the functions below to
+(temporarily) use a different command that works just like {\ex pkg-config}.
+\item[get\_pkgconfig(arg, pkg{[}, vermin{]}{[}, vermax{]})] --- Obtain results
+from running {\ex pkg-config} with the given *arg*, on the given *pkg*
+whose version must be at least *vermin* (if supplied) and/or at most
+*vermax* (if supplied).  On error, nil and an error message are returned.
+The *arg* should normally be something like {\ex --cflags} or {\ex
+--libs}.
+\item[pkgconfig\_libs] The {\ex pkgconfig} option to obtain linker flags
+({\ex --libs}).  Note that this may be overridden if a different set
+of linker flags is needed (for example if {\ex pkgconfig} was
+overridden).
+\item[pkg\_libs(pkg{[}, vermin{]}{[}, vermax{]})] --- Return the
+libraries from {\ex pkg-config --libs} in Odin option format.
+\item[pkgconfig\_libs] The {\ex pkgconfig} option to obtain C compiler flags
+({\ex --cflags})  Note that this may be overridden if a different set
+of compiler flags is needed (for example if {\ex pkgconfig} was
+overridden).
+\item[pkg\_cflags(pkg{[}, vermin{]}{[}, vermax{]})] --- Return the C
+compiler flags and libraries from {\ex pkg-config --libs --cflags} in
+Odin option format.  Two separate runs are made to separate generic
+linker flags ({\ex +ld\_flags}) from generic compiler flags ({\ex
++cc\_flags}) properly.
+\item[aprconfig] The expected Apache Portable Runtime configuration
+program ({\ex apr-1-config} unless APRCONFIG is set in the environment)
+\item[get\_aprconfig(fl)] --- Get APR configuration information using
+configuration command flags \emph{fl}.
+\item[apr\_libs()] Return APR linker flags, parsed to Odin format.
+\item[apr\_cflags()] Return APR C compiler and linker flags, parsed to Odin
+format.
 \end{description}
 
 \section{Miscellaneous}

@@ -40,8 +40,8 @@ for lib_name in lib_names:gsub("-L ", "-L"):gmatch("%S+") do
 	 for i, ext in ipairs{'so','sl','a'} do
 	    lib = lib_base .. '/lib' .. lib_name .. '.' .. ext
 	    vd:write("'" .. lib .. "'\n")
-	    for file in apr.glob(lib .. '.[0-9]*.[0-9]*') do
-	       vd:write("'" .. file .. "'\n")
+	    for file in dir_glob(lib_base, basename(lib) .. '.[0-9]*.[0-9]*') do
+	       vd:write("'" .. pathcat(lib_base, file) .. "'\n")
 	    end
 	 end
       end

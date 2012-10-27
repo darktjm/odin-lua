@@ -18,8 +18,7 @@ ODIN_root, ODIN_aux, ODIN_bbl, ODIN_ind = unpack(arg)
 vtd = io.open('texauxin.vtd', 'w')
 
 if is_dir(ODIN_aux) then
-   for f in apr.glob(pathcat(ODIN_aux, '*')) do
-      f = basename(f)
+   for f in glib.dir(ODIN_aux) do
       vtd:write('%' .. f .. '==' .. pathcat(ODIN_aux, f) .. '\n')
    end
 end

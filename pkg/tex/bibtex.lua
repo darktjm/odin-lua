@@ -31,25 +31,32 @@ if not got_cit or not got_dat then
 end
 
 tex_progname = 'bibtex'
-dofile(pathcat(pathcat(pathcat(getenv("ODINCACHE"), 'PKGS'), 'tex'), 'path.lua'))
 
 sp = {}
 for d in words(ODIN_search) do table.insert(sp, d) end
-bi = sp
-for i, v in ipairs(apr.filepath_list_split(getenv("BIBINPUTS"))) do
-   table.insert(bi, v)
+bi = {unpack(sp)}
+if glib.getenv("BIBINPUTS") then
+   for i, v in ipairs(glib.split_path(getenv("BIBINPUTS"))) do
+      table.insert(bi, v)
+   end
+else
+   table.insert(bi, '')
 end
-setenv('BIBINPUTS', apr.filepath_list_merge(bi))
+setenv('BIBINPUTS', build_path(bi))
 
 if getenv('BSTINPUTS') ~= '' then
    bstsrc = 'BSTINPUTS'
 else
    bstsrc = 'TEXINPUTS'
 end
-for i, v in ipairs(apr.filepath_list_split(getenv(bstsrc))) do
-   table.insert(sp, v)
+if glib.getenv(bstsrc) then
+   for i, v in ipairs(split_path(getenv(bstsrc))) do
+      table.insert(sp, v)
+   end
+else
+   table.insert(sp, '')
 end
-setenv('BSTINPUTS', apr.filepath_list_merge(sp))
+setenv('BSTINPUTS', build_path(sp))
 
 odin_log('bibtex')
 

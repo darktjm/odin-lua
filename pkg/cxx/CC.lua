@@ -17,18 +17,18 @@ ODIN_debug, ODIN_prof, ODIN_optimize,
 ODIN_define, ODIN_cxx, ODIN_flags,
 ODIN_abort = unpack(arg)
 
-path = apr.filepath_list_split(getenv("PATH"));
+path = split_path(getenv("PATH"));
 if getenv("ODIN_CXX_HOME") ~= "" then
    table.insert(path, getenv("ODIN_CXX_HOME"))
-   apr.env_set("PATH", apr.filepath_list_merge(path))
+   setenv("PATH", build_path(path))
 end
 
 if getenv("ODIN_CXX_LD_LIBRARY_PATH") ~= "" then
-   LD_LIBRARY_PATH = apr.filepath_list_split(getenv("LD_LIBRARY_PATH"))
-   for i,v in ipairs(apr.filepath_list_split(getenv("ODIN_CXX_LD_LIBRARY_PATH")) do
+   LD_LIBRARY_PATH = split_path(getenv("LD_LIBRARY_PATH"))
+   for i,v in ipairs(split_path(getenv("ODIN_CXX_LD_LIBRARY_PATH"))) do
       table.insert(LD_LIBRARY_PATH, v)
    end
-   apr.env_set("LD_LIBRARY_PATH", apr.filepath_list_merge(LD_LIBRARY_PATH))
+   setenv("LD_LIBRARY_PATH", build_path(LD_LIBRARY_PATH))
 end
 
 compiler = getenv("ODIN_CXX")
@@ -69,7 +69,7 @@ if not runcmd(compiler .. flags , {'-c', ODIN_source, '-o', pathcat(getcwd(), 'o
 	 errs = io.open("ERRORS")
 	 io.write(errs:read('*a'))
 	 errs:close()
-	 apr.file_remove("ERRORS")
+	 rm("ERRORS")
 	 os.exit(1)
       end
    end

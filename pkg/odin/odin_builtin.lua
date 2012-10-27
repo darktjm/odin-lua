@@ -1,109 +1,285 @@
--- APR provides portable setenv, basename, and others
-apr = require 'apr'
 -- GLib provides portable setenv, basename, and others
 glib = require 'glib'
 
 -- some convenient aliases for often-used functions
 
-basename = apr.filepath_name
-function pathcat(d, f)
-    return apr.filepath_merge(d, f, 'native')
-end
-function getcwd()
-    return apr.filepath_get(true)
-end
-chdir = apr.filepath_set
-mkdir = apr.dir_make_recursive
-mv = apr.file_rename
-cp = apr.file_copy
-rm = apr.file_remove
+pathcat = glib.build_filename
+getcwd = glib.get_current_dir
+chdir = glib.chdir
+mkdir = glib.mkdir_with_parents
+mv = glib.rename
+exists = glib.exists
+is_dir = glib.is_dir
+is_file = glib.is_file
+is_exec = glib.is_exec
+is_link = glib.is_symlink
 
 -- 5.2 compatibility
 if unpack == nil then unpack = table.unpack end
 
+-- split/merge path lists
+function build_path(a1, ...)
+   local i, v
+   local ret = ''
+   local p
+   if type(a1) == 'table' then
+      p = a1
+   else
+      p = {a1, ...}
+   end
+   local sep = glib.searchpath_separator
+   for i, v in ipairs(p) do
+      if i > 1 then ret = ret .. sep end
+      ret = ret .. v
+   end
+   return ret
+end
+
+function split_path(p)
+    return glib.regex_new(glib.regex_escape_string(glib.searchpath_separator)):split(p)
+end
+
+function glob_to_regex(g)
+   local escall = glib.regex_escape_string(g)
+   local s, e, pos, re, brnest, brloc, skip, com
+   local dirsep = glib.regex_escape_string(glib.dir_separator)
+   pos = 1
+   re = ''
+   brnest = 0
+   com = {}
+   brloc = {}
+   for s, e, what in glib.regex_new('\\\\(.)'):gfind(escall) do
+      if s > pos then
+	 local unesc = escall:sub(pos, s - 1)
+	 if brnest > 0 then
+	    local anycom
+	    if skip then
+	       local comsub
+	       comsub, anycom = unesc:sub(2):gsub(',', '|')
+	       unesc = unesc:sub(1, 1) .. comsub
+	    else
+	       unesc, anycom = unesc:gsub(',', '|')
+	    end
+	    com[brnest] = com[brnest] + anycom
+	 end
+	 re = re .. unesc
+	 skip = false
+      end
+      pos = e + 1
+      if skip then
+	 skip = false
+      elseif what == '*' then
+	 re = re .. '[^' .. dirsep .. ']*'
+      elseif what == '?' then
+	 re = re .. '[^' .. dirsep .. ']'
+      elseif what == '[' then
+	 re = re .. '(?![' .. dirsep .. '])['
+      elseif what == ']' then
+	 re = re .. what
+      elseif what == '{' then
+	 brnest = brnest + 1
+	 com[brnest] = 0
+	 brloc[brnest] = #re
+	 re = re .. '(?:'
+      elseif brnest > 0 and what == '}' then
+	 if com[brnest] == 0 then
+	    re = re:sub(1, brloc[brnest]) .. '\\{' .. re:sub(brloc[brnest] + 4)
+	    re = re .. '\\}'
+	 else
+	    re = re .. ')'
+	 end
+	 brnest = brnest - 1
+      else
+	 re = re .. '\\' .. what
+      end
+   end
+   re = re .. escall:sub(pos)
+   while brnest > 0 do
+      re = re:sub(1, brloc[brnest]) .. '\\{' .. re:sub(brloc[brnest] + 4)
+      brnest = brnest - 1
+   end
+   -- let regex library detect mismatched []
+   return '^' .. re .. '$'
+end
+
+function dir_regex(dir, regex)
+   if regex == nil then
+      regex = dir
+      dir = '.'
+   end
+   if type(regex) == 'string' then
+      local msg
+      regex, msg = glib.regex_new(regex)
+      if not regex then
+	 return function() return nil end
+      end
+   end
+   local d = glib.dir(dir)
+   return function()
+      while true do
+	 local n = d()
+	 if n == nil then return nil end
+	 if regex:find(n) then
+	    return n
+	 end
+      end
+   end
+end
+
+function dir_glob(dir, glob)
+   if glob == nil then
+      glob = dir
+      dir = '.'
+   end
+   return dir_regex(dir, glob_to_regex(glob))
+end
+
 -- common uses of stat
-function exists(f)
-    return apr.stat(f, 'type') ~= nil
-end
-
-function is_dir(f)
-    return apr.stat(f, 'type') == 'directory'
-end
-
-function is_file(f)
-    return apr.stat(f, 'type') == 'file'
-end
-
-function is_exec(f)
-    local p = apr.stat(f, 'protection')
-    if p == nil then return false end
-    return p:sub(3, 1) == 'x'
-end
-
 function is_empty(f)
-   local t, s = apr.stat(f, 'type', 'size')
+   local t, s = glib.stat(f, 'type', 'size')
    return not t or (t == 'file' and s == 0)
 end
 
+-- recursive delete
+function rm(f)
+   local ok, msg, err, gmsg
+   if not is_link(f) and is_dir(f) then
+      local e
+      for e in glib.dir(f) do
+	 ok, msg = rm(pathcat(f, e))
+	 if not ok and not err then
+	    err = true
+	    gmsg = msg
+	 end
+      end
+   end
+   ok, msg = glib.remove(f)
+   if not ok and not err then
+      err = true
+      gmsg = msg
+   end
+   if err then
+      return false, gmsg
+   else
+      return true
+   end
+end
+
 -- touch the way it's supposed to be
-function touch(f, ...)
-    if not apr.stat(f, 'type') then
-	local fd = io.open(f, 'w')
-	if fd then fd:close() end
-    end
-    apr.file_mtime_set(f, ...)
+function touch(f, date)
+   if not exists(f) then
+      local fd = io.open(f, 'w')
+      if fd then fd:close() end
+   end
+   glib.utime(f, nil, date)
+end
+
+-- apr-style basename
+function basename(n, split)
+   local ret = glib.path_get_basename(n)
+   if not split then
+      return ret
+   end
+   return glib.regex_new('^(.+?)(|\\.[^.]*)$'):match(ret)
 end
 
 -- shell-style getenv: undef returns empty string
 -- that way you don't have to check for both blank and nil
 function getenv(v)
-   return apr.env_get(v) or ''
+   return glib.getenv(v) or ''
 end
 
-setenv = apr.env_set
+function setenv(name, val)
+   return glib.setenv(name, val, true)
+end
 
 -- for subsequent functions: return a file descriptor for file/name arg
 function fopen(f, mode)
-    if io.type(f) == 'file' then
-	return f
-    else
-	return io.open(f, mode)
-    end
+   if io.type(f) == 'file' then
+      return f
+   else
+      return io.open(f, mode)
+   end
 end
 
 -- close f if f was opened above
 function fclose(f, n)
-    if io.type(n) ~= 'file' and f ~= nil then
-	f:close()
-    end
+   if io.type(n) ~= 'file' and f ~= nil then
+      return f:close()
+   else
+      return true
+   end
+end
+
+local builtin_io_bufsize = 16384
+
+-- copy a file
+-- note that although Lua will eventually garbage collect files, it's
+-- better to close them as soon as possible
+function cp(src, dest, mode)
+   local s = fopen(src, 'rb')
+   if not s then
+      return false, "Can't open " .. src
+   end
+   local d = fopen(dest, 'wb')
+   if not d then
+      fclose(s, src)
+      return false, "Can't open " .. dest
+   end
+   local buf
+   while true do
+      buf = s:read(builtin_io_bufsize)
+      if not buf then break end
+      if not d:write(buf) then
+	 fclose(s, src)
+	 fclose(d, dest)
+	 return false, "I/O error writing to " .. tostring(dest)
+      end
+   end
+   fclose(s, src)
+   if not fclose(d, dest) then
+      return false, "I/O error writing to " .. tostring(dest)
+   end
+   if not mode and io.type(src) == 'file' then
+      mode = glib.stat(src, 'perm')
+   end
+   if mode and io.type(dest) ~= 'file' then
+      glib.chmod(dest, mode)
+   end
+   return true
 end
 
 -- recursive file comparison
 function cmp(f1, f2)
-    if is_dir(f1) then
-	if not is_dir(f2) then return false end
-	for p in apr.glob(pathcat(f1, '*')) do
-	    if not cmp(p, pathcat(f2, basename(p))) then
-		return false
-	    end
-	end
-	return true
-    end
-    if not is_file(f1) or not is_file(f2) then
-	return false
-    end
-    local f1d, f2d
-    f1d = io.open(f1, 'rb')
-    f2d = io.open(f2, 'rb')
-    if not f1d or not f2d then return false end
-    local f1b, f2b
-    repeat
-	f1b = f1d:read(16384)
-	f2b = f2d:read(16384)
-    until f1b ~= f2b or f1b == nil
-    f1d:close()
-    f2d:close()
-    return f1b == f2b
+   if is_dir(f1) then
+      if not is_dir(f2) then return false end
+      for p in glib.dir(f1) do
+	 if not cmp(pathcat(f1, p), pathcat(f2, p)) then
+	    return false
+	 end
+      end
+      for p in glib.dir(f2) do
+	 if not exists(pathcat(f1, p)) then
+	    return false
+	 end
+      end
+      return true
+   end
+   if not is_file(f1) or not is_file(f2) then
+      return false
+   end
+   local f1d, f2d
+   f1d = io.open(f1, 'rb')
+   f2d = io.open(f2, 'rb')
+   if not f1d or not f2d then return false end
+   local f1b, f2b
+   repeat
+      f1b = f1d:read(builtin_io_bufsize)
+      f2b = f2d:read(builtin_io_bufsize)
+   until f1b ~= f2b or f1b == nil
+   f1d:close()
+   f2d:close()
+   return f1b == f2b
 end
 
 -- recursive file copy (cp -RpL)
@@ -115,15 +291,17 @@ function cp_RpL(src, dest, plus_w, d_to_d)
    local t, m
    local st, msg
    if not d_to_d then
-      local t, m = apr.stat(src, 'type', 'protection')
+      -- this dereferences any link (-L)
+      local t, m = glib.stat(src, 'type', 'perm')
       if plus_w then
-	 m = m:sub(1, 1) .. 'w' .. m:sub(3)
+	 m = m + 128 -- 0200 == 2 * 8^2 == 2 * 64
       end
-      if t == 'directory' then
+      if t == 'dir' then
 	 st, msg = mkdir(dest, m)
 	 if not st then
 	    return nil, "Error writing " .. dest .. ": " .. msg
 	 end
+	 -- drop through to d_to_d code
       elseif t == 'file' then
 	 st, msg = cp(src, dest, m)
 	 if not st then
@@ -134,17 +312,16 @@ function cp_RpL(src, dest, plus_w, d_to_d)
 	 return nil, 'Copy attempt on special ' .. src
       end
    end
-   local dir = apr.dir_open(src)
-   local p, n
-   -- can't use 'type' here because soft links show up as link
-   for p, n in dir:entries('path', 'name') do
+   local n
+   for n in glib.dir(src) do
+      local p = pathcat(src, n)
       -- this dereferences any link (-L)
-      t, m = apr.stat(p, 'type', 'protection')
+      t, m = glib.stat(p, 'type', 'perm')
       if plus_w then
-	 m = m:sub(1, 1) .. 'w' .. m:sub(3)
+	 m = m + 128 -- 0200 == 2 * 8^2 == 2 * 64
       end
       local d = pathcat(dest, n)
-      if t == 'directory' then
+      if t == 'dir' then
 	 st, msg = mkdir(d, m)
 	 if not st then
 	    return nil, "Error writing " .. d .. ": " .. msg
@@ -169,11 +346,13 @@ if not has_posix then posix = nil end
 -- there is no portable ln -s, so try hard link then copy
 function ln(s, d)
    if has_posix then
-      return posix.link(s, d, true)
+      if not posix.link(s, d, true) then
+	 return posix.link(s, d, false)
+      else
+	 return true
+      end
    end
-   if not apr.file_link or not apr.file_link(s, d) then
-      cp_RpL(s, d)
-   end
+   return cp_RpL(s, d)
 end
 
 -- shell-style backtick-cat-as-args: get words from file (iterator)
@@ -236,72 +415,37 @@ end
 --  .stdin = <name> -> input from file <name>
 function runcmd(cmd, moreargs)
    if moreargs == nil then moreargs = {} end
-   local args = apr.tokenize_to_argv(cmd)
+   local args = glib.shell_parse_argv(cmd)
    local i, v
    for i,v in ipairs(moreargs) do table.insert(args, v) end
-   local cmd = table.remove(args, 1)
-   local proc = apr.proc_create(cmd)
-   proc:cmdtype_set('program/env/path')
-   if moreargs.chdir then
-      proc:dir_set(moreargs.chdir)
-   end
+   args.chdir = moreargs.chdir
+   args.stderr = 'WARNINGS'
+   args.stdout = 'MESSAGES'
+   args.stdin = moreargs.stdin
    local ret, err
-   local of, inf, wf
-   ret = apr.file_open('WARNINGS', 'a')
+--   io.write('running')
+--   for i, v in ipairs(args) do
+--       io.write(' ' .. glib.shell_quote(v))
+--   end
+   io.write('\n')
+   ret, err = glib.spawn(args)
    if ret then
-      wf = ret
-      ret, err = proc:err_set(wf)
-   end
-   if ret then
-      ret = apr.file_open("MESSAGES", 'a')
-   end
-   if ret then
-      of = ret
-      ret, err = proc:out_set(of)
-   end
-   if ret and moreargs.stdin then
-      inf = apr.file_open(moreargs.stdin)
+      ret = ret:wait()
    else
-      -- this seems to be the only way to close input
-      -- other than detach, which doesn't work quite right
-      ret, err = apr.pipe_create()
-      if ret then
-	 inf = ret
-	 err:close()
-      end
+      append_line('WARNINGS', err)
+      ret = -1
    end
-   if ret then
-      ret, err = proc:in_set(inf)
-   end
-   local ty
-   if ret then ret, err, ty = proc:exec(args) end
-   if wf then wf:close() end
-   if of then of:close() end
-   if inf then inf:close() end
-   if ret then
-      local why, val
-      repeat
-         ret, why, val, err = proc:wait(1)
-      until ret
-      if why == 'signal' then val = -1 end
-      if not ret and not err then
-	 err = '*** Aborted'
-      end
-      if ret and val ~= 0 and not moreargs.ignret then ret = nil end
-   end
-   if not ret then
+   if ret ~= 0 then
       -- on error, merge all captured output into single 'ERRORS' file
-      apr.file_append('WARNINGS', 'MESSAGES')
+      local mf = io.open('MESSAGES', 'a')
+      cp('WARNINGS', mf)
+      mf:close()
       rm('WARNINGS')
       mv('MESSAGES', 'ERRORS')
-      if err then
-	 odin_error(err)
-      end
-      odin_error(cmd .. ' failed')
+      odin_error(args[1] .. ' failed')
    elseif moreargs.stdout then
       if moreargs.stdout ~= 'MESSAGES' then
-	 apr.file_append('MESSAGES', moreargs.stdout)
-	 rm('MESSAGES')
+	 mv('MESSAGES', moreargs.stdout)
       end
    else
       cat('MESSAGES')
@@ -348,7 +492,7 @@ end
 -- parse output from a configuration program as ldflags
 -- any options other than -L and -l are returned in +ld_flags
 function parse_ldflags(fl)
-    local a = apr.tokenize_to_argv(fl)
+    local a = glib.shell_parse_argv(fl)
     local i, v, ret
     ret = ''
     for i, v in ipairs(a) do
@@ -367,7 +511,7 @@ end
 -- any options other than -I and -D are returned in +cc_flags
 -- -O and -g are ignored
 function parse_cflags(fl)
-    local a = apr.tokenize_to_argv(fl)
+    local a = glib.shell_parse_argv(fl)
     local i, v, ret
     ret = ''
     for i, v in ipairs(a) do
@@ -386,7 +530,7 @@ end
 -- if not in path
 pkgconfig = getenv("PKGCONFIG")
 if pkgconfig == '' then
-    pkgconfig = 'pkg-config'
+   pkgconfig = glib.find_program_in_path('pkg-config') or 'pkg-config'
 end
 
 -- run pkg-config for pkg; optionally requiring min/max version
@@ -400,35 +544,38 @@ function get_pkgconfig(arg, pkg, vermin, vermax)
 	cmd = cmd .. ' --max-version=' .. vermax
     end
     cmd = cmd .. ' ' .. pkg
-    local p = io.popen(cmd)
-    local ret = p:read()
-    p:close()
-    return ret
+    local p, msg = glib.spawn{cmd = cmd, stderr = true}
+    if not p then return p, msg end
+    local ret, stdout, stderr = p:wait()
+    if ret ~= 0 then return nil, stderr end
+    return stdout
 end
 
 -- run pkg-config for ldflags
+pkgconfig_libs = '--libs'
 function pkg_libs(...)
-    local fl = get_pkgconfig('--libs', ...)
+    local fl = get_pkgconfig(pkgconfig_libs, ...)
     if not fl then return nil end
     return parse_ldflags(fl)
 end
 
 -- run pkg-config for cflags *and* ldflags
 -- this is done with two runs so generic flags are separated properly
+pkgconfig_cflags = '--cflags'
 function pkg_cflags(...)
-    local fl = get_pkgconfig('--cflags', ...)
+    local fl = get_pkgconfig(pkgconfig_cflags, ...)
     if not fl then return nil end
     return parse_cflags(fl) .. pkg_libs(...)
 end
 
--- since we use apr internally, may as well support it directly as well
+-- since we once used apr internally, may as well support it directly as well
 aprconfig = getenv("APRCONFIG")
 if aprconfig == '' then
-    aprconfig = 'apr-1-config'
+   aprconfig = glib.find_program_in_path('apr-1-config') or 'apr-1-config'
 end
 apuconfig = getenv("APUCONFIG")
 if apuconfig == '' then
-    apuconfig = 'apu-1-config'
+   apuconfig = glib.find_program_in_path('apu-1-config') or 'apu-1-config'
 end
 
 function get_aprconfig(fl)

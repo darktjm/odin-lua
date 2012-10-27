@@ -51,10 +51,10 @@ if cmp(ODIN_OBJECT, ODIN_dest) then
    os.exit(0)
 end
 
-apr.file_remove(ODIN_dest)
-m = apr.stat(ODIN_OBJECT, 'protection')
+rm(ODIN_dest)
+m = glib.stat(ODIN_OBJECT, 'perm')
 -- bug fix wrt original: chmod u+w for copied out files
-m = m:sub(1, 1) .. 'w' .. m:sub(3)
+m = m + 128 -- 0200 == 2 * 8^2 == 2 * 64
 st, msg = cp(ODIN_OBJECT, ODIN_dest, m)
 if not st then
    -- assumes all errors are transient, but actually

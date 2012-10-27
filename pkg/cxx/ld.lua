@@ -11,25 +11,23 @@ if not runcmd then
    dofile(d .. "/odin/odin_builtin.lua")
 end
 
-rex = require 'rex_posix'
-
 ODIN_o, ODIN_lib, ODIN_ptr,
 ODIN_define, ODIN_incsp, ODIN_gnu,
 ODIN_purify, ODIN_debug, ODIN_prof,
 ODIN_eprof, ODIN_cxx, ODIN_flags = unpack(arg)
 
-path = apr.filepath_list_split(getenv("PATH"));
+path = split_path(getenv("PATH"));
 if getenv("ODIN_CXX_HOME") ~= "" then
    table.insert(path, getenv("ODIN_CXX_HOME"))
-   apr.env_set("PATH", apr.filepath_list_merge(path))
+   setenv("PATH", build_path(path))
 end
 
 if getenv("ODIN_CXX_LD_LIBRARY_PATH") ~= "" then
-   LD_LIBRARY_PATH = apr.filepath_list_split(getenv("LD_LIBRARY_PATH"))
-   for i,v in ipairs(apr.filepath_list_split(getenv("ODIN_CXX_LD_LIBRARY_PATH")) do
+   LD_LIBRARY_PATH = split_path(getenv("LD_LIBRARY_PATH"))
+   for i,v in ipairs(split_path(getenv("ODIN_CXX_LD_LIBRARY_PATH")) do
       table.insert(LD_LIBRARY_PATH, v)
    end
-   apr.env_set("LD_LIBRARY_PATH", apr.filepath_list_merge(LD_LIBRARY_PATH))
+   setenv("LD_LIBRARY_PATH", build_path(LD_LIBRARY_PATH))
 end
 
 compiler = getenv("ODIN_CXX")
@@ -60,7 +58,7 @@ flags=flags .. " " .. getenv("ODIN_CXX_FLAGS")
 
 args={}
 objs=''
-for o in apr.glob(pathcat(ODIN_o, "*")) do
+for o in glib.dir(ODIN_o) do
    o = basename(o)
    objs = objs .. ' ' .. o
    table.insert(args, o)
@@ -79,10 +77,10 @@ args.chdir = ODIN_o
 if not runcmd(compiler .. flags .. libs, args) then
    ignerr = getenv("ODIN_CXX_IGNORE_ERR")
    if ignerr ~= "" then
-      ok, msg = pcall(rex.new, ignerr)
-      if ok then
+      ignerr, msg = glib.regex_new(ignerr)
+      if ignerr then
 	 for l in io.lines("ERRORS") do
-	    if msg:exec(l) then
+	    if ignerr:find(l) then
 	       mv("ERRORS", "WARNINGS")
 	       break
 	    end
@@ -95,10 +93,9 @@ msg = io.open("MESSAGES")
 if msg then io.write(msg:read('*a')); msg:close() end
 
 if ODIN_purify ~= "" then
-   odir = apr.dir_open(ODIN_o)
-   for endle in odir:entries('type', 'path') do
-      if endle.type ~= 'link' then
-	 apr.file_remove(endle.path)
+   for endle in glib.dir(ODIN_o) do
+      if is_link(pathcat(ODIN_o, endle)) then
+	 rm(pathcat(ODIN_o, endle))
       end
    end
 end

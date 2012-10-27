@@ -20,24 +20,21 @@ end
 ODIN_fmtcmd, ODIN_root, ODIN_search, ODIN_aux = unpack(arg)
 mkdir('texauxout')
 
-tex_progname = wholefile(ODIN_fmtcmd)
-dofile(pathcat(pathcat(pathcat(getenv("ODINCACHE"), 'PKGS'), 'tex'), 'path.lua'))
-
 sp = {'.'}
 for d in words(ODIN_search) do table.insert(sp, d) end
-for i, v in ipairs(apr.filepath_list_split(getenv("TEXINPUTS"))) do
-   table.insert(sp, v)
+if glib.getenv("TEXINPUTS") then
+   for i, v in ipairs(split_path(getenv("TEXINPUTS"))) do
+      table.insert(sp, v)
+   end
+else
+   table.insert(sp, '') -- kpathsea: use built-in search path
 end
--- kpathsea tacks on built-in path if final element is empty
--- but apr.filepath_list_merge doesn't support empty elements
--- table.insert(sp, 'zZzZ')
--- setenv('TEXINPUTS', apr.filepath_list_merge(sp):gsub('zZzZ', ''))
-setenv('TEXINPUTS', apr.filepath_list_merge(sp))
+setenv('TEXINPUTS', build_path(sp))
 
 if is_dir(ODIN_aux) then
-   for f in apr.glob(pathcat(ODIN_aux, '*')) do
+   for f in glib.dir(ODIN_aux) do
       -- original had unsafe 'chmod +w' instead of chmod 'u+w'
-      cp(f, pathcat('texauxout', basename(f)), 'rw-r--r--')
+      cp(pathcat(ODIN_aux, f), pathcat('texauxout', f), '=r,u+w')
    end
 end
 
@@ -48,8 +45,9 @@ runcmd(wholefile(ODIN_fmtcmd), {wholefile(ODIN_root) .. '.tex', chdir = 'texauxo
 touch('tex.log')
 touch('indexntry')
 c = io.open("citations", "w")
-for f in apr.glob(pathcat('texauxout', '*')) do
+for f in glib.dir('texauxout') do
    b, e = basename(f, true)
+   f = pathcat('texauxout', f)
    if e == '.dvi' then mv(f, 'dvi') end
    if e == '.pdf' then mv(f, 'texpdf') end
    if e == '.log' then mv(f, 'tex.log') end
@@ -70,9 +68,6 @@ if is_dir(ODIN_aux) and not cmp(ODIN_aux, 'texauxout') then
    rm('dvi') rm('texpdf')
 end
 
-for f in apr.glob(pathcat('texauxout', '*.bbl')) do
-   rm(f)
-end
-for f in apr.glob(pathcat('texauxout', '*.ind')) do
-   rm(f)
+for f in dir_glob('texauxout', '*.{bbl,ind}') do
+   rm(pathcat('texauxout', f))
 end

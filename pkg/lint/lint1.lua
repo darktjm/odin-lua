@@ -35,12 +35,11 @@ runcmd('lint ' .. flags, {ODIN_c, stdout = 'lint1.log'})
 
 -- parse ignore patterns before running lint so errors cause early abort
 re = nil
-rex = require 'rex_posix'
 re = 'possible pointer alignment'
 if ODIN_ignore ~= '' then
    if ODIN_ignore ~= '' then
-      for l in io.lines(ODIN_igore) do
-	 ok, msg = pcall(rex.new, l)
+      for l in io.lines(ODIN_ignore) do
+	 ok, msg = glib.regex_new(l)
 	 if not ok then
 	    odin_error("Error in ignore pattern '" .. l .. "': " .. msg, 0)
 	 end
@@ -48,15 +47,16 @@ if ODIN_ignore ~= '' then
       end
    end
 end
-re = rex.new(re)
+re = glib.regex_new(re)
 
 input = basename(ODIN_c, true)
 if is_file(input .. '.ln') then mv(input .. '.ln', 'ln') end
 
 tmp = io.open('tmp', 'w')
 for l in lines('lint1.log') do
-   if not re:match(l) then
+   if not re:find(l) then
       tmp:write(l .. '\n')
    end
 end
+tmp:close()
 mv('tmp', 'lint1.log')

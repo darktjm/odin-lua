@@ -12,8 +12,11 @@ regsub:
   backslash followed by a curly-brace enclosed decimal number,
   represents that parenthesis-enclosed subexpression.  Subexpression
   zero is the entire matching text, and the rest numbered by the order
-  of the opening parenthesis.  All +subst parameters are applied in the
-  order they are given, so an earlier one may affect a later one.
+  of the opening parenthesis.  Named subexpressions may be referenced
+  using a name in curly braces rather than a number; the name must
+  start with something other than a digit, and may contain no
+  close-curly-braces.  All +subst parameters are applied in the order
+  they are given, so an earlier one may affect a later one.
   
   If the +subst_only parameter is given, any line which does not cause
   a substitution will be filtered out as well.  This is a shortcut for

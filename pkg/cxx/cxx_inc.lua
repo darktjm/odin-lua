@@ -11,8 +11,6 @@ if not runcmd then
    dofile(d .. "/odin/odin_builtin.lua")
 end
 
-rex = require 'rex_posix'
-
 ODIN_FILE, ODIN_dir,
 ODIN_home, ODIN_incsp, ODIN_ignore = unpack(arg)
 
@@ -22,7 +20,7 @@ incsp=ODIN_home
 if ODIN_incsp ~= "" then incsp=incsp .. ' ' .. wholefile(ODIN_incsp) end
 incsp=incsp .. ' ' .. getenv("ODIN_CXX_I")
 for header in incsp:gmatch('%S+') do
-   if not apr.filepath_root(header, 'native') then
+   if not glib.path_is_absolute(header) then
       odin_error("Search path entry must be absolute: " .. header, 0)
    end
 end
@@ -30,59 +28,46 @@ end
 local_i, global_i = "", ""
 
 -- precompile ignore patterns before loop
--- refl = rex.flags()
--- nosub = refl['NOSUB'] + refl['EXTENDED']
--- rex returns screwy results with NOSUB, so just drop it
-nosub = nil
-
 ignore_re = nil
 if ODIN_ignore ~= "" then
    re = ""
    for l in io.lines(ODIN_ignore) do
-      ok, msg = pcall(rex.new, l, nosub)
+      ok, msg = glib.regex_new(l)
       if not ok then
-	 io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. l .. "': " .. msg .. "\n")
-	 os.exit(0)
+	 odin_error("Error in ignore pattern '" .. l .. "': " .. msg, 0)
       end
       if re == "" then re = l else re = re .. "|" .. l end
    end
    ODIN_ignore = re
-   ok, msg = pcall(rex.new, re, nosub)
-   if ok then
-      ignore_re = msg
-   else
-      io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. re .. "': " .. msg .. "\n")
-      os.exit(0)
+   ignore_re, msg = glib.regex_new(re)
+   if not ignore_re then
+      odin_error("Error in ignore pattern '" .. re .. "': " .. msg, 0)
    end
 end
 
 ODIN_IGNORE = getenv("ODIN_IGNORE")
 if ODIN_IGNORE ~= "" then
-   ok, msg = pcall(rex.new, ODIN_IGNORE, nosub)
+   ok, msg = glib.regex_new(ODIN_IGNORE)
    if not ok then
-      io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. ODIN_IGNORE .. "': " .. msg .. "\n")
-      os.exit(0)
+      odin_error("Error in ignore pattern '" .. ODIN_IGNORE .. "': " .. msg, 0)
    elseif ignore_re then
       ODIN_ignore = ODIN_ignore .. '|' .. ODIN_IGNORE
-      ok, msg = pcall(rex.new, ODIN_ignore, nosub)
-      if ok then
-	 ignore_re = msg
-      else
-	 io.open('ERRORS', 'a'):write("Error in ignore pattern '" .. ODIN_ignore .. "': " .. msg .. "\n")
-	 os.exit(0)
+      ignore_re, msg = glib.regex_new(ODIN_ignore)
+      if not ignore_re then
+	 odin_error("Error in ignore pattern '" .. ODIN_ignore .. "': " .. msg, 0)
       end
    else
-      ignore_re = msg
+      ignore_re = ok
    end
 end
 
--- may as well use rex_posix for the main search as well
-include_re = rex.new('^[ 	]*#[ 	]*include[^"]*"([^"]*)"|' ..
-		     '^[ 	]*#[ 	]*include[^<]*<([^>]*)>')
+include_re = glib.regex_new('^[ \t]*#[ \t]*include[^"]*"([^"]*)"|' ..
+		            '^[ \t]*#[ \t]*include[^<]*<([^>]*)>')
 
--- and to pre-split the dirs var
 dirs = {}
-for d in rex.split(incsp, '[ \t\n]') do table.insert(dirs, d) end
+for i, d in ipairs(glib.regex_new('[ \t\n]'):split(incsp)) do
+    table.insert(dirs, d)
+end
 
 vd = io.open("cxx_inc.view_desc", "w")
 
@@ -92,22 +77,22 @@ for l in io.lines(ODIN_FILE) do
       name = nil
       kind = nil
       for i, v in ipairs(m) do if v then name, kind = v, i end end
-      if apr.filepath_root(name, 'native') then
-	 if not ignore_re or not ignore_re:exec(name) then
+      if glib.path_is_absolute(name) then
+	 if not ignore_re or not ignore_re:find(name) then
 	    vd:write("'" .. name .. "'\n=''\n")
 	 end
       else
 	 didone = nil
 	 if kind == 1 then -- local
 	    aname = pathcat(ODIN_dir, name)
-	    if not ignore_re or not ignore_re:exec(aname) then
+	    if not ignore_re or not ignore_re:find(aname) then
 	       vd:write("'" .. aname .. "'\n")
 	       didone = 1
 	    end
 	 end
 	 for i, header in ipairs(dirs) do
 	    aname = pathcat(header, name)
-	    if not ignore_re or not ignore_re:exec(aname) then
+	    if not ignore_re or not ignore_re:find(aname) then
 	       vd:write("'" .. aname .. "'\n")
 	       didone = 1
 	    end

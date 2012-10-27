@@ -14,12 +14,12 @@ end
 ODIN_schemas, ODIN_schemadirs,
 ODIN_dbdir, ODIN_incsp, ODIN_standin = unpack(arg)
 
-path = apr.filepath_list_split(getenv("PATH"));
+path = splt_path(getenv("PATH"));
 table.insert(path, getenv("OS_ROOTDIR") .. '/bin')
-setenv("PATH", apr.filepath_list_merge(path))
-path = apr.filepath_list_split(getenv("LD_LIBRARY_PATH"))
+setenv("PATH", build_path(path))
+path = split_path(getenv("LD_LIBRARY_PATH"))
 table.insert(path, getenv("OS_ROOTDIR") .. '/lib')
-setenv("LD_LIBRARY_PATH", apr.filepath_list_merge(path))
+setenv("LD_LIBRARY_PATH", build_path(path))
 
 if ODIN_schemas ~= '' then
    touch('com_schema_standin')

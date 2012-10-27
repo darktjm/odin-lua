@@ -14,9 +14,9 @@ end
 ODIN_idl, ODIN_dir, ODIN_incsp, ODIN_flags = unpack(arg)
 
 if getenv("ODIN_IDL_HOME") ~= "" then
-   path = apr.filepath_list_split(getenv("PATH"))
+   path = split_path(getenv("PATH"))
    table.insert(path, getenv("ODIN_IDL_HOME"))
-   setenv("PATH", apr.filepath_list_merge(path))
+   setenv("PATH", build_path(path))
 end
 
 flags = " -I" .. ODIN_dir
@@ -39,6 +39,6 @@ if is_file(input .. 'C.C') then mv(input .. 'C.C', 'client.C') end
 if is_file(input .. 'E.C') then mv(input .. 'E.C', 'epv.C') end
 
 mkdir('idl_h_dir')
-for f in apr.glob('*.[hH]') do
-   mv(f, pathcat('idl_h_dir', basename(f)))
+for f in dir_glob('*.[hH]') do
+   mv(f, pathcat('idl_h_dir', f))
 end

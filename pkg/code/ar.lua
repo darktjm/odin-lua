@@ -15,12 +15,10 @@ ODIN_src, ODIN_o = unpack(arg)
 
 cmdargs = { }
 objs =
-d = apr.dir_open(arg[1])
-for f in d:entries("name") do
+for f in glib.dir(arg[1]) do
    table.insert(cmdargs, f)
    objs = objs .. " " .. f
 end
-d:close()
 
 odin_log('ar qcv out.a' .. objs)
 

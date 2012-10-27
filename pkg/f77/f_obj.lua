@@ -15,9 +15,9 @@ ODIN_f, ODIN_debug, ODIN_prof,
 ODIN_home, ODIN_f77, ODIN_flags = unpack(arg)
 
 if ODIN_home ~= "" then
-   path = apr.filepath_list_split(getenv("PATH"));
+   path = split_path(getenv("PATH"));
    table.insert(path, ODIN_home)
-   apr.env_set("PATH", apr.filepath_list_merge(path))
+   setenv("PATH", build_path(path))
 end
 
 compiler = "f77"

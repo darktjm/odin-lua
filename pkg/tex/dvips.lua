@@ -23,13 +23,16 @@ if ODIN_flags ~= '' then
 end
 
 tex_progname = 'dvips'
-dofile(pathcat(pathcat(pathcat(getenv("ODINCACHE"), 'PKGS'), 'tex'), 'path.lua'))
 
 sp = {}
 for d in words(ODIN_search) do table.insert(sp, d) end
-for i, v in ipairs(apr.filepath_list_split(getenv("TEXINPUTS"))) do
-    table.insert(sp, v)
+if glib.getenv("TEXINPUTS") then
+    for i, v in ipairs(split_path(getenv("TEXINPUTS"))) do
+	table.insert(sp, v)
+    end
+else
+    table.insert(sp, '')
 end
-setenv('TEXINPUTS', apr.filepath_list_merge(sp))
+setenv('TEXINPUTS', build_path(sp))
 
 runcmd('dvips ' .. flags, {'-o', 'texps', ODIN_dvi})
