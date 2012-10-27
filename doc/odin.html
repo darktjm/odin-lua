@@ -10750,6 +10750,11 @@ files.
 file <I>f</I>.  <I>f</I> may be either the name of a file or a Lua
 file descriptor.
 </DD>
+<DT><STRONG>split_filename(f)</STRONG></DT>
+<DD>-- the inverse of <TT>pathcat</TT>.  Returns
+the root part (if present), followed by a table with each path
+element, in order.
+</DD>
 <DT><STRONG>build_path(...)</STRONG></DT>
 <DD>-- create a search path using the system
 separator out arguments.  Arguments may be a single table
@@ -10767,21 +10772,46 @@ square brackets, and backslash to escape the special meaning of these
 characters.  None of the above patterns can be used to match directory
 separators.  It also supports curly braces, but unlike the shell,
 only matching alternatives are returned (e.g. <TT>{a,b,c*}</TT> will match
-a or b or c*, but in the shell it would return a and b regardless of whether
-or not a or b were present).  Like the shell, mismatched curly
-brackets and curly brackets without unescaped commas are ignored.
-Directory separators are supported within curly braces.
+<TT>a</TT> or <TT>b</TT> or <TT>c*</TT>, but in the shell it would return <TT>a</TT> and
+<TT>b</TT> regardless of whether or not <TT>a</TT> or <TT>b</TT> match).  Like the
+shell, mismatched curly brackets and curly brackets without unescaped commas
+are ignored.  Directory separators are supported within curly braces.
+</DD>
+<DT><STRONG>shell_expand_braces</STRONG></DT>
+<DD>-- expand curly braces the way a shell
+would.  Returns a table with all entries produced by expanding braces.
+For example, <TT>'{a,b,c*}'</TT> would return <TT>{'a', 'b', 'c*'}</TT>.
 </DD>
 <DT><STRONG>dir_regex([dir,] regex)</STRONG></DT>
-<DD>-- Return directory entries matching
-<I>regex</I>.  If <I>dir</I> is not specified, search the current
-directory.  The <I>regex</I> parameter may either by a regular
-expression string or a compiled regular expression (from <TT>glib.regex_new</TT>.
+<DD>-- Return an iterator which
+produces names of directory entries in <I>dir</I> matching <I>regex</I>.
+If <I>dir</I> is not specified, search the current directory.  The
+<I>regex</I> parameter may either by a regular expression string or a
+compiled regular expression (from <TT>glib.regex_new</TT>).  The special
+directory elements <TT>'.'</TT> and <TT>'..'</TT> cannot be matched.
 </DD>
 <DT><STRONG>dir_glob([dir,] glob)</STRONG></DT>
-<DD>- Return directory entries matching
-glob-style pattern <I>glob</I>.  If <I>dir</I> is not specified,
-search the current directory.
+<DD>-- Return an iterator which produces
+names of directory entries in <I>dir</I> matching glob-style pattern
+<I>glob</I>.  If <I>dir</I> is not specified, search the current directory.
+The special directory elements <TT>'.'</TT> and <TT>'..'</TT> cannot be matched.
+</DD>
+<DT><STRONG>relative_glob([dir,] glob)</STRONG></DT>
+<DD>-- Return an iterator which produces
+relative paths of directory entries which match the glob-style pattern
+<I>glob</I>.  Directory separators in <I>glob</I> are followed.  No
+part of the pattern may match the special directory entires <TT>'.'</TT> and
+<TT>'..'</TT>.
+</DD>
+<DT><STRONG>glob(pat)</STRONG></DT>
+<DD>-- Return an iterator which produces directory entries
+which match the glob-style pattern <I>pat</I>.  Absolute paths are
+permitted, so long as the absolute prefix contains no pattern elements
+other than curly braces/commas.  Relative patterns are always matched
+relative to the current working directory.  The special path elements
+<TT>'.'</TT> and <TT>'..'</TT> are not matched, unless they appear in the path
+before the first special character (after curly brace expansion).  For
+example, <TT>'../*.[ch]'</TT> works, but <TT>'*/..'</TT> does not.
 </DD>
 </DL>
 
@@ -11015,7 +11045,7 @@ Richard&nbsp;M. Stallman and Roland McGrath.
 <BR><HR>
 <ADDRESS>
 Thomas J. Moore
-2012-10-27
+2012-10-28
 </ADDRESS>
 </BODY>
 </HTML>
