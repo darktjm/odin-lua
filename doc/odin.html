@@ -34,7 +34,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <P ALIGN="CENTER"><STRONG>Geoffrey M. Clemm</STRONG></P>
 <P ALIGN="CENTER"><STRONG>
-*** Odin Version 1.17 ***
+*** Odin Version 1.18 ***
 <BR>The Odin System is a simpler, more powerful, and more reliable
 replacement for Make.  It computes complete dependency information
 automatically, making the build scripts shorter and easier to manage.
@@ -54,401 +54,403 @@ Contents</A>
 <!--Table of Contents-->
 
 <UL>
-<LI><A NAME="tex2html161"
+<LI><A NAME="tex2html162"
   HREF="odin.html#SECTION00200000000000000000">1. Introduction</A>
 <UL>
-<LI><A NAME="tex2html162"
-  HREF="odin.html#SECTION00210000000000000000">1.1 Derived Object Managers</A>
 <LI><A NAME="tex2html163"
+  HREF="odin.html#SECTION00210000000000000000">1.1 Derived Object Managers</A>
+<LI><A NAME="tex2html164"
   HREF="odin.html#SECTION00220000000000000000">1.2 Odin Objects</A>
 <UL>
-<LI><A NAME="tex2html164"
-  HREF="odin.html#SECTION00221000000000000000">1.2.1 Source and Derived Objects</A>
 <LI><A NAME="tex2html165"
+  HREF="odin.html#SECTION00221000000000000000">1.2.1 Source and Derived Objects</A>
+<LI><A NAME="tex2html166"
   HREF="odin.html#SECTION00222000000000000000">1.2.2 The Derived Object Cache</A>
 </UL>
-<LI><A NAME="tex2html166"
+<LI><A NAME="tex2html167"
   HREF="odin.html#SECTION00230000000000000000">1.3 Why Not Just Use Make?</A>
 <UL>
-<LI><A NAME="tex2html167"
-  HREF="odin.html#SECTION00231000000000000000">1.3.1 Dependency Information</A>
 <LI><A NAME="tex2html168"
-  HREF="odin.html#SECTION00232000000000000000">1.3.2 Specifying Build Variants</A>
+  HREF="odin.html#SECTION00231000000000000000">1.3.1 Dependency Information</A>
 <LI><A NAME="tex2html169"
-  HREF="odin.html#SECTION00233000000000000000">1.3.3 Storing Derived File Variants</A>
+  HREF="odin.html#SECTION00232000000000000000">1.3.2 Specifying Build Variants</A>
 <LI><A NAME="tex2html170"
-  HREF="odin.html#SECTION00234000000000000000">1.3.4 Parallel Builds</A>
+  HREF="odin.html#SECTION00233000000000000000">1.3.3 Storing Derived File Variants</A>
 <LI><A NAME="tex2html171"
-  HREF="odin.html#SECTION00235000000000000000">1.3.5 Help</A>
+  HREF="odin.html#SECTION00234000000000000000">1.3.4 Parallel Builds</A>
 <LI><A NAME="tex2html172"
-  HREF="odin.html#SECTION00236000000000000000">1.3.6 Errors</A>
+  HREF="odin.html#SECTION00235000000000000000">1.3.5 Help</A>
 <LI><A NAME="tex2html173"
-  HREF="odin.html#SECTION00237000000000000000">1.3.7 Operations on Lists</A>
+  HREF="odin.html#SECTION00236000000000000000">1.3.6 Errors</A>
 <LI><A NAME="tex2html174"
-  HREF="odin.html#SECTION00238000000000000000">1.3.8 Editing while Building</A>
+  HREF="odin.html#SECTION00237000000000000000">1.3.7 Operations on Lists</A>
 <LI><A NAME="tex2html175"
-  HREF="odin.html#SECTION00239000000000000000">1.3.9 Recursive Implicit Rules</A>
+  HREF="odin.html#SECTION00238000000000000000">1.3.8 Editing while Building</A>
 <LI><A NAME="tex2html176"
-  HREF="odin.html#SECTION002310000000000000000">1.3.10 Circular Dependencies</A>
+  HREF="odin.html#SECTION00239000000000000000">1.3.9 Recursive Implicit Rules</A>
 <LI><A NAME="tex2html177"
-  HREF="odin.html#SECTION002311000000000000000">1.3.11 Efficient Dependency Computation</A>
+  HREF="odin.html#SECTION002310000000000000000">1.3.10 Circular Dependencies</A>
 <LI><A NAME="tex2html178"
-  HREF="odin.html#SECTION002312000000000000000">1.3.12 Tool Dependencies</A>
+  HREF="odin.html#SECTION002311000000000000000">1.3.11 Efficient Dependency Computation</A>
 <LI><A NAME="tex2html179"
+  HREF="odin.html#SECTION002312000000000000000">1.3.12 Tool Dependencies</A>
+<LI><A NAME="tex2html180"
   HREF="odin.html#SECTION002313000000000000000">1.3.13 Availability</A>
 </UL>
 </UL><BR>
-<LI><A NAME="tex2html180"
+<LI><A NAME="tex2html181"
   HREF="odin.html#SECTION00300000000000000000">2. The Odinfile</A>
 <UL>
-<LI><A NAME="tex2html181"
-  HREF="odin.html#SECTION00310000000000000000">2.1 Targets</A>
 <LI><A NAME="tex2html182"
+  HREF="odin.html#SECTION00310000000000000000">2.1 Targets</A>
+<LI><A NAME="tex2html183"
   HREF="odin.html#SECTION00320000000000000000">2.2 Odin-Expressions</A>
 <UL>
-<LI><A NAME="tex2html183"
-  HREF="odin.html#SECTION00321000000000000000">2.2.1 Lexical Conventions</A>
 <LI><A NAME="tex2html184"
-  HREF="odin.html#SECTION00322000000000000000">2.2.2 Selection Expressions</A>
+  HREF="odin.html#SECTION00321000000000000000">2.2.1 Lexical Conventions</A>
 <LI><A NAME="tex2html185"
-  HREF="odin.html#SECTION00323000000000000000">2.2.3 Derivation Expressions</A>
+  HREF="odin.html#SECTION00322000000000000000">2.2.2 Selection Expressions</A>
 <LI><A NAME="tex2html186"
-  HREF="odin.html#SECTION00324000000000000000">2.2.4 Parameterization Expressions</A>
+  HREF="odin.html#SECTION00323000000000000000">2.2.3 Derivation Expressions</A>
 <LI><A NAME="tex2html187"
+  HREF="odin.html#SECTION00324000000000000000">2.2.4 Parameterization Expressions</A>
+<LI><A NAME="tex2html188"
   HREF="odin.html#SECTION00325000000000000000">2.2.5 String Expressions</A>
 </UL>
-<LI><A NAME="tex2html188"
-  HREF="odin.html#SECTION00330000000000000000">2.3 Virtual Targets</A>
 <LI><A NAME="tex2html189"
+  HREF="odin.html#SECTION00330000000000000000">2.3 Virtual Targets</A>
+<LI><A NAME="tex2html190"
   HREF="odin.html#SECTION00340000000000000000">2.4 Text Targets</A>
 <UL>
-<LI><A NAME="tex2html190"
+<LI><A NAME="tex2html191"
   HREF="odin.html#SECTION00341000000000000000">2.4.1 Executable Text Targets</A>
 </UL>
-<LI><A NAME="tex2html191"
-  HREF="odin.html#SECTION00350000000000000000">2.5 Command Targets</A>
 <LI><A NAME="tex2html192"
+  HREF="odin.html#SECTION00350000000000000000">2.5 Command Targets</A>
+<LI><A NAME="tex2html193"
   HREF="odin.html#SECTION00360000000000000000">2.6 Nested Target Definitions</A>
 </UL><BR>
-<LI><A NAME="tex2html193"
+<LI><A NAME="tex2html194"
   HREF="odin.html#SECTION00400000000000000000">3. Getting Started</A>
 <UL>
-<LI><A NAME="tex2html194"
-  HREF="odin.html#SECTION00410000000000000000">3.1 Systems with Several Files</A>
 <LI><A NAME="tex2html195"
-  HREF="odin.html#SECTION00420000000000000000">3.2 Files in Other Directories</A>
+  HREF="odin.html#SECTION00410000000000000000">3.1 Systems with Several Files</A>
 <LI><A NAME="tex2html196"
-  HREF="odin.html#SECTION00430000000000000000">3.3 Recursive Odin Calls</A>
+  HREF="odin.html#SECTION00420000000000000000">3.2 Files in Other Directories</A>
 <LI><A NAME="tex2html197"
+  HREF="odin.html#SECTION00430000000000000000">3.3 Recursive Odin Calls</A>
+<LI><A NAME="tex2html198"
   HREF="odin.html#SECTION00440000000000000000">3.4 Debugging Your Program</A>
 </UL><BR>
-<LI><A NAME="tex2html198"
+<LI><A NAME="tex2html199"
   HREF="odin.html#SECTION00500000000000000000">4. Odin-Commands</A>
 <UL>
-<LI><A NAME="tex2html199"
+<LI><A NAME="tex2html200"
   HREF="odin.html#SECTION00510000000000000000">4.1 Query Odin-Commands</A>
 <UL>
-<LI><A NAME="tex2html200"
-  HREF="odin.html#SECTION00511000000000000000">4.1.1 Status of Odin Objects</A>
 <LI><A NAME="tex2html201"
+  HREF="odin.html#SECTION00511000000000000000">4.1.1 Status of Odin Objects</A>
+<LI><A NAME="tex2html202"
   HREF="odin.html#SECTION00512000000000000000">4.1.2 Error and Warning Messages</A>
 </UL>
-<LI><A NAME="tex2html202"
+<LI><A NAME="tex2html203"
   HREF="odin.html#SECTION00520000000000000000">4.2 Copy Odin-Commands</A>
 <UL>
-<LI><A NAME="tex2html203"
-  HREF="odin.html#SECTION00521000000000000000">4.2.1 Copying to Standard Output</A>
 <LI><A NAME="tex2html204"
+  HREF="odin.html#SECTION00521000000000000000">4.2.1 Copying to Standard Output</A>
+<LI><A NAME="tex2html205"
   HREF="odin.html#SECTION00522000000000000000">4.2.2 Editing with the Copy Odin-Command</A>
 </UL>
-<LI><A NAME="tex2html205"
-  HREF="odin.html#SECTION00530000000000000000">4.3 Execute Odin-Commands</A>
 <LI><A NAME="tex2html206"
+  HREF="odin.html#SECTION00530000000000000000">4.3 Execute Odin-Commands</A>
+<LI><A NAME="tex2html207"
   HREF="odin.html#SECTION00540000000000000000">4.4 Variable Assignment Odin-Commands</A>
 <UL>
-<LI><A NAME="tex2html207"
-  HREF="odin.html#SECTION00541000000000000000">4.4.1 Dir</A>
 <LI><A NAME="tex2html208"
-  HREF="odin.html#SECTION00542000000000000000">4.4.2 BuildHosts, MaxBuilds</A>
+  HREF="odin.html#SECTION00541000000000000000">4.4.1 Dir</A>
 <LI><A NAME="tex2html209"
-  HREF="odin.html#SECTION00543000000000000000">4.4.3 KeepGoing</A>
+  HREF="odin.html#SECTION00542000000000000000">4.4.2 BuildHosts, MaxBuilds</A>
 <LI><A NAME="tex2html210"
-  HREF="odin.html#SECTION00544000000000000000">4.4.4 History</A>
+  HREF="odin.html#SECTION00543000000000000000">4.4.3 KeepGoing</A>
 <LI><A NAME="tex2html211"
-  HREF="odin.html#SECTION00545000000000000000">4.4.5 ErrLevel, WarnLevel, LogLevel</A>
+  HREF="odin.html#SECTION00544000000000000000">4.4.4 History</A>
 <LI><A NAME="tex2html212"
-  HREF="odin.html#SECTION00546000000000000000">4.4.6 HelpLevel</A>
+  HREF="odin.html#SECTION00545000000000000000">4.4.5 ErrLevel, WarnLevel, LogLevel</A>
 <LI><A NAME="tex2html213"
-  HREF="odin.html#SECTION00547000000000000000">4.4.7 VerifyLevel</A>
+  HREF="odin.html#SECTION00546000000000000000">4.4.6 HelpLevel</A>
 <LI><A NAME="tex2html214"
-  HREF="odin.html#SECTION00548000000000000000">4.4.8 Size</A>
+  HREF="odin.html#SECTION00547000000000000000">4.4.7 VerifyLevel</A>
 <LI><A NAME="tex2html215"
+  HREF="odin.html#SECTION00548000000000000000">4.4.8 Size</A>
+<LI><A NAME="tex2html216"
   HREF="odin.html#SECTION00549000000000000000">4.4.9 Environment Variables</A>
 </UL>
-<LI><A NAME="tex2html216"
+<LI><A NAME="tex2html217"
   HREF="odin.html#SECTION00550000000000000000">4.5 Help</A>
 <UL>
-<LI><A NAME="tex2html217"
-  HREF="odin.html#SECTION00551000000000000000">4.5.1 Source Type Help</A>
 <LI><A NAME="tex2html218"
-  HREF="odin.html#SECTION00552000000000000000">4.5.2 Derivation Help</A>
+  HREF="odin.html#SECTION00551000000000000000">4.5.1 Source Type Help</A>
 <LI><A NAME="tex2html219"
-  HREF="odin.html#SECTION00553000000000000000">4.5.3 Parameterization Help</A>
+  HREF="odin.html#SECTION00552000000000000000">4.5.2 Derivation Help</A>
 <LI><A NAME="tex2html220"
+  HREF="odin.html#SECTION00553000000000000000">4.5.3 Parameterization Help</A>
+<LI><A NAME="tex2html221"
   HREF="odin.html#SECTION00554000000000000000">4.5.4 Variable Help</A>
 </UL>
 </UL><BR>
-<LI><A NAME="tex2html221"
+<LI><A NAME="tex2html222"
   HREF="odin.html#SECTION00600000000000000000">A. Dependency Database Utilities</A>
 <UL>
-<LI><A NAME="tex2html222"
-  HREF="odin.html#SECTION00610000000000000000">A.1 Testing Host Files for Changes</A>
 <LI><A NAME="tex2html223"
-  HREF="odin.html#SECTION00620000000000000000">A.2 Redoing a Particular Derivation Step</A>
+  HREF="odin.html#SECTION00610000000000000000">A.1 Testing Host Files for Changes</A>
 <LI><A NAME="tex2html224"
+  HREF="odin.html#SECTION00620000000000000000">A.2 Redoing a Particular Derivation Step</A>
+<LI><A NAME="tex2html225"
   HREF="odin.html#SECTION00630000000000000000">A.3 Browsing the Dependency Database</A>
 </UL><BR>
-<LI><A NAME="tex2html225"
+<LI><A NAME="tex2html226"
   HREF="odin.html#SECTION00700000000000000000">B. Tool Package Libraries</A>
 <UL>
-<LI><A NAME="tex2html226"
+<LI><A NAME="tex2html227"
   HREF="odin.html#SECTION00710000000000000000">B.1 Tool Packages</A>
 <UL>
-<LI><A NAME="tex2html227"
+<LI><A NAME="tex2html228"
   HREF="odin.html#SECTION00711000000000000000">B.1.1 Versioned Tool Packages</A>
 </UL>
-<LI><A NAME="tex2html228"
-  HREF="odin.html#SECTION00720000000000000000">B.2 Derivation Graphs</A>
 <LI><A NAME="tex2html229"
-  HREF="odin.html#SECTION00730000000000000000">B.3 Source Declarations</A>
+  HREF="odin.html#SECTION00720000000000000000">B.2 Derivation Graphs</A>
 <LI><A NAME="tex2html230"
+  HREF="odin.html#SECTION00730000000000000000">B.3 Source Declarations</A>
+<LI><A NAME="tex2html231"
   HREF="odin.html#SECTION00740000000000000000">B.4 Object Type Declarations</A>
 <UL>
-<LI><A NAME="tex2html231"
-  HREF="odin.html#SECTION00741000000000000000">B.4.1 Built-In Supertypes</A>
 <LI><A NAME="tex2html232"
+  HREF="odin.html#SECTION00741000000000000000">B.4.1 Built-In Supertypes</A>
+<LI><A NAME="tex2html233"
   HREF="odin.html#SECTION00742000000000000000">B.4.2 Built-In Derived Object Types</A>
 </UL>
-<LI><A NAME="tex2html233"
-  HREF="odin.html#SECTION00750000000000000000">B.5 Parameter Type Declarations</A>
 <LI><A NAME="tex2html234"
-  HREF="odin.html#SECTION00760000000000000000">B.6 Environment Variable Declarations</A>
+  HREF="odin.html#SECTION00750000000000000000">B.5 Parameter Type Declarations</A>
 <LI><A NAME="tex2html235"
+  HREF="odin.html#SECTION00760000000000000000">B.6 Environment Variable Declarations</A>
+<LI><A NAME="tex2html236"
   HREF="odin.html#SECTION00770000000000000000">B.7 Tool Declarations</A>
 <UL>
-<LI><A NAME="tex2html236"
-  HREF="odin.html#SECTION00771000000000000000">B.7.1 Input-Expressions</A>
 <LI><A NAME="tex2html237"
-  HREF="odin.html#SECTION00772000000000000000">B.7.2 Ignoring the Status of a Tool Input</A>
+  HREF="odin.html#SECTION00771000000000000000">B.7.1 Input-Expressions</A>
 <LI><A NAME="tex2html238"
-  HREF="odin.html#SECTION00773000000000000000">B.7.3 Ignoring Changes to the Value of a Tool Input</A>
+  HREF="odin.html#SECTION00772000000000000000">B.7.2 Ignoring the Status of a Tool Input</A>
 <LI><A NAME="tex2html239"
-  HREF="odin.html#SECTION00774000000000000000">B.7.4 EXEC Tool</A>
+  HREF="odin.html#SECTION00773000000000000000">B.7.3 Ignoring Changes to the Value of a Tool Input</A>
 <LI><A NAME="tex2html240"
-  HREF="odin.html#SECTION00775000000000000000">B.7.5 COLLECT Tool</A>
+  HREF="odin.html#SECTION00774000000000000000">B.7.4 EXEC Tool</A>
 <LI><A NAME="tex2html241"
-  HREF="odin.html#SECTION00776000000000000000">B.7.6 READ-LIST Tool</A>
+  HREF="odin.html#SECTION00775000000000000000">B.7.5 COLLECT Tool</A>
 <LI><A NAME="tex2html242"
+  HREF="odin.html#SECTION00776000000000000000">B.7.6 READ-LIST Tool</A>
+<LI><A NAME="tex2html243"
   HREF="odin.html#SECTION00777000000000000000">B.7.7 READ-REFERENCE Tool</A>
 </UL>
 </UL><BR>
-<LI><A NAME="tex2html243"
-  HREF="odin.html#SECTION00800000000000000000">C. Derivation Graph Syntax</A>
 <LI><A NAME="tex2html244"
-  HREF="odin.html#SECTION00900000000000000000">D. Derivation Graph Example</A>
+  HREF="odin.html#SECTION00800000000000000000">C. Derivation Graph Syntax</A>
 <LI><A NAME="tex2html245"
+  HREF="odin.html#SECTION00900000000000000000">D. Derivation Graph Example</A>
+<LI><A NAME="tex2html246"
   HREF="odin.html#SECTION001000000000000000000">E. Odin Tool Package Library</A>
 <UL>
-<LI><A NAME="tex2html246"
-  HREF="odin.html#SECTION001010000000000000000">E.1 config</A>
 <LI><A NAME="tex2html247"
+  HREF="odin.html#SECTION001010000000000000000">E.1 config</A>
+<LI><A NAME="tex2html248"
   HREF="odin.html#SECTION001020000000000000000">E.2 odin</A>
 <UL>
-<LI><A NAME="tex2html248"
+<LI><A NAME="tex2html249"
   HREF="odin.html#SECTION001021000000000000000">E.2.1 Other transformations</A>
 </UL>
-<LI><A NAME="tex2html249"
+<LI><A NAME="tex2html250"
   HREF="odin.html#SECTION001030000000000000000">E.3 vc</A>
 <UL>
-<LI><A NAME="tex2html250"
-  HREF="odin.html#SECTION001031000000000000000">E.3.1 SCCS version control file</A>
 <LI><A NAME="tex2html251"
-  HREF="odin.html#SECTION001032000000000000000">E.3.2 A view-path system model</A>
+  HREF="odin.html#SECTION001031000000000000000">E.3.1 SCCS version control file</A>
 <LI><A NAME="tex2html252"
-  HREF="odin.html#SECTION001033000000000000000">E.3.3 RCS version control file</A>
+  HREF="odin.html#SECTION001032000000000000000">E.3.2 A view-path system model</A>
 <LI><A NAME="tex2html253"
+  HREF="odin.html#SECTION001033000000000000000">E.3.3 RCS version control file</A>
+<LI><A NAME="tex2html254"
   HREF="odin.html#SECTION001034000000000000000">E.3.4 Other transformations</A>
 </UL>
-<LI><A NAME="tex2html254"
+<LI><A NAME="tex2html255"
   HREF="odin.html#SECTION001040000000000000000">E.4 code</A>
 <UL>
-<LI><A NAME="tex2html255"
-  HREF="odin.html#SECTION001041000000000000000">E.4.1 System model of source code files</A>
 <LI><A NAME="tex2html256"
-  HREF="odin.html#SECTION001042000000000000000">E.4.2 Object library archive</A>
+  HREF="odin.html#SECTION001041000000000000000">E.4.1 System model of source code files</A>
 <LI><A NAME="tex2html257"
-  HREF="odin.html#SECTION001043000000000000000">E.4.3 Object module</A>
+  HREF="odin.html#SECTION001042000000000000000">E.4.2 Object library archive</A>
 <LI><A NAME="tex2html258"
+  HREF="odin.html#SECTION001043000000000000000">E.4.3 Object module</A>
+<LI><A NAME="tex2html259"
   HREF="odin.html#SECTION001044000000000000000">E.4.4 Other transformations</A>
 </UL>
-<LI><A NAME="tex2html259"
+<LI><A NAME="tex2html260"
   HREF="odin.html#SECTION001050000000000000000">E.5 cc</A>
 <UL>
-<LI><A NAME="tex2html260"
-  HREF="odin.html#SECTION001051000000000000000">E.5.1 System model for a C program</A>
 <LI><A NAME="tex2html261"
-  HREF="odin.html#SECTION001052000000000000000">E.5.2 Executable binary</A>
+  HREF="odin.html#SECTION001051000000000000000">E.5.1 System model for a C program</A>
 <LI><A NAME="tex2html262"
-  HREF="odin.html#SECTION001053000000000000000">E.5.3 C source code</A>
+  HREF="odin.html#SECTION001052000000000000000">E.5.2 Executable binary</A>
 <LI><A NAME="tex2html263"
+  HREF="odin.html#SECTION001053000000000000000">E.5.3 C source code</A>
+<LI><A NAME="tex2html264"
   HREF="odin.html#SECTION001054000000000000000">E.5.4 Other transformations</A>
 </UL>
-<LI><A NAME="tex2html264"
+<LI><A NAME="tex2html265"
   HREF="odin.html#SECTION001060000000000000000">E.6 cpp</A>
 <UL>
-<LI><A NAME="tex2html265"
+<LI><A NAME="tex2html266"
   HREF="odin.html#SECTION001061000000000000000">E.6.1 Cpp input</A>
 </UL>
-<LI><A NAME="tex2html266"
+<LI><A NAME="tex2html267"
   HREF="odin.html#SECTION001070000000000000000">E.7 cxx</A>
 <UL>
-<LI><A NAME="tex2html267"
-  HREF="odin.html#SECTION001071000000000000000">E.7.1 System model for a C++ program</A>
 <LI><A NAME="tex2html268"
-  HREF="odin.html#SECTION001072000000000000000">E.7.2 C++ source code</A>
+  HREF="odin.html#SECTION001071000000000000000">E.7.1 System model for a C++ program</A>
 <LI><A NAME="tex2html269"
+  HREF="odin.html#SECTION001072000000000000000">E.7.2 C++ source code</A>
+<LI><A NAME="tex2html270"
   HREF="odin.html#SECTION001073000000000000000">E.7.3 Other transformations</A>
 </UL>
-<LI><A NAME="tex2html270"
+<LI><A NAME="tex2html271"
   HREF="odin.html#SECTION001080000000000000000">E.8 odi</A>
 <UL>
-<LI><A NAME="tex2html271"
-  HREF="odin.html#SECTION001081000000000000000">E.8.1 System model for an ODI C++ program</A>
 <LI><A NAME="tex2html272"
+  HREF="odin.html#SECTION001081000000000000000">E.8.1 System model for an ODI C++ program</A>
+<LI><A NAME="tex2html273"
   HREF="odin.html#SECTION001082000000000000000">E.8.2 Other transformations</A>
 </UL>
-<LI><A NAME="tex2html273"
+<LI><A NAME="tex2html274"
   HREF="odin.html#SECTION001090000000000000000">E.9 f77</A>
 <UL>
-<LI><A NAME="tex2html274"
+<LI><A NAME="tex2html275"
   HREF="odin.html#SECTION001091000000000000000">E.9.1 Fortran77 source code</A>
 </UL>
-<LI><A NAME="tex2html275"
+<LI><A NAME="tex2html276"
   HREF="odin.html#SECTION0010100000000000000000">E.10 lex</A>
 <UL>
-<LI><A NAME="tex2html276"
+<LI><A NAME="tex2html277"
   HREF="odin.html#SECTION0010101000000000000000">E.10.1 Scanner grammar</A>
 </UL>
-<LI><A NAME="tex2html277"
+<LI><A NAME="tex2html278"
   HREF="odin.html#SECTION0010110000000000000000">E.11 yacc</A>
 <UL>
-<LI><A NAME="tex2html278"
+<LI><A NAME="tex2html279"
   HREF="odin.html#SECTION0010111000000000000000">E.11.1 Yacc input</A>
 </UL>
-<LI><A NAME="tex2html279"
+<LI><A NAME="tex2html280"
   HREF="odin.html#SECTION0010120000000000000000">E.12 tregrm</A>
 <UL>
-<LI><A NAME="tex2html280"
+<LI><A NAME="tex2html281"
   HREF="odin.html#SECTION0010121000000000000000">E.12.1 Input grammar for the Tregrm tree-building parser generator</A>
 </UL>
-<LI><A NAME="tex2html281"
+<LI><A NAME="tex2html282"
   HREF="odin.html#SECTION0010130000000000000000">E.13 dg</A>
 <UL>
-<LI><A NAME="tex2html282"
+<LI><A NAME="tex2html283"
   HREF="odin.html#SECTION0010131000000000000000">E.13.1 Odin Derivation Graph</A>
 </UL>
-<LI><A NAME="tex2html283"
+<LI><A NAME="tex2html284"
   HREF="odin.html#SECTION0010140000000000000000">E.14 idl</A>
 <UL>
-<LI><A NAME="tex2html284"
-  HREF="odin.html#SECTION0010141000000000000000">E.14.1 C++ Interface Definition Language file</A>
 <LI><A NAME="tex2html285"
+  HREF="odin.html#SECTION0010141000000000000000">E.14.1 C++ Interface Definition Language file</A>
+<LI><A NAME="tex2html286"
   HREF="odin.html#SECTION0010142000000000000000">E.14.2 Other transformations</A>
 </UL>
-<LI><A NAME="tex2html286"
+<LI><A NAME="tex2html287"
   HREF="odin.html#SECTION0010150000000000000000">E.15 prof</A>
 <UL>
-<LI><A NAME="tex2html287"
+<LI><A NAME="tex2html288"
   HREF="odin.html#SECTION0010151000000000000000">E.15.1 Other transformations</A>
 </UL>
-<LI><A NAME="tex2html288"
+<LI><A NAME="tex2html289"
   HREF="odin.html#SECTION0010160000000000000000">E.16 lint</A>
 <UL>
-<LI><A NAME="tex2html289"
+<LI><A NAME="tex2html290"
   HREF="odin.html#SECTION0010161000000000000000">E.16.1 Other transformations</A>
 </UL>
-<LI><A NAME="tex2html290"
+<LI><A NAME="tex2html291"
   HREF="odin.html#SECTION0010170000000000000000">E.17 misc</A>
 <UL>
-<LI><A NAME="tex2html291"
+<LI><A NAME="tex2html292"
   HREF="odin.html#SECTION0010171000000000000000">E.17.1 Other transformations</A>
 </UL>
-<LI><A NAME="tex2html292"
+<LI><A NAME="tex2html293"
   HREF="odin.html#SECTION0010180000000000000000">E.18 roff</A>
 <UL>
-<LI><A NAME="tex2html293"
-  HREF="odin.html#SECTION0010181000000000000000">E.18.1 Nroff/troff input</A>
 <LI><A NAME="tex2html294"
-  HREF="odin.html#SECTION0010182000000000000000">E.18.2 Eqn input</A>
+  HREF="odin.html#SECTION0010181000000000000000">E.18.1 Nroff/troff input</A>
 <LI><A NAME="tex2html295"
-  HREF="odin.html#SECTION0010183000000000000000">E.18.3 Tbl input</A>
+  HREF="odin.html#SECTION0010182000000000000000">E.18.2 Eqn input</A>
 <LI><A NAME="tex2html296"
+  HREF="odin.html#SECTION0010183000000000000000">E.18.3 Tbl input</A>
+<LI><A NAME="tex2html297"
   HREF="odin.html#SECTION0010184000000000000000">E.18.4 Other transformations</A>
 </UL>
-<LI><A NAME="tex2html297"
+<LI><A NAME="tex2html298"
   HREF="odin.html#SECTION0010190000000000000000">E.19 tex</A>
 <UL>
-<LI><A NAME="tex2html298"
-  HREF="odin.html#SECTION0010191000000000000000">E.19.1 Basis of a TeX formatted document</A>
 <LI><A NAME="tex2html299"
-  HREF="odin.html#SECTION0010192000000000000000">E.19.2 Bibliographic data file</A>
+  HREF="odin.html#SECTION0010191000000000000000">E.19.1 Basis of a TeX formatted document</A>
 <LI><A NAME="tex2html300"
-  HREF="odin.html#SECTION0010193000000000000000">E.19.3 Bibliographic style file</A>
+  HREF="odin.html#SECTION0010192000000000000000">E.19.2 Bibliographic data file</A>
 <LI><A NAME="tex2html301"
-  HREF="odin.html#SECTION0010194000000000000000">E.19.4 Formatting style file</A>
+  HREF="odin.html#SECTION0010193000000000000000">E.19.3 Bibliographic style file</A>
 <LI><A NAME="tex2html302"
-  HREF="odin.html#SECTION0010195000000000000000">E.19.5 Portable Document Format file</A>
+  HREF="odin.html#SECTION0010194000000000000000">E.19.4 Formatting style file</A>
 <LI><A NAME="tex2html303"
-  HREF="odin.html#SECTION0010196000000000000000">E.19.6 Formatting style file</A>
+  HREF="odin.html#SECTION0010195000000000000000">E.19.5 Portable Document Format file</A>
 <LI><A NAME="tex2html304"
-  HREF="odin.html#SECTION0010197000000000000000">E.19.7 TeX formatter input</A>
+  HREF="odin.html#SECTION0010196000000000000000">E.19.6 Formatting style file</A>
 <LI><A NAME="tex2html305"
-  HREF="odin.html#SECTION0010198000000000000000">E.19.8 Postscript file</A>
+  HREF="odin.html#SECTION0010197000000000000000">E.19.7 TeX formatter input</A>
 <LI><A NAME="tex2html306"
+  HREF="odin.html#SECTION0010198000000000000000">E.19.8 Postscript file</A>
+<LI><A NAME="tex2html307"
   HREF="odin.html#SECTION0010199000000000000000">E.19.9 Other transformations</A>
 </UL>
-<LI><A NAME="tex2html307"
+<LI><A NAME="tex2html308"
   HREF="odin.html#SECTION0010200000000000000000">E.20 dbx</A>
 <UL>
-<LI><A NAME="tex2html308"
+<LI><A NAME="tex2html309"
   HREF="odin.html#SECTION0010201000000000000000">E.20.1 Other transformations</A>
 </UL>
-<LI><A NAME="tex2html309"
+<LI><A NAME="tex2html310"
   HREF="odin.html#SECTION0010210000000000000000">E.21 run</A>
 <UL>
-<LI><A NAME="tex2html310"
+<LI><A NAME="tex2html311"
   HREF="odin.html#SECTION0010211000000000000000">E.21.1 Other transformations</A>
 </UL>
-<LI><A NAME="tex2html311"
+<LI><A NAME="tex2html312"
   HREF="odin.html#SECTION0010220000000000000000">E.22 regsub</A>
 <UL>
-<LI><A NAME="tex2html312"
+<LI><A NAME="tex2html313"
   HREF="odin.html#SECTION0010221000000000000000">E.22.1 Regsub substitution input</A>
 </UL>
 </UL><BR>
-<LI><A NAME="tex2html313"
+<LI><A NAME="tex2html314"
   HREF="odin.html#SECTION001100000000000000000">F. Odin Lua Library</A>
 <UL>
-<LI><A NAME="tex2html314"
-  HREF="odin.html#SECTION001110000000000000000">F.1 Apache Portable Runtime</A>
 <LI><A NAME="tex2html315"
-  HREF="odin.html#SECTION001120000000000000000">F.2 File Commands</A>
+  HREF="odin.html#SECTION001110000000000000000">F.1 GLib</A>
 <LI><A NAME="tex2html316"
-  HREF="odin.html#SECTION001130000000000000000">F.3 Odin Support Utilities</A>
+  HREF="odin.html#SECTION001120000000000000000">F.2 File Commands</A>
 <LI><A NAME="tex2html317"
-  HREF="odin.html#SECTION001140000000000000000">F.4 Miscellaneous</A>
-</UL><BR>
+  HREF="odin.html#SECTION001130000000000000000">F.3 Odin Support Utilities</A>
 <LI><A NAME="tex2html318"
+  HREF="odin.html#SECTION001140000000000000000">F.4 Configuration Support</A>
+<LI><A NAME="tex2html319"
+  HREF="odin.html#SECTION001150000000000000000">F.5 Miscellaneous</A>
+</UL><BR>
+<LI><A NAME="tex2html320"
   HREF="odin.html#SECTION001200000000000000000">Bibliography</A>
 </UL>
 <!--End of Table of Contents-->
@@ -1710,7 +1712,7 @@ You exit the Odin interpreter by typing an end-of-file,
 commonly the control-D character.
 <PRE>
    1% odin
-   Odin Version 1.17
+   Odin Version 1.18.0
    -&gt; ^D
    2%
 </PRE>
@@ -10485,8 +10487,11 @@ matching text.  A backslash followed by a single digit, or a
 backslash followed by a curly-brace enclosed decimal number,
 represents that parenthesis-enclosed subexpression.  Subexpression
 zero is the entire matching text, and the rest numbered by the order
-of the opening parenthesis.  All +subst parameters are applied in the
-order they are given, so an earlier one may affect a later one.
+of the opening parenthesis.  Named subexpressions may be referenced
+using a name in curly braces rather than a number; the name must
+start with something other than a digit, and may contain no
+close-curly-braces.  All +subst parameters are applied in the order
+they are given, so an earlier one may affect a later one.
 
 <P>
 If the +subst_only parameter is given, any line which does not cause
@@ -10613,46 +10618,59 @@ utility functions for convenience and portability.
 <P>
 
 <H1><A NAME="SECTION001110000000000000000">
-F.1 Apache Portable Runtime</A>
+F.1 GLib</A>
 </H1>
 
 <P>
 Portability to other operating systems is supported by including the
-lua-apr package in the table <TT>apr</TT>.  See
+lua-glib package in the table <TT>glib</TT>.  See
 <TT><A NAME="tex2html1"
-  HREF="http://peterodding.com/code/lua/apr">http://peterodding.com/code/lua/apr</A></TT> for details.  Some of its
+  HREF="https://github.com/darktjm/lua-glib">https://github.com/darktjm/lua-glib</A></TT> for details.  Some of its
 commonly used functions are aliased globally to shorten scripts: 
 
 <P>
 <DL>
-<DT><STRONG>basename(name[, ext])</STRONG></DT>
-<DD><TT>apr.filepath_name</TT> -- get last path
-element, and optionally return extension separately
-</DD>
-<DT><STRONG>pathcat(dir,name)</STRONG></DT>
-<DD><TT>apr.filepath_merge</TT> with the <TT>native</TT> option set. -- add path elements portably
+<DT><STRONG>pathcat(dir,name, ...)</STRONG></DT>
+<DD><TT>glib.build_filename</TT> -- add path
+elements portably
 </DD>
 <DT><STRONG>getcwd()</STRONG></DT>
-<DD><TT>apr.filepath_get</TT> with the <TT>native</TT> option
-set. -- return current directory
+<DD><TT>glib.get_current_directory</TT> -- return current directory
 </DD>
 <DT><STRONG>chdir(dir)</STRONG></DT>
-<DD><TT>apr.filepath_set</TT> -- change working directory
+<DD><TT>glib.chdir</TT> -- change working directory
 </DD>
-<DT><STRONG>mkdir(dir)</STRONG></DT>
-<DD><TT>apr.dir_make_recursive</TT> -- create directory and
-any missing intervening directories
+<DT><STRONG>mkdir(dir[, perm])</STRONG></DT>
+<DD><TT>glib.mkdir_with_parents</TT> -- create
+directory and any missing intervening directories
 </DD>
 <DT><STRONG>mv(src, dest)</STRONG></DT>
-<DD><TT>apr.file_rename</TT> -- file rename
+<DD><TT>glib.rename</TT> -- file rename
 </DD>
-<DT><STRONG>cp(src, dest)</STRONG></DT>
-<DD><TT>apr.file_copy</TT> -- file copy
+<DT><STRONG>exists(name)</STRONG></DT>
+<DD><TT>glib.exists</TT> -- return true if <I>name</I> exists
+in the file system.
 </DD>
-<DT><STRONG>rm(name)</STRONG></DT>
-<DD><TT>apr.file_remove</TT> -- recursive delete
+<DT><STRONG>is_dir(name)</STRONG></DT>
+<DD><TT>glib.is_dir</TT> -- return true if <I>name</I> is a
+directory or a soft link to a directory.
 </DD>
-</DL>
+<DT><STRONG>is_file(name)</STRONG></DT>
+<DD><TT>glib.is_file</TT> -- return true if <I>name</I> is a
+file or a soft link to a file.
+</DD>
+<DT><STRONG>is_exec(name)</STRONG></DT>
+<DD><TT>glib.is_exec</TT> -- return true if <I>name</I> is a
+file and executable permission is set for that file.  Note that on Windows,
+a heuristic is applied to <I>name</I> determine if a file is executable,
+since otherwise all files would be executable by that logic.
+</DD>
+<DT><STRONG>is_link(name)</STRONG></DT>
+<DD><TT>glib.is_symlink</TT> -- return true if <I>name</I> is
+a soft link.  Note that pseudo-soft link files (<TT> *.lnk) on Windows are
+not covered by this, so it always returns false on Windows.
+</DD>
+</DL></TT>
 
 <P>
 In addition, light wrappers are available for a few functions:
@@ -10663,22 +10681,14 @@ In addition, light wrappers are available for a few functions:
 <DD>-- return the given environment variable's value, or
 blank if unset (in comparison to <TT>nil</TT> as returned by <TT>apr.env_get</TT>)
 </DD>
-<DT><STRONG>exists(name)</STRONG></DT>
-<DD>-- return true if <I>name</I> exists in the file
-system.
+<DT><STRONG>setenv(name, val)</STRONG></DT>
+<DD>-- overwrite env var <I>name</I> with
+<I>val</I>
 </DD>
-<DT><STRONG>is_dir(name)</STRONG></DT>
-<DD>-- return true if <I>name</I> is a directory or a
-soft link to a directory.
-</DD>
-<DT><STRONG>is_file(name)</STRONG></DT>
-<DD>-- return true if <I>name</I> is a file or a
-soft link to a file.
-</DD>
-<DT><STRONG>is_exec(name)</STRONG></DT>
-<DD>-- return true if <I>name</I> is a file and
-executable permission is set for that file.  Note that on Windows, all
-files are considered executable by this logic.
+<DT><STRONG>basename(name[, split])</STRONG></DT>
+<DD><TT>glib.path_get_basename</TT> -- get last
+path element, and split off last dot-separated extension and return
+separately
 </DD>
 <DT><STRONG>is_empty(name)</STRONG></DT>
 <DD>-- return true if <I>name</I> either does not
@@ -10686,7 +10696,8 @@ exist or is an empty file.
 </DD>
 <DT><STRONG>touch(name[, date])</STRONG></DT>
 <DD>-- if <I>name</I> does not exist, it is
-created as an empty file.  Otherwise, this is the same as <TT>apr.file_mtime_set</TT>.
+created as an empty file.  Otherwise, it sets the modification time to
+the given parameter (seconds past epoch).
 </DD>
 </DL>
 
@@ -10697,14 +10708,24 @@ F.2 File Commands</A>
 </H1>
 
 <P>
-Some additional file commands not provided by APR are provided here:
+Some additional file commands not provided by GLib are provided here:
 
 <P>
 <DL>
+<DT><STRONG>cp(src, dest[, mode])</STRONG></DT>
+<DD>-- copy file <I>src</I> to <I>dest</I>.
+<I>src</I> and <I>dest</I> may be a file descriptor or a file name.  If
+<I>dest</I> is a file name, protection attributes are set to <I>mode</I>,
+if provided.  If <I>src</I> and <I>dest</I> are both file names, and
+<I>mode</I> is not provided, permissios are copied from <I>src</I>.
+</DD>
+<DT><STRONG>rm(name)</STRONG></DT>
+<DD>-- recursive delete
+</DD>
 <DT><STRONG>cmp(f1, f2)</STRONG></DT>
 <DD>-- recursively compare two files or directories,
 returning true if they match.  Only contents are compared; differences
-in file modification times and permissions are ignore.  Soft links are
+in file modification times and permissions are ignored.  Soft links are
 resolved before comparison.
 </DD>
 <DT><STRONG>cp_RpL(src, dest[, plus_w])</STRONG></DT>
@@ -10729,6 +10750,39 @@ files.
 file <I>f</I>.  <I>f</I> may be either the name of a file or a Lua
 file descriptor.
 </DD>
+<DT><STRONG>build_path(...)</STRONG></DT>
+<DD>-- create a search path using the system
+separator out arguments.  Arguments may be a single table
+of strings or zero or more strings.
+</DD>
+<DT><STRONG>split_path(p)</STRONG></DT>
+<DD>-- split a search path into its elements;
+unlike some such utilities, blank elements are returned as well.
+Elements are returned as a table of strings.
+</DD>
+<DT><STRONG>glob_to_regex(g)</STRONG></DT>
+<DD>-- turn a glob-style pattern to a regular
+expression.  This supports <TT>?</TT>, <TT>*</TT>, characater classes in
+square brackets, and backslash to escape the special meaning of these
+characters.  None of the above patterns can be used to match directory
+separators.  It also supports curly braces, but unlike the shell,
+only matching alternatives are returned (e.g. <TT>{a,b,c*}</TT> will match
+a or b or c*, but in the shell it would return a and b regardless of whether
+or not a or b were present).  Like the shell, mismatched curly
+brackets and curly brackets without unescaped commas are ignored.
+Directory separators are supported within curly braces.
+</DD>
+<DT><STRONG>dir_regex([dir,] regex)</STRONG></DT>
+<DD>-- Return directory entries matching
+<I>regex</I>.  If <I>dir</I> is not specified, search the current
+directory.  The <I>regex</I> parameter may either by a regular
+expression string or a compiled regular expression (from <TT>glib.regex_new</TT>.
+</DD>
+<DT><STRONG>dir_glob([dir,] glob)</STRONG></DT>
+<DD>- Return directory entries matching
+glob-style pattern <I>glob</I>.  If <I>dir</I> is not specified,
+search the current directory.
+</DD>
 </DL>
 
 <P>
@@ -10746,6 +10800,12 @@ The following functions are for common things done in Odin scripts:
 <DD>-- append <I>msg</I> to <TT>ERRORS</TT>
 and, if <I>ret</I> is provided, exit the script with <I>ret</I> as the
 result.
+</DD>
+<DT><STRONG>ODINVERBOSE</STRONG></DT>
+<DD>-- true if ODINVERBOSE is set in environment
+</DD>
+<DT><STRONG>ODINRBSHOST</STRONG></DT>
+<DD>- shortcut for <TT>getenv('ODINRBSHOST')</TT>
 </DD>
 <DT><STRONG>odin_log(msg)</STRONG></DT>
 <DD>-- print <I>msg</I> if ODINVERBOSE is set in
@@ -10807,7 +10867,81 @@ removed as well.
 <P>
 
 <H1><A NAME="SECTION001140000000000000000">
-F.4 Miscellaneous</A>
+F.4 Configuration Support</A>
+</H1>
+
+<P>
+The following support tasks traditionally done by a configuration
+script:
+
+<P>
+<DL>
+<DT><STRONG>parse_ldflags(fl)</STRONG></DT>
+<DD>-- Parse <I>fl</I> as standard UNIX C
+linker flags, and return as Odin <TT>+lib_sp</TT>, <TT>+lib</TT>, and
++ld_flags options.
+</DD>
+<DT><STRONG>parse_cflags(fl)</STRONG></DT>
+<DD>-- Parse <I>fl</I> as standard UNIX C
+compiler flags, and return as Odin <TT>+inc_sp</TT>, <TT>+define</TT>, and
++cc_flags options.
+</DD>
+<DT><STRONG>pkgconfig</STRONG></DT>
+<DD>-- The expected name of the <TT>pkg-config</TT>
+command (<TT>pkg-config</TT> unless PKGCONFIG is set in environment).  Note that
+this can be set to something different before calling the functions below to
+(temporarily) use a different command that works just like <TT>pkg-config</TT>.
+</DD>
+<DT><STRONG>get_pkgconfig(arg, pkg[, vermin][, vermax])</STRONG></DT>
+<DD>-- Obtain results
+from running <TT>pkg-config</TT> with the given *arg*, on the given *pkg*
+whose version must be at least *vermin* (if supplied) and/or at most
+*vermax* (if supplied).  On error, nil and an error message are returned.
+The *arg* should normally be something like <TT>-cflags</TT> or <TT>-libs</TT>.
+</DD>
+<DT><STRONG>pkgconfig_libs</STRONG></DT>
+<DD>The <TT>pkgconfig</TT> option to obtain linker flags
+(<TT>-libs</TT>).  Note that this may be overridden if a different set
+of linker flags is needed (for example if <TT>pkgconfig</TT> was
+overridden).
+</DD>
+<DT><STRONG>pkg_libs(pkg[, vermin][, vermax])</STRONG></DT>
+<DD>-- Return the
+libraries from <TT>pkg-config -libs</TT> in Odin option format.
+</DD>
+<DT><STRONG>pkgconfig_libs</STRONG></DT>
+<DD>The <TT>pkgconfig</TT> option to obtain C compiler flags
+(<TT>-cflags</TT>)  Note that this may be overridden if a different set
+of compiler flags is needed (for example if <TT>pkgconfig</TT> was
+overridden).
+</DD>
+<DT><STRONG>pkg_cflags(pkg[, vermin][, vermax])</STRONG></DT>
+<DD>-- Return the C
+compiler flags and libraries from <TT>pkg-config -libs -cflags</TT> in
+Odin option format.  Two separate runs are made to separate generic
+linker flags (<TT>+ld_flags</TT>) from generic compiler flags (<TT>+cc_flags</TT>) properly.
+</DD>
+<DT><STRONG>aprconfig</STRONG></DT>
+<DD>The expected Apache Portable Runtime configuration
+program (<TT>apr-1-config</TT> unless APRCONFIG is set in the environment)
+</DD>
+<DT><STRONG>get_aprconfig(fl)</STRONG></DT>
+<DD>-- Get APR configuration information using
+configuration command flags <I>fl</I>.
+</DD>
+<DT><STRONG>apr_libs()</STRONG></DT>
+<DD>Return APR linker flags, parsed to Odin format.
+</DD>
+<DT><STRONG>apr_cflags()</STRONG></DT>
+<DD>Return APR C compiler and linker flags, parsed to Odin
+format.
+</DD>
+</DL>
+
+<P>
+
+<H1><A NAME="SECTION001150000000000000000">
+F.5 Miscellaneous</A>
 </H1>
 
 <P>
@@ -10881,7 +11015,7 @@ Richard&nbsp;M. Stallman and Roland McGrath.
 <BR><HR>
 <ADDRESS>
 Thomas J. Moore
-2012-10-26
+2012-10-27
 </ADDRESS>
 </BODY>
 </HTML>
