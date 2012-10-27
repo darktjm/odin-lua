@@ -25,7 +25,7 @@ rbs.exe == %rbs-exe
 
 %size == () +cmd='args={}\
                   for f in io.lines(trim([['(%src-files)']])) do \
-                     if apr.stat(f, "type") == "file" then\
+                     if is_file(f) then\
 		        table.insert(args, f)\
 		     end\
 		  end\
@@ -46,7 +46,7 @@ rbs.exe == %rbs-exe
    if getenv("ODINBOOT_CONFIG") ~= "" then
       io.write(getenv("ODINBOOT_SOCKET_LIBS_PRM"))
    else
-      for f in apr.glob("/usr/lib/libsocket.*") do
+      for f in dir_glob("/usr/lib", "libsocket.*") do
          io.write("+lib=socket +lib=nsl")
 	 break
       end

@@ -11,7 +11,7 @@ odin.html == %odin.html-latex2html
 
 %odin.html-latex2html == () \
    +cmd='vd = trim[[' (%html-in :list :cat :vir_dir) ']]' \
-        'for f in apr.glob(pathcat(vd, "*")) do ln(f, basename(f)) end' \
+        'for f in glib.dir(vd) do ln(pathcat(vd, f), f) end' \
         'cmd = "latex2html -split 0 -noimages -nonavigation " ..' \
 	'                 "-show_section_numbers -math -noinfo " ..' \
 	'                 "odin.tex"' \
@@ -21,6 +21,6 @@ odin.html == %odin.html-latex2html
 
 %odin.html-hevea == () \
    +cmd='vd = trim[[' (%html-in :list :cat :vir_dir) ']]' \
-        'for f in apr.glob(pathcat(vd, "*")) do ln(f, basename(f)) end' \
+        'for f in glib.dir(vd) do ln(pathcat(vd, f), f) end' \
 	'os.execute("hevea -fix -o odin.html odin.tex")' \
    :lua_output/odin.html
