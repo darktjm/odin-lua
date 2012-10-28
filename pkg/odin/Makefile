@@ -1,6 +1,3 @@
-# this will do for boot build
-CFLAGS=`pkg-config glib-2.0 --cflags`
-
 FILES = if-bcast.o if-build.o if-candrv.o if-client.o if-cmd.o \
   if-depend.o if-drvgrf.o if-dir.o if-drvpth.o if-drvspc.o \
   if-edg.o if-env.o if-err.o if-exec.o if-execint.o if-execspc.o \
