@@ -11,6 +11,13 @@ have taken over Odin maintenance.  I haven't interacted with them yet,
 either, since this is still a work in progress (it works, but I want
 to do more changes first).
 
+In order to avoid having to bootstrap using Odin, I have provided
+the results of bootstrapping (./autogen -m), except for the configure
+script, in tjm-autogen.diff.  You will still need to run autoconf in
+order to generate ./configure, and then you can safely follow the
+instructions below.  I have also supplied the built doc/odin.html and
+doc/odin.pdf so you can read the documentation right away.
+
 For most machines and configurations, the following sequence of two
 commands will build an executable version (both commands should be given
 in the directory containing this README file):
