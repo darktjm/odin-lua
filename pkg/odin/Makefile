@@ -1,3 +1,6 @@
+# this will do for boot build
+CFLAGS=`pkg-config glib-2.0 --cflags`
+
 FILES = if-bcast.o if-build.o if-candrv.o if-client.o if-cmd.o \
   if-depend.o if-drvgrf.o if-dir.o if-drvpth.o if-drvspc.o \
   if-edg.o if-env.o if-err.o if-exec.o if-execint.o if-execspc.o \
@@ -22,7 +25,7 @@ odin.exe: $(FILES)
 	- $(CC) $(CFLAGS) $(LDFLAGS) -o odin.exe $(FILES) -llua \
          `if [ $$ODINBOOT_CONFIG ] ; then echo $$ODINBOOT_SOCKET_LIBS; \
 	  elif [ -f /usr/lib/libsocket.* ] ; then echo '-lsocket -lnsl'; \
-	  else true; fi`
+	  else true; fi` `pkg-config glib-2.0 --libs`
 
 clean:
 	rm -f *.o */*.o *.exe
