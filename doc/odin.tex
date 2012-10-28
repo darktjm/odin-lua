@@ -2821,6 +2821,9 @@ files.
 \item[append\_line(f, msg)] --- append \emph{msg} and a newline to the
 file \emph{f}.  \emph{f} may be either the name of a file or a Lua
 file descriptor.
+\item[split\_filename(f)] --- the inverse of {\ex pathcat}.  Returns
+the root part (if present), followed by a table with each path
+element, in order.
 \item[build\_path({\ldots})] --- create a search path using the system
 separator out arguments.  Arguments may be a single table
 of strings or zero or more strings.
@@ -2833,18 +2836,36 @@ square brackets, and backslash to escape the special meaning of these
 characters.  None of the above patterns can be used to match directory
 separators.  It also supports curly braces, but unlike the shell,
 only matching alternatives are returned (e.g. {\ex \{a,b,c*\}} will match
-a or b or c*, but in the shell it would return a and b regardless of whether
-or not a or b were present).  Like the shell, mismatched curly
-brackets and curly brackets without unescaped commas are ignored.
-Directory separators are supported within curly braces.
-\item[dir\_regex({[}dir,{]} regex)] --- Return directory entries matching
-\emph{regex}.  If \emph{dir} is not specified, search the current
-directory.  The \emph{regex} parameter may either by a regular
-expression string or a compiled regular expression (from {\ex
-glib.regex\_new}.
-\item[dir\_glob({[}dir,{]} glob)] -- Return directory entries matching
-glob-style pattern \emph{glob}.  If \emph{dir} is not specified,
-search the current directory.
+{\ex a} or {\ex b} or {\ex c*}, but in the shell it would return {\ex a} and
+{\ex b} regardless of whether or not {\ex a} or {\ex b} match).  Like the
+shell, mismatched curly brackets and curly brackets without unescaped commas
+are ignored.  Directory separators are supported within curly braces.
+\item[shell\_expand\_braces] --- expand curly braces the way a shell
+would.  Returns a table with all entries produced by expanding braces.
+For example, {\ex '\{a,b,c*\}'} would return {\ex \{'a', 'b', 'c*'\}}.
+\item[dir\_regex({[}dir,{]} regex)] --- Return an iterator which
+produces names of directory entries in \emph{dir} matching \emph{regex}.
+If \emph{dir} is not specified, search the current directory.  The
+\emph{regex} parameter may either by a regular expression string or a
+compiled regular expression (from {\ex glib.regex\_new}).  The special
+directory elements {\ex '.'} and {\ex '..'} cannot be matched.
+\item[dir\_glob({[}dir,{]} glob)] --- Return an iterator which produces
+names of directory entries in \emph{dir} matching glob-style pattern
+\emph{glob}.  If \emph{dir} is not specified, search the current directory.
+The special directory elements {\ex '.'} and {\ex '..'} cannot be matched.
+\item[relative\_glob({[}dir,{]} glob)] --- Return an iterator which produces
+relative paths of directory entries which match the glob-style pattern
+\emph{glob}.  Directory separators in \emph{glob} are followed.  No
+part of the pattern may match the special directory entires {\ex '.'} and
+{\ex '..'}.
+\item[glob(pat)] --- Return an iterator which produces directory entries
+which match the glob-style pattern \emph{pat}.  Absolute paths are
+permitted, so long as the absolute prefix contains no pattern elements
+other than curly braces/commas.  Relative patterns are always matched
+relative to the current working directory.  The special path elements
+{\ex '.'} and {\ex '..'} are not matched, unless they appear in the path
+before the first special character (after curly brace expansion).  For
+example, {\ex '../*.{[}ch{]}'} works, but {\ex '*/..'} does not.
 \end{description}
 
 \section{Odin Support Utilities}
