@@ -12,7 +12,7 @@ odin pkg/tregrm/tregrm-yacc.c && cp -f pkg/tregrm/tregrm-yacc.c{,.dflt}
 test "x$1" = "x-m" || exit 0
 
 # stuff to do for make builds
-test -f pkg/odin/inc/config.hh || ./.configure
+test -f pkg/odin/inc/config.hh || ./configure
 odin pkg/odin/boot/%boot.sm:list
 odin pkg/{dg,odin,odin/ipcgen,tregrm}/inc/Func.hh
 odin pkg/odin/inc/odin_builtin.lua.h
