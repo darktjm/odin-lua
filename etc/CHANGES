@@ -3,7 +3,7 @@
 Any EXEC tool whose first argument ends with .lua is executed in an
 internal interpreter which has odin_builtin.lua pre-loaded.  See that
 file for a list of available functions.  This requires lua 5.1 or 5.2,
-lua-glib, and, optionally, if you want symbolic links, lua-posix.
+lua-glib, and glib.
 
 Executing commands in odin scripts which have lua! as their first four
 characters also executes the command as Lua code in an internal

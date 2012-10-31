@@ -18,16 +18,26 @@ is_link = glib.is_symlink
 if unpack == nil then unpack = table.unpack end
 
 --- inverse of pathcat
+dir_separator_charclass = '[' .. glib.regex_escape_string(glib.dir_separator) .. ']')
+dir_separator_regex = glib.regex_new(dir_separator_charclass)
+dir_separator_all_regex = glib.regex_new('^' .. dir_separator_charclass .. '+$')
+--dir_separator_end_regex = glib.regex_new('^((?!' ..  dir_separator_charclass .. ').*?)' ..
+--					dir_separator_charclass .. '+$')
 function split_filename(f)
    local res = {}
    local r
    r, f = glib.path_split_root(f)
-   while f ~= '' do
-      local b = glib.path_get_basename(f)
-      table.insert(res, 1, b)
-      if b == f then break end
-      f = glib.path_get_dirname(f)
+   if r and dir_separator_all_regex:match(r) then
+      r = glib.dir_separator:sub(1, 1)
    end
+   -- not sure if trimming trailing dir_separators from r is safe, so don't.
+   -- if r then dir_separator_end_regex:gsub(r, '\\1') end
+   local i, e, laste
+   for i, e in ipairs(dir_separator_regex:split(f)) do
+      if e ~= '' then table.insert(res, e) end
+      laste = e 
+   end
+   if laste == '' then table.insert(res, '') end
    return r, res
 end
 
@@ -608,19 +618,11 @@ function cp_RpL(src, dest, plus_w, d_to_d)
    return true
 end
 
-has_posix, posix = pcall(require, 'posix')
-if not has_posix then posix = nil end
-
 -- there is no portable ln -s, so try hard link then copy
 function ln(s, d)
-   if has_posix then
-      if not posix.link(s, d, true) then
-	 return posix.link(s, d, false)
-      else
-	 return true
-      end
+   if not glib.link(s, d, true) and not glib.link(s, d, false) then
+      return cp_RpL(s, d)
    end
-   return cp_RpL(s, d)
 end
 
 -- shell-style backtick-cat-as-args: get words from file (iterator)
@@ -834,45 +836,4 @@ function pkg_cflags(...)
     local fl = get_pkgconfig(pkgconfig_cflags, ...)
     if not fl then return nil end
     return parse_cflags(fl) .. pkg_libs(...)
-end
-
--- since we once used apr internally, may as well support it directly as well
-aprconfig = getenv("APRCONFIG")
-if aprconfig == '' then
-   aprconfig = glib.find_program_in_path('apr-1-config') or 'apr-1-config'
-end
-apuconfig = getenv("APUCONFIG")
-if apuconfig == '' then
-   apuconfig = glib.find_program_in_path('apu-1-config') or 'apu-1-config'
-end
-
-function get_aprconfig(fl)
-    local ret, p
-    p = io.popen(aprconfig .. fl)
-    ret = p:read()
-    p:close()
-    if p == nil then
-	return nil
-    end
-    if apuconfig ~= '' then
-	p = io.popen(apuconfig .. fl:gsub('--cp*flags', ''))
-	ret = ret .. ' ' .. p:read()
-	p:close();
-    end
-    return ret
-end    
-
--- run apr-1-config and apu-1-config for ldflags
-function apr_libs()
-    local lf = get_aprconfig(' --link-ld --libs')
-    if lf == nil then return nil end
-    return parse_ldflags(lf)
-end
-
--- run apr-1-config and apu-1-config for cflags *and* ldflags
--- this is done with two runs so generic flags are separated properly
-function apr_cflags()
-    local cf = get_aprconfig(' --cflags --cppflags --includes')
-    if cf == nil then return nil end
-    return parse_cflags(cf) .. apr_libs()
 end

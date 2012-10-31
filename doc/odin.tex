@@ -2811,9 +2811,8 @@ resolved before comparison.
 recursively, copying permissions if possible.  If \emph{plus\_w} is
 true, user write permission is added to all destination items.
 \item[ln(src, dest)] --- make a link from source to destination.  If
-lua-posix is installed, a soft link is made.  Otherwise, if possible,
-a hard link if made.  If no link can be made, this is the same as
-{\ex cp\_RpL}.
+possible, a soft link is made.  Otherwise, if possible, a hard link if made.
+If no link can be made, this is the same as {\ex cp\_RpL}.
 \item[cat(f)] --- print \emph{f} on standard output.  \emph{f} may be
 either the name of a file or a Lua file descriptor.  The entire file
 is not read into memory at once, so this can be safely used with large
@@ -2955,12 +2954,6 @@ compiler flags and libraries from {\ex pkg-config --libs --cflags} in
 Odin option format.  Two separate runs are made to separate generic
 linker flags ({\ex +ld\_flags}) from generic compiler flags ({\ex
 +cc\_flags}) properly.
-\item[aprconfig] The expected Apache Portable Runtime configuration
-program ({\ex apr-1-config} unless APRCONFIG is set in the environment)
-\item[get\_aprconfig(fl)] --- Get APR configuration information using
-configuration command flags \emph{fl}.
-\item[apr\_libs()] Return APR linker flags, parsed to Odin format.
-\item[apr\_cflags()] Return APR C compiler and linker flags, parsed to Odin
 format.
 \end{description}
 
@@ -2977,9 +2970,6 @@ whitespace-separated words.
 command-line argument, equivalent to concatenating all of {\ex
 words(f)} into a single string, each word separated by a single space.
 \item[unpack(table)] --- an alias for {\ex table.unpack()} in Lua 5.2.
-\item[has\_posix] --- a boolean indicating presence of the lua-posix
-library.
-\item[posix] --- the lua-posix library, if present
 \end{description}
 
 \bibliographystyle{plain}
