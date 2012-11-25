@@ -1,8 +1,8 @@
 diff -ruNx autom4te.cache -x 'config*' pkg/dg/dg-yacc.c pkg/dg/dg-yacc.c
 --- pkg/dg/dg-yacc.c	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/dg/dg-yacc.c	2012-10-28 03:51:14.000000000 -0500
-@@ -0,0 +1,2028 @@
-+/* A Bison parser, made by GNU Bison 2.6.4.  */
++++ pkg/dg/dg-yacc.c	2012-11-25 14:56:37.000000000 -0600
+@@ -0,0 +1,1990 @@
++/* A Bison parser, made by GNU Bison 2.6.5.  */
 +
 +/* Bison implementation for Yacc-like parsers in C
 +   
@@ -48,7 +48,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/dg/dg-yacc.c pkg/dg/dg-yacc.c
 +#define YYBISON 1
 +
 +/* Bison version.  */
-+#define YYBISON_VERSION "2.6.4"
++#define YYBISON_VERSION "2.6.5"
 +
 +/* Skeleton name.  */
 +#define YYSKELETON_NAME "yacc.c"
@@ -66,8 +66,8 @@ diff -ruNx autom4te.cache -x 'config*' pkg/dg/dg-yacc.c pkg/dg/dg-yacc.c
 +
 +
 +/* Copy the first part of user declarations.  */
-+/* Line 358 of yacc.c  */
-+#line 1 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 360 of yacc.c  */
++#line 1 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +
 +#include "inc/GMC.h"
 +extern int num_ParseErrors;
@@ -79,7 +79,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/dg/dg-yacc.c pkg/dg/dg-yacc.c
 +{num_ParseErrors++; ParseError(s);}
 +int yylex() {return YY_Lex();}
 +
-+/* Line 358 of yacc.c  */
++/* Line 360 of yacc.c  */
 +#line 80 "y.tab.c"
 +
 +# ifndef YY_NULL
@@ -185,7 +185,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/dg/dg-yacc.c pkg/dg/dg-yacc.c
 +
 +/* Copy the second part of user declarations.  */
 +
-+/* Line 377 of yacc.c  */
++/* Line 379 of yacc.c  */
 +#line 186 "y.tab.c"
 +
 +#ifdef short
@@ -724,47 +724,18 @@ diff -ruNx autom4te.cache -x 'config*' pkg/dg/dg-yacc.c pkg/dg/dg-yacc.c
 +    }								\
 +while (YYID (0))
 +
-+
++/* Error token number */
 +#define YYTERROR	1
 +#define YYERRCODE	256
 +
-+/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
-+   If N is 0, then set CURRENT to the empty location which ends
-+   the previous symbol: RHS[0] (always defined).  */
-+
-+#ifndef YYLLOC_DEFAULT
-+# define YYLLOC_DEFAULT(Current, Rhs, N)                                \
-+    do                                                                  \
-+      if (YYID (N))                                                     \
-+        {                                                               \
-+          (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;        \
-+          (Current).first_column = YYRHSLOC (Rhs, 1).first_column;      \
-+          (Current).last_line    = YYRHSLOC (Rhs, N).last_line;         \
-+          (Current).last_column  = YYRHSLOC (Rhs, N).last_column;       \
-+        }                                                               \
-+      else                                                              \
-+        {                                                               \
-+          (Current).first_line   = (Current).last_line   =              \
-+            YYRHSLOC (Rhs, 0).last_line;                                \
-+          (Current).first_column = (Current).last_column =              \
-+            YYRHSLOC (Rhs, 0).last_column;                              \
-+        }                                                               \
-+    while (YYID (0))
-+#endif
-+
-+#define YYRHSLOC(Rhs, K) ((Rhs)[K])
-+
-+
 +
 +/* This macro is provided for backward compatibility. */
-+
 +#ifndef YY_LOCATION_PRINT
 +# define YY_LOCATION_PRINT(File, Loc) ((void) 0)
 +#endif
 +
 +
 +/* YYLEX -- calling `yylex' with the right arguments.  */
-+
 +#ifdef YYLEX_PARAM
 +# define YYLEX yylex (YYLEX_PARAM)
 +#else
@@ -1230,16 +1201,16 @@ diff -ruNx autom4te.cache -x 'config*' pkg/dg/dg-yacc.c pkg/dg/dg-yacc.c
 +int yychar;
 +
 +
-+#ifndef YYLVAL_INITIALIZE
-+# define YYLVAL_INITIALIZE()
-+#endif
 +#ifndef YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
 +# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
 +# define YY_IGNORE_MAYBE_UNINITIALIZED_END
 +#endif
++#ifndef YY_INITIAL_VALUE
++# define YY_INITIAL_VALUE(Value) /* Nothing. */
++#endif
 +
 +/* The semantic value of the lookahead symbol.  */
-+YYSTYPE yylval;
++YYSTYPE yylval YY_INITIAL_VALUE(yyval_default);
 +
 +/* Number of syntax errors so far.  */
 +int yynerrs;
@@ -1315,8 +1286,8 @@ diff -ruNx autom4te.cache -x 'config*' pkg/dg/dg-yacc.c pkg/dg/dg-yacc.c
 +     Keep to zero when no symbol should be popped.  */
 +  int yylen = 0;
 +
-+  yyss = yyssa;
-+  yyvs = yyvsa;
++  yyssp = yyss = yyssa;
++  yyvsp = yyvs = yyvsa;
 +  yystacksize = YYINITDEPTH;
 +
 +  YYDPRINTF ((stderr, "Starting parse\n"));
@@ -1325,15 +1296,6 @@ diff -ruNx autom4te.cache -x 'config*' pkg/dg/dg-yacc.c pkg/dg/dg-yacc.c
 +  yyerrstatus = 0;
 +  yynerrs = 0;
 +  yychar = YYEMPTY; /* Cause a token to be read.  */
-+
-+  /* Initialize stack pointers.
-+     Waste one element of value and location stack
-+     so that they stay on the same level as the state stack.
-+     The wasted elements are never initialized.  */
-+  yyssp = yyss;
-+  yyvsp = yyvs;
-+
-+  YYLVAL_INITIALIZE ();
 +  goto yysetstate;
 +
 +/*------------------------------------------------------------.
@@ -1513,290 +1475,290 @@ diff -ruNx autom4te.cache -x 'config*' pkg/dg/dg-yacc.c pkg/dg/dg-yacc.c
 +  switch (yyn)
 +    {
 +        case 2:
-+/* Line 1813 of yacc.c  */
-+#line 36 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 36 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(1,1);}
 +    break;
 +
 +  case 3:
-+/* Line 1813 of yacc.c  */
-+#line 42 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 42 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 5:
-+/* Line 1813 of yacc.c  */
-+#line 47 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 47 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 6:
-+/* Line 1813 of yacc.c  */
-+#line 50 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 50 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(2,1);}
 +    break;
 +
 +  case 7:
-+/* Line 1813 of yacc.c  */
-+#line 55 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 55 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(3,2);}
 +    break;
 +
 +  case 8:
-+/* Line 1813 of yacc.c  */
-+#line 61 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 61 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(5,3);}
 +    break;
 +
 +  case 9:
-+/* Line 1813 of yacc.c  */
-+#line 67 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 67 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(4,3);}
 +    break;
 +
 +  case 10:
-+/* Line 1813 of yacc.c  */
-+#line 73 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 73 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(7,3);}
 +    break;
 +
 +  case 11:
-+/* Line 1813 of yacc.c  */
-+#line 80 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 80 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(6,4);}
 +    break;
 +
 +  case 12:
-+/* Line 1813 of yacc.c  */
-+#line 85 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 85 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 14:
-+/* Line 1813 of yacc.c  */
-+#line 92 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 92 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(8,1);}
 +    break;
 +
 +  case 15:
-+/* Line 1813 of yacc.c  */
-+#line 95 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 95 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(9,1);}
 +    break;
 +
 +  case 17:
-+/* Line 1813 of yacc.c  */
-+#line 102 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 102 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 20:
-+/* Line 1813 of yacc.c  */
-+#line 119 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 119 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 22:
-+/* Line 1813 of yacc.c  */
-+#line 126 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 126 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(10,1);}
 +    break;
 +
 +  case 23:
-+/* Line 1813 of yacc.c  */
-+#line 132 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 132 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(11,1);}
 +    break;
 +
 +  case 25:
-+/* Line 1813 of yacc.c  */
-+#line 138 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 138 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(12,1);}
 +    break;
 +
 +  case 26:
-+/* Line 1813 of yacc.c  */
-+#line 143 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 143 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 28:
-+/* Line 1813 of yacc.c  */
-+#line 150 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 150 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(13,1);}
 +    break;
 +
 +  case 29:
-+/* Line 1813 of yacc.c  */
-+#line 151 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 151 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(13,0);}
 +    break;
 +
 +  case 30:
-+/* Line 1813 of yacc.c  */
-+#line 156 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 156 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 32:
-+/* Line 1813 of yacc.c  */
-+#line 162 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 162 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(16,1);}
 +    break;
 +
 +  case 33:
-+/* Line 1813 of yacc.c  */
-+#line 164 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 164 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(16,1);}
 +    break;
 +
 +  case 34:
-+/* Line 1813 of yacc.c  */
-+#line 169 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 169 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 37:
-+/* Line 1813 of yacc.c  */
-+#line 183 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 183 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(17,1);}
 +    break;
 +
 +  case 40:
-+/* Line 1813 of yacc.c  */
-+#line 192 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 192 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(14,1);}
 +    break;
 +
 +  case 41:
-+/* Line 1813 of yacc.c  */
-+#line 195 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 195 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(15,1);}
 +    break;
 +
 +  case 42:
-+/* Line 1813 of yacc.c  */
-+#line 201 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 201 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(18,1);}
 +    break;
 +
 +  case 44:
-+/* Line 1813 of yacc.c  */
-+#line 208 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 208 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 46:
-+/* Line 1813 of yacc.c  */
-+#line 217 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 217 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(21,0);}
 +    break;
 +
 +  case 48:
-+/* Line 1813 of yacc.c  */
-+#line 221 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 221 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(19,1);}
 +    break;
 +
 +  case 49:
-+/* Line 1813 of yacc.c  */
-+#line 223 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 223 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(20,1);}
 +    break;
 +
 +  case 50:
-+/* Line 1813 of yacc.c  */
-+#line 225 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 225 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(22,0);}
 +    break;
 +
 +  case 51:
-+/* Line 1813 of yacc.c  */
-+#line 228 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 228 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(23,1);}
 +    break;
 +
 +  case 52:
-+/* Line 1813 of yacc.c  */
-+#line 231 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 231 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(30,1);}
 +    break;
 +
 +  case 53:
-+/* Line 1813 of yacc.c  */
-+#line 236 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 236 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(24,2);}
 +    break;
 +
 +  case 54:
-+/* Line 1813 of yacc.c  */
-+#line 239 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 239 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(25,1);}
 +    break;
 +
 +  case 55:
-+/* Line 1813 of yacc.c  */
-+#line 241 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 241 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(27,1);}
 +    break;
 +
 +  case 56:
-+/* Line 1813 of yacc.c  */
-+#line 245 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 245 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(28,2);}
 +    break;
 +
 +  case 57:
-+/* Line 1813 of yacc.c  */
-+#line 248 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 248 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(31,1);}
 +    break;
 +
 +  case 58:
-+/* Line 1813 of yacc.c  */
-+#line 250 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 250 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(32,0);}
 +    break;
 +
 +  case 59:
-+/* Line 1813 of yacc.c  */
-+#line 253 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 253 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(30,1);}
 +    break;
 +
 +  case 61:
-+/* Line 1813 of yacc.c  */
-+#line 260 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 260 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 62:
-+/* Line 1813 of yacc.c  */
-+#line 265 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 265 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(26,1);}
 +    break;
 +
 +  case 63:
-+/* Line 1813 of yacc.c  */
-+#line 270 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 270 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 68:
-+/* Line 1813 of yacc.c  */
-+#line 285 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 285 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(33,1);}
 +    break;
 +
 +  case 69:
-+/* Line 1813 of yacc.c  */
-+#line 287 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 1778 of yacc.c  */
++#line 287 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +    {Action(34,-1);}
 +    break;
 +
 +
-+/* Line 1813 of yacc.c  */
-+#line 1796 "y.tab.c"
++/* Line 1778 of yacc.c  */
++#line 1758 "y.tab.c"
 +      default: break;
 +    }
 +  /* User semantic actions sometimes alter yychar, and that requires
@@ -2027,12 +1989,12 @@ diff -ruNx autom4te.cache -x 'config*' pkg/dg/dg-yacc.c pkg/dg/dg-yacc.c
 +}
 +
 +
-+/* Line 2076 of yacc.c  */
-+#line 289 "/home/darktjm/.ODIN/darktjm/FILES/a/f/drvgrf.ygi.1966620.y"
++/* Line 2041 of yacc.c  */
++#line 289 "/home/darktjm/.ODIN/darktjm/FILES/a/p/drvgrf.ygi.2605071.y"
 +
 diff -ruNx autom4te.cache -x 'config*' pkg/dg/inc/Func.hh pkg/dg/inc/Func.hh
 --- pkg/dg/inc/Func.hh	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/dg/inc/Func.hh	2012-10-28 03:51:14.000000000 -0500
++++ pkg/dg/inc/Func.hh	2012-11-25 14:56:38.000000000 -0600
 @@ -0,0 +1,235 @@
 +/* pkg/dg/dg-analyze.c */
 +extern boolean Is_Output(tp_FilTyp, tp_Tool);
@@ -2271,7 +2233,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/dg/inc/Func.hh pkg/dg/inc/Func.hh
 +extern void Write_Syms(tp_FilDsc);
 diff -ruNx autom4te.cache -x 'config*' pkg/dg/inc/NodTyp_.h pkg/dg/inc/NodTyp_.h
 --- pkg/dg/inc/NodTyp_.h	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/dg/inc/NodTyp_.h	2012-10-28 03:51:03.000000000 -0500
++++ pkg/dg/inc/NodTyp_.h	2012-11-25 14:56:26.000000000 -0600
 @@ -0,0 +1,39 @@
 +#ifndef TP_YYNODTYP
 +#define TP_YYNODTYP
@@ -2314,7 +2276,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/dg/inc/NodTyp_.h pkg/dg/inc/NodTyp_.h
 +#endif
 diff -ruNx autom4te.cache -x 'config*' pkg/dg/inc/TokTyp_.h pkg/dg/inc/TokTyp_.h
 --- pkg/dg/inc/TokTyp_.h	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/dg/inc/TokTyp_.h	2012-10-28 03:51:03.000000000 -0500
++++ pkg/dg/inc/TokTyp_.h	2012-11-25 14:56:26.000000000 -0600
 @@ -0,0 +1,25 @@
 +#ifndef TP_YYTOKTYP
 +#define TP_YYTOKTYP
@@ -2343,9 +2305,9 @@ diff -ruNx autom4te.cache -x 'config*' pkg/dg/inc/TokTyp_.h pkg/dg/inc/TokTyp_.h
 +#endif
 diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/client-yacc.c pkg/odin/boot/client-yacc.c
 --- pkg/odin/boot/client-yacc.c	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/odin/boot/client-yacc.c	2012-10-28 03:51:13.000000000 -0500
-@@ -0,0 +1,1927 @@
-+/* A Bison parser, made by GNU Bison 2.6.4.  */
++++ pkg/odin/boot/client-yacc.c	2012-11-25 14:56:36.000000000 -0600
+@@ -0,0 +1,1889 @@
++/* A Bison parser, made by GNU Bison 2.6.5.  */
 +
 +/* Bison implementation for Yacc-like parsers in C
 +   
@@ -2391,7 +2353,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/client-yacc.c pkg/odin/boot
 +#define OCBISON 1
 +
 +/* Bison version.  */
-+#define OCBISON_VERSION "2.6.4"
++#define OCBISON_VERSION "2.6.5"
 +
 +/* Skeleton name.  */
 +#define OCSKELETON_NAME "yacc.c"
@@ -2409,7 +2371,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/client-yacc.c pkg/odin/boot
 +
 +
 +/* Copy the first part of user declarations.  */
-+/* Line 358 of yacc.c  */
++/* Line 360 of yacc.c  */
 +
 +#include "inc/GMC.h"
 +extern int num_ParseErrors;
@@ -2421,7 +2383,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/client-yacc.c pkg/odin/boot
 +{num_ParseErrors++; ParseError(s);}
 +int oclex() {return OC_Lex();}
 +
-+/* Line 358 of yacc.c  */
++/* Line 360 of yacc.c  */
 +
 +# ifndef OC_NULL
 +#  if defined __cplusplus && 201103L <= __cplusplus
@@ -2520,7 +2482,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/client-yacc.c pkg/odin/boot
 +
 +/* Copy the second part of user declarations.  */
 +
-+/* Line 377 of yacc.c  */
++/* Line 379 of yacc.c  */
 +
 +#ifdef short
 +# undef short
@@ -3040,47 +3002,18 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/client-yacc.c pkg/odin/boot
 +    }								\
 +while (OCID (0))
 +
-+
++/* Error token number */
 +#define OCTERROR	1
 +#define OCERRCODE	256
 +
-+/* OCLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
-+   If N is 0, then set CURRENT to the empty location which ends
-+   the previous symbol: RHS[0] (always defined).  */
-+
-+#ifndef OCLLOC_DEFAULT
-+# define OCLLOC_DEFAULT(Current, Rhs, N)                                \
-+    do                                                                  \
-+      if (OCID (N))                                                     \
-+        {                                                               \
-+          (Current).first_line   = OCRHSLOC (Rhs, 1).first_line;        \
-+          (Current).first_column = OCRHSLOC (Rhs, 1).first_column;      \
-+          (Current).last_line    = OCRHSLOC (Rhs, N).last_line;         \
-+          (Current).last_column  = OCRHSLOC (Rhs, N).last_column;       \
-+        }                                                               \
-+      else                                                              \
-+        {                                                               \
-+          (Current).first_line   = (Current).last_line   =              \
-+            OCRHSLOC (Rhs, 0).last_line;                                \
-+          (Current).first_column = (Current).last_column =              \
-+            OCRHSLOC (Rhs, 0).last_column;                              \
-+        }                                                               \
-+    while (OCID (0))
-+#endif
-+
-+#define OCRHSLOC(Rhs, K) ((Rhs)[K])
-+
-+
 +
 +/* This macro is provided for backward compatibility. */
-+
 +#ifndef OC_LOCATION_PRINT
 +# define OC_LOCATION_PRINT(File, Loc) ((void) 0)
 +#endif
 +
 +
 +/* OCLEX -- calling `oclex' with the right arguments.  */
-+
 +#ifdef OCLEX_PARAM
 +# define OCLEX oclex (OCLEX_PARAM)
 +#else
@@ -3546,16 +3479,16 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/client-yacc.c pkg/odin/boot
 +int occhar;
 +
 +
-+#ifndef OCLVAL_INITIALIZE
-+# define OCLVAL_INITIALIZE()
-+#endif
 +#ifndef OC_IGNORE_MAYBE_UNINITIALIZED_BEGIN
 +# define OC_IGNORE_MAYBE_UNINITIALIZED_BEGIN
 +# define OC_IGNORE_MAYBE_UNINITIALIZED_END
 +#endif
++#ifndef OC_INITIAL_VALUE
++# define OC_INITIAL_VALUE(Value) /* Nothing. */
++#endif
 +
 +/* The semantic value of the lookahead symbol.  */
-+OCSTYPE oclval;
++OCSTYPE oclval OC_INITIAL_VALUE(ocval_default);
 +
 +/* Number of syntax errors so far.  */
 +int ocnerrs;
@@ -3631,8 +3564,8 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/client-yacc.c pkg/odin/boot
 +     Keep to zero when no symbol should be popped.  */
 +  int oclen = 0;
 +
-+  ocss = ocssa;
-+  ocvs = ocvsa;
++  ocssp = ocss = ocssa;
++  ocvsp = ocvs = ocvsa;
 +  ocstacksize = OCINITDEPTH;
 +
 +  OCDPRINTF ((stderr, "Starting parse\n"));
@@ -3641,15 +3574,6 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/client-yacc.c pkg/odin/boot
 +  ocerrstatus = 0;
 +  ocnerrs = 0;
 +  occhar = OCEMPTY; /* Cause a token to be read.  */
-+
-+  /* Initialize stack pointers.
-+     Waste one element of value and location stack
-+     so that they stay on the same level as the state stack.
-+     The wasted elements are never initialized.  */
-+  ocssp = ocss;
-+  ocvsp = ocvs;
-+
-+  OCLVAL_INITIALIZE ();
 +  goto ocsetstate;
 +
 +/*------------------------------------------------------------.
@@ -3829,217 +3753,217 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/client-yacc.c pkg/odin/boot
 +  switch (ocn)
 +    {
 +        case 2:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(-1,1);}
 +    break;
 +
 +  case 3:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(0,2);}
 +    break;
 +
 +  case 5:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(2,0);}
 +    break;
 +
 +  case 11:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(7,2);}
 +    break;
 +
 +  case 12:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(7,1);}
 +    break;
 +
 +  case 13:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(7,1);}
 +    break;
 +
 +  case 14:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(7,0);}
 +    break;
 +
 +  case 15:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(8,2);}
 +    break;
 +
 +  case 16:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(8,1);}
 +    break;
 +
 +  case 17:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(4,2);}
 +    break;
 +
 +  case 18:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(6,2);}
 +    break;
 +
 +  case 19:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(3,1);}
 +    break;
 +
 +  case 20:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(5,1);}
 +    break;
 +
 +  case 21:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(9,1);}
 +    break;
 +
 +  case 22:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(10,2);}
 +    break;
 +
 +  case 23:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(10,2);}
 +    break;
 +
 +  case 24:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(15,1);}
 +    break;
 +
 +  case 26:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(0,2);}
 +    break;
 +
 +  case 28:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(16,0);}
 +    break;
 +
 +  case 31:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(17,0);}
 +    break;
 +
 +  case 32:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(18,1);}
 +    break;
 +
 +  case 33:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(21,1);}
 +    break;
 +
 +  case 34:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(14,1);}
 +    break;
 +
 +  case 35:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(13,1);}
 +    break;
 +
 +  case 36:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(25,1);}
 +    break;
 +
 +  case 37:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(29,1);}
 +    break;
 +
 +  case 38:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(19,2);}
 +    break;
 +
 +  case 39:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(20,1);}
 +    break;
 +
 +  case 40:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(21,1);}
 +    break;
 +
 +  case 41:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(22,2);}
 +    break;
 +
 +  case 42:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(23,1);}
 +    break;
 +
 +  case 43:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(24,0);}
 +    break;
 +
 +  case 44:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(25,1);}
 +    break;
 +
 +  case 46:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(0,0);}
 +    break;
 +
 +  case 47:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(27,1);}
 +    break;
 +
 +  case 48:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(0,2);}
 +    break;
 +
 +  case 51:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(28,1);}
 +    break;
 +
 +  case 54:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(11,0);}
 +    break;
 +
 +  case 56:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(12,0);}
 +    break;
 +
 +  case 58:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(31,-1);}
 +    break;
 +
 +  case 59:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(30,-1);}
 +    break;
 +
 +  case 60:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(32,-1);}
 +    break;
 +
 +
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +      default: break;
 +    }
 +  /* User semantic actions sometimes alter occhar, and that requires
@@ -4270,11 +4194,11 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/client-yacc.c pkg/odin/boot
 +}
 +
 +
-+/* Line 2076 of yacc.c  */
++/* Line 2041 of yacc.c  */
 +
 diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/default-dg.c pkg/odin/boot/default-dg.c
 --- pkg/odin/boot/default-dg.c	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/odin/boot/default-dg.c	2012-10-28 03:51:13.000000000 -0500
++++ pkg/odin/boot/default-dg.c	2012-11-25 14:56:36.000000000 -0600
 @@ -0,0 +1,3785 @@
 +char *DG_Version = "1.16.10";
 +char *Banner = "";
@@ -8063,9 +7987,9 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/default-dg.c pkg/odin/boot/
 +  {4, 0, &_PrmTypS[72], 0, 0, 0, 0} };
 diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/fsys-yacc.c pkg/odin/boot/fsys-yacc.c
 --- pkg/odin/boot/fsys-yacc.c	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/odin/boot/fsys-yacc.c	2012-10-28 03:51:13.000000000 -0500
-@@ -0,0 +1,1866 @@
-+/* A Bison parser, made by GNU Bison 2.6.4.  */
++++ pkg/odin/boot/fsys-yacc.c	2012-11-25 14:56:36.000000000 -0600
+@@ -0,0 +1,1828 @@
++/* A Bison parser, made by GNU Bison 2.6.5.  */
 +
 +/* Bison implementation for Yacc-like parsers in C
 +   
@@ -8111,7 +8035,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/fsys-yacc.c pkg/odin/boot/f
 +#define YYBISON 1
 +
 +/* Bison version.  */
-+#define YYBISON_VERSION "2.6.4"
++#define YYBISON_VERSION "2.6.5"
 +
 +/* Skeleton name.  */
 +#define YYSKELETON_NAME "yacc.c"
@@ -8129,7 +8053,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/fsys-yacc.c pkg/odin/boot/f
 +
 +
 +/* Copy the first part of user declarations.  */
-+/* Line 358 of yacc.c  */
++/* Line 360 of yacc.c  */
 +
 +#include "inc/GMC.h"
 +extern int num_ParseErrors;
@@ -8141,7 +8065,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/fsys-yacc.c pkg/odin/boot/f
 +{num_ParseErrors++; ParseError(s);}
 +int yylex() {return YY_Lex();}
 +
-+/* Line 358 of yacc.c  */
++/* Line 360 of yacc.c  */
 +
 +# ifndef YY_NULL
 +#  if defined __cplusplus && 201103L <= __cplusplus
@@ -8240,7 +8164,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/fsys-yacc.c pkg/odin/boot/f
 +
 +/* Copy the second part of user declarations.  */
 +
-+/* Line 377 of yacc.c  */
++/* Line 379 of yacc.c  */
 +
 +#ifdef short
 +# undef short
@@ -8744,47 +8668,18 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/fsys-yacc.c pkg/odin/boot/f
 +    }								\
 +while (YYID (0))
 +
-+
++/* Error token number */
 +#define YYTERROR	1
 +#define YYERRCODE	256
 +
-+/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
-+   If N is 0, then set CURRENT to the empty location which ends
-+   the previous symbol: RHS[0] (always defined).  */
-+
-+#ifndef YYLLOC_DEFAULT
-+# define YYLLOC_DEFAULT(Current, Rhs, N)                                \
-+    do                                                                  \
-+      if (YYID (N))                                                     \
-+        {                                                               \
-+          (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;        \
-+          (Current).first_column = YYRHSLOC (Rhs, 1).first_column;      \
-+          (Current).last_line    = YYRHSLOC (Rhs, N).last_line;         \
-+          (Current).last_column  = YYRHSLOC (Rhs, N).last_column;       \
-+        }                                                               \
-+      else                                                              \
-+        {                                                               \
-+          (Current).first_line   = (Current).last_line   =              \
-+            YYRHSLOC (Rhs, 0).last_line;                                \
-+          (Current).first_column = (Current).last_column =              \
-+            YYRHSLOC (Rhs, 0).last_column;                              \
-+        }                                                               \
-+    while (YYID (0))
-+#endif
-+
-+#define YYRHSLOC(Rhs, K) ((Rhs)[K])
-+
-+
 +
 +/* This macro is provided for backward compatibility. */
-+
 +#ifndef YY_LOCATION_PRINT
 +# define YY_LOCATION_PRINT(File, Loc) ((void) 0)
 +#endif
 +
 +
 +/* YYLEX -- calling `yylex' with the right arguments.  */
-+
 +#ifdef YYLEX_PARAM
 +# define YYLEX yylex (YYLEX_PARAM)
 +#else
@@ -9250,16 +9145,16 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/fsys-yacc.c pkg/odin/boot/f
 +int yychar;
 +
 +
-+#ifndef YYLVAL_INITIALIZE
-+# define YYLVAL_INITIALIZE()
-+#endif
 +#ifndef YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
 +# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
 +# define YY_IGNORE_MAYBE_UNINITIALIZED_END
 +#endif
++#ifndef YY_INITIAL_VALUE
++# define YY_INITIAL_VALUE(Value) /* Nothing. */
++#endif
 +
 +/* The semantic value of the lookahead symbol.  */
-+YYSTYPE yylval;
++YYSTYPE yylval YY_INITIAL_VALUE(yyval_default);
 +
 +/* Number of syntax errors so far.  */
 +int yynerrs;
@@ -9335,8 +9230,8 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/fsys-yacc.c pkg/odin/boot/f
 +     Keep to zero when no symbol should be popped.  */
 +  int yylen = 0;
 +
-+  yyss = yyssa;
-+  yyvs = yyvsa;
++  yyssp = yyss = yyssa;
++  yyvsp = yyvs = yyvsa;
 +  yystacksize = YYINITDEPTH;
 +
 +  YYDPRINTF ((stderr, "Starting parse\n"));
@@ -9345,15 +9240,6 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/fsys-yacc.c pkg/odin/boot/f
 +  yyerrstatus = 0;
 +  yynerrs = 0;
 +  yychar = YYEMPTY; /* Cause a token to be read.  */
-+
-+  /* Initialize stack pointers.
-+     Waste one element of value and location stack
-+     so that they stay on the same level as the state stack.
-+     The wasted elements are never initialized.  */
-+  yyssp = yyss;
-+  yyvsp = yyvs;
-+
-+  YYLVAL_INITIALIZE ();
 +  goto yysetstate;
 +
 +/*------------------------------------------------------------.
@@ -9533,172 +9419,172 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/fsys-yacc.c pkg/odin/boot/f
 +  switch (yyn)
 +    {
 +        case 3:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(-7,1);}
 +    break;
 +
 +  case 4:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(0,2);}
 +    break;
 +
 +  case 6:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(1,1);}
 +    break;
 +
 +  case 7:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(2,1);}
 +    break;
 +
 +  case 8:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(3,1);}
 +    break;
 +
 +  case 9:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(0,3);}
 +    break;
 +
 +  case 11:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(0,0);}
 +    break;
 +
 +  case 12:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(4,0);}
 +    break;
 +
 +  case 14:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(5,1);}
 +    break;
 +
 +  case 15:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(6,1);}
 +    break;
 +
 +  case 17:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(0,0);}
 +    break;
 +
 +  case 19:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(0,0);}
 +    break;
 +
 +  case 21:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(0,0);}
 +    break;
 +
 +  case 22:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(8,1);}
 +    break;
 +
 +  case 24:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(0,2);}
 +    break;
 +
 +  case 26:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(9,0);}
 +    break;
 +
 +  case 29:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(10,0);}
 +    break;
 +
 +  case 30:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(11,1);}
 +    break;
 +
 +  case 31:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(14,1);}
 +    break;
 +
 +  case 32:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(18,1);}
 +    break;
 +
 +  case 33:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(21,1);}
 +    break;
 +
 +  case 34:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(12,2);}
 +    break;
 +
 +  case 35:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(13,1);}
 +    break;
 +
 +  case 36:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(14,1);}
 +    break;
 +
 +  case 37:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(15,2);}
 +    break;
 +
 +  case 38:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(16,1);}
 +    break;
 +
 +  case 39:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(17,0);}
 +    break;
 +
 +  case 40:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(18,1);}
 +    break;
 +
 +  case 42:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(0,0);}
 +    break;
 +
 +  case 43:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(20,1);}
 +    break;
 +
 +  case 44:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(0,2);}
 +    break;
 +
 +  case 50:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(23,-1);}
 +    break;
 +
 +  case 51:
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +    {Action(24,-1);}
 +    break;
 +
 +
-+/* Line 1813 of yacc.c  */
++/* Line 1778 of yacc.c  */
 +      default: break;
 +    }
 +  /* User semantic actions sometimes alter yychar, and that requires
@@ -9929,11 +9815,11 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/fsys-yacc.c pkg/odin/boot/f
 +}
 +
 +
-+/* Line 2076 of yacc.c  */
++/* Line 2041 of yacc.c  */
 +
 diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/stub-in.c pkg/odin/boot/stub-in.c
 --- pkg/odin/boot/stub-in.c	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/odin/boot/stub-in.c	2012-10-28 03:51:13.000000000 -0500
++++ pkg/odin/boot/stub-in.c	2012-11-25 14:56:37.000000000 -0600
 @@ -0,0 +1,1033 @@
 +#include "inc/GMC.h"
 +#include "inc/Str.h"
@@ -10970,7 +10856,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/stub-in.c pkg/odin/boot/stu
 +   }
 diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/stub-out.c pkg/odin/boot/stub-out.c
 --- pkg/odin/boot/stub-out.c	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/odin/boot/stub-out.c	2012-10-28 03:51:13.000000000 -0500
++++ pkg/odin/boot/stub-out.c	2012-11-25 14:56:37.000000000 -0600
 @@ -0,0 +1,1119 @@
 +#include "inc/GMC.h"
 +
@@ -12093,7 +11979,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/boot/stub-out.c pkg/odin/boot/st
 +#endif
 diff -ruNx autom4te.cache -x 'config*' pkg/odin/inc/Func.hh pkg/odin/inc/Func.hh
 --- pkg/odin/inc/Func.hh	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/odin/inc/Func.hh	2012-10-28 03:51:15.000000000 -0500
++++ pkg/odin/inc/Func.hh	2012-11-25 14:56:39.000000000 -0600
 @@ -0,0 +1,762 @@
 +/* pkg/odin/if-bcast.c */
 +extern void Broadcast(tp_FilHdr, tp_Status);
@@ -12859,7 +12745,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/inc/Func.hh pkg/odin/inc/Func.hh
 +extern void Get_DPath(tp_Str);
 diff -ruNx autom4te.cache -x 'config*' pkg/odin/inc/NodTyp_.h pkg/odin/inc/NodTyp_.h
 --- pkg/odin/inc/NodTyp_.h	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/odin/inc/NodTyp_.h	2012-10-28 03:51:03.000000000 -0500
++++ pkg/odin/inc/NodTyp_.h	2012-11-25 14:56:26.000000000 -0600
 @@ -0,0 +1,29 @@
 +#ifndef TP_YYNODTYP
 +#define TP_YYNODTYP
@@ -12892,7 +12778,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/inc/NodTyp_.h pkg/odin/inc/NodTy
 +#endif
 diff -ruNx autom4te.cache -x 'config*' pkg/odin/inc/OC_NodTyp_.h pkg/odin/inc/OC_NodTyp_.h
 --- pkg/odin/inc/OC_NodTyp_.h	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/odin/inc/OC_NodTyp_.h	2012-10-28 03:51:03.000000000 -0500
++++ pkg/odin/inc/OC_NodTyp_.h	2012-11-25 14:56:26.000000000 -0600
 @@ -0,0 +1,37 @@
 +#ifndef TP_OCNODTYP
 +#define TP_OCNODTYP
@@ -12933,8 +12819,8 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/inc/OC_NodTyp_.h pkg/odin/inc/OC
 +#endif
 diff -ruNx autom4te.cache -x 'config*' pkg/odin/inc/odin_builtin.lua.h pkg/odin/inc/odin_builtin.lua.h
 --- pkg/odin/inc/odin_builtin.lua.h	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/odin/inc/odin_builtin.lua.h	2012-10-28 03:51:16.000000000 -0500
-@@ -0,0 +1,878 @@
++++ pkg/odin/inc/odin_builtin.lua.h	2012-11-25 14:56:39.000000000 -0600
+@@ -0,0 +1,839 @@
 +"-- GLib provides portable setenv, basename, and others\n"
 +"glib = require 'glib'\n"
 +"\n"
@@ -12955,16 +12841,26 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/inc/odin_builtin.lua.h pkg/odin/
 +"if unpack == nil then unpack = table.unpack end\n"
 +"\n"
 +"--- inverse of pathcat\n"
++"dir_separator_charclass = '[' .. glib.regex_escape_string(glib.dir_separator) .. ']')\n"
++"dir_separator_regex = glib.regex_new(dir_separator_charclass)\n"
++"dir_separator_all_regex = glib.regex_new('^' .. dir_separator_charclass .. '+$')\n"
++"--dir_separator_end_regex = glib.regex_new('^((?!' ..  dir_separator_charclass .. ').*?)' ..\n"
++"--					dir_separator_charclass .. '+$')\n"
 +"function split_filename(f)\n"
 +"   local res = {}\n"
 +"   local r\n"
 +"   r, f = glib.path_split_root(f)\n"
-+"   while f ~= '' do\n"
-+"      local b = glib.path_get_basename(f)\n"
-+"      table.insert(res, 1, b)\n"
-+"      if b == f then break end\n"
-+"      f = glib.path_get_dirname(f)\n"
++"   if r and dir_separator_all_regex:match(r) then\n"
++"      r = glib.dir_separator:sub(1, 1)\n"
 +"   end\n"
++"   -- not sure if trimming trailing dir_separators from r is safe, so don't.\n"
++"   -- if r then dir_separator_end_regex:gsub(r, '\\\\1') end\n"
++"   local i, e, laste\n"
++"   for i, e in ipairs(dir_separator_regex:split(f)) do\n"
++"      if e ~= '' then table.insert(res, e) end\n"
++"      laste = e \n"
++"   end\n"
++"   if laste == '' then table.insert(res, '') end\n"
 +"   return r, res\n"
 +"end\n"
 +"\n"
@@ -13545,19 +13441,11 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/inc/odin_builtin.lua.h pkg/odin/
 +"   return true\n"
 +"end\n"
 +"\n"
-+"has_posix, posix = pcall(require, 'posix')\n"
-+"if not has_posix then posix = nil end\n"
-+"\n"
 +"-- there is no portable ln -s, so try hard link then copy\n"
 +"function ln(s, d)\n"
-+"   if has_posix then\n"
-+"      if not posix.link(s, d, true) then\n"
-+"	 return posix.link(s, d, false)\n"
-+"      else\n"
-+"	 return true\n"
-+"      end\n"
++"   if not glib.link(s, d, true) and not glib.link(s, d, false) then\n"
++"      return cp_RpL(s, d)\n"
 +"   end\n"
-+"   return cp_RpL(s, d)\n"
 +"end\n"
 +"\n"
 +"-- shell-style backtick-cat-as-args: get words from file (iterator)\n"
@@ -13772,50 +13660,9 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/inc/odin_builtin.lua.h pkg/odin/
 +"    if not fl then return nil end\n"
 +"    return parse_cflags(fl) .. pkg_libs(...)\n"
 +"end\n"
-+"\n"
-+"-- since we once used apr internally, may as well support it directly as well\n"
-+"aprconfig = getenv(\"APRCONFIG\")\n"
-+"if aprconfig == '' then\n"
-+"   aprconfig = glib.find_program_in_path('apr-1-config') or 'apr-1-config'\n"
-+"end\n"
-+"apuconfig = getenv(\"APUCONFIG\")\n"
-+"if apuconfig == '' then\n"
-+"   apuconfig = glib.find_program_in_path('apu-1-config') or 'apu-1-config'\n"
-+"end\n"
-+"\n"
-+"function get_aprconfig(fl)\n"
-+"    local ret, p\n"
-+"    p = io.popen(aprconfig .. fl)\n"
-+"    ret = p:read()\n"
-+"    p:close()\n"
-+"    if p == nil then\n"
-+"	return nil\n"
-+"    end\n"
-+"    if apuconfig ~= '' then\n"
-+"	p = io.popen(apuconfig .. fl:gsub('--cp*flags', ''))\n"
-+"	ret = ret .. ' ' .. p:read()\n"
-+"	p:close();\n"
-+"    end\n"
-+"    return ret\n"
-+"end    \n"
-+"\n"
-+"-- run apr-1-config and apu-1-config for ldflags\n"
-+"function apr_libs()\n"
-+"    local lf = get_aprconfig(' --link-ld --libs')\n"
-+"    if lf == nil then return nil end\n"
-+"    return parse_ldflags(lf)\n"
-+"end\n"
-+"\n"
-+"-- run apr-1-config and apu-1-config for cflags *and* ldflags\n"
-+"-- this is done with two runs so generic flags are separated properly\n"
-+"function apr_cflags()\n"
-+"    local cf = get_aprconfig(' --cflags --cppflags --includes')\n"
-+"    if cf == nil then return nil end\n"
-+"    return parse_cflags(cf) .. apr_libs()\n"
-+"end\n"
 diff -ruNx autom4te.cache -x 'config*' pkg/odin/inc/TokTyp_.h pkg/odin/inc/TokTyp_.h
 --- pkg/odin/inc/TokTyp_.h	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/odin/inc/TokTyp_.h	2012-10-28 03:51:03.000000000 -0500
++++ pkg/odin/inc/TokTyp_.h	2012-11-25 14:56:26.000000000 -0600
 @@ -0,0 +1,22 @@
 +#ifndef TP_YYTOKTYP
 +#define TP_YYTOKTYP
@@ -13841,9 +13688,9 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/inc/TokTyp_.h pkg/odin/inc/TokTy
 +#endif
 diff -ruNx autom4te.cache -x 'config*' pkg/odin/ipcgen/inc/Func.hh pkg/odin/ipcgen/inc/Func.hh
 --- pkg/odin/ipcgen/inc/Func.hh	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/odin/ipcgen/inc/Func.hh	2012-10-28 03:51:15.000000000 -0500
++++ pkg/odin/ipcgen/inc/Func.hh	2012-11-25 14:56:39.000000000 -0600
 @@ -0,0 +1,109 @@
-+/* /home/darktjm/.ODIN/darktjm/FILES/a/f/ipcgen.ygi.2038867.c */
++/* /home/darktjm/.ODIN/darktjm/FILES/a/q/ipcgen.ygi.2713383.c */
 +extern tp_Nod YY_Parse(void);
 +extern void yyerror(char *);
 +extern int yylex(void);
@@ -13954,7 +13801,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/ipcgen/inc/Func.hh pkg/odin/ipcg
 +extern void Write_Syms(tp_FilDsc);
 diff -ruNx autom4te.cache -x 'config*' pkg/odin/ipcgen/inc/NodTyp_.h pkg/odin/ipcgen/inc/NodTyp_.h
 --- pkg/odin/ipcgen/inc/NodTyp_.h	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/odin/ipcgen/inc/NodTyp_.h	2012-10-28 03:51:03.000000000 -0500
++++ pkg/odin/ipcgen/inc/NodTyp_.h	2012-11-25 14:56:26.000000000 -0600
 @@ -0,0 +1,22 @@
 +#ifndef TP_YYNODTYP
 +#define TP_YYNODTYP
@@ -13980,7 +13827,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/ipcgen/inc/NodTyp_.h pkg/odin/ip
 +#endif
 diff -ruNx autom4te.cache -x 'config*' pkg/odin/ipcgen/inc/TokTyp_.h pkg/odin/ipcgen/inc/TokTyp_.h
 --- pkg/odin/ipcgen/inc/TokTyp_.h	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/odin/ipcgen/inc/TokTyp_.h	2012-10-28 03:51:03.000000000 -0500
++++ pkg/odin/ipcgen/inc/TokTyp_.h	2012-11-25 14:56:26.000000000 -0600
 @@ -0,0 +1,24 @@
 +#ifndef TP_YYTOKTYP
 +#define TP_YYTOKTYP
@@ -14008,7 +13855,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/odin/ipcgen/inc/TokTyp_.h pkg/odin/ip
 +#endif
 diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/inc/Func.hh pkg/tregrm/inc/Func.hh
 --- pkg/tregrm/inc/Func.hh	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/tregrm/inc/Func.hh	2012-10-28 03:51:16.000000000 -0500
++++ pkg/tregrm/inc/Func.hh	2012-11-25 14:56:39.000000000 -0600
 @@ -0,0 +1,137 @@
 +/* pkg/tregrm/tg-main.c */
 +extern int main(void);
@@ -14149,7 +13996,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/inc/Func.hh pkg/tregrm/inc/Fun
 +extern void Write_Syms(tp_FilDsc);
 diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/inc/NodTyp_.h pkg/tregrm/inc/NodTyp_.h
 --- pkg/tregrm/inc/NodTyp_.h	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/tregrm/inc/NodTyp_.h	2012-10-28 03:51:03.000000000 -0500
++++ pkg/tregrm/inc/NodTyp_.h	2012-11-25 14:56:26.000000000 -0600
 @@ -0,0 +1,27 @@
 +#ifndef TP_YYNODTYP
 +#define TP_YYNODTYP
@@ -14180,7 +14027,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/inc/NodTyp_.h pkg/tregrm/inc/N
 +#endif
 diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/inc/TokTyp_.h pkg/tregrm/inc/TokTyp_.h
 --- pkg/tregrm/inc/TokTyp_.h	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/tregrm/inc/TokTyp_.h	2012-10-28 03:51:03.000000000 -0500
++++ pkg/tregrm/inc/TokTyp_.h	2012-11-25 14:56:26.000000000 -0600
 @@ -0,0 +1,26 @@
 +#ifndef TP_YYTOKTYP
 +#define TP_YYTOKTYP
@@ -14210,9 +14057,9 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/inc/TokTyp_.h pkg/tregrm/inc/T
 +#endif
 diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c pkg/tregrm/tregrm-yacc.c
 --- pkg/tregrm/tregrm-yacc.c	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/tregrm/tregrm-yacc.c	2012-10-28 03:51:03.000000000 -0500
-@@ -0,0 +1,1917 @@
-+/* A Bison parser, made by GNU Bison 2.6.4.  */
++++ pkg/tregrm/tregrm-yacc.c	2012-11-25 14:56:26.000000000 -0600
+@@ -0,0 +1,1879 @@
++/* A Bison parser, made by GNU Bison 2.6.5.  */
 +
 +/* Bison implementation for Yacc-like parsers in C
 +   
@@ -14258,7 +14105,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c pkg/tregrm/tregr
 +#define YYBISON 1
 +
 +/* Bison version.  */
-+#define YYBISON_VERSION "2.6.4"
++#define YYBISON_VERSION "2.6.5"
 +
 +/* Skeleton name.  */
 +#define YYSKELETON_NAME "yacc.c"
@@ -14276,8 +14123,8 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c pkg/tregrm/tregr
 +
 +
 +/* Copy the first part of user declarations.  */
-+/* Line 358 of yacc.c  */
-+#line 1 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 360 of yacc.c  */
++#line 1 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +
 +#include "inc/GMC.h"
 +extern int num_ParseErrors;
@@ -14289,7 +14136,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c pkg/tregrm/tregr
 +{num_ParseErrors++; ParseError(s);}
 +int yylex() {return YY_Lex();}
 +
-+/* Line 358 of yacc.c  */
++/* Line 360 of yacc.c  */
 +#line 80 "y.tab.c"
 +
 +# ifndef YY_NULL
@@ -14397,7 +14244,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c pkg/tregrm/tregr
 +
 +/* Copy the second part of user declarations.  */
 +
-+/* Line 377 of yacc.c  */
++/* Line 379 of yacc.c  */
 +#line 188 "y.tab.c"
 +
 +#ifdef short
@@ -14901,47 +14748,18 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c pkg/tregrm/tregr
 +    }								\
 +while (YYID (0))
 +
-+
++/* Error token number */
 +#define YYTERROR	1
 +#define YYERRCODE	256
 +
-+/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
-+   If N is 0, then set CURRENT to the empty location which ends
-+   the previous symbol: RHS[0] (always defined).  */
-+
-+#ifndef YYLLOC_DEFAULT
-+# define YYLLOC_DEFAULT(Current, Rhs, N)                                \
-+    do                                                                  \
-+      if (YYID (N))                                                     \
-+        {                                                               \
-+          (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;        \
-+          (Current).first_column = YYRHSLOC (Rhs, 1).first_column;      \
-+          (Current).last_line    = YYRHSLOC (Rhs, N).last_line;         \
-+          (Current).last_column  = YYRHSLOC (Rhs, N).last_column;       \
-+        }                                                               \
-+      else                                                              \
-+        {                                                               \
-+          (Current).first_line   = (Current).last_line   =              \
-+            YYRHSLOC (Rhs, 0).last_line;                                \
-+          (Current).first_column = (Current).last_column =              \
-+            YYRHSLOC (Rhs, 0).last_column;                              \
-+        }                                                               \
-+    while (YYID (0))
-+#endif
-+
-+#define YYRHSLOC(Rhs, K) ((Rhs)[K])
-+
-+
 +
 +/* This macro is provided for backward compatibility. */
-+
 +#ifndef YY_LOCATION_PRINT
 +# define YY_LOCATION_PRINT(File, Loc) ((void) 0)
 +#endif
 +
 +
 +/* YYLEX -- calling `yylex' with the right arguments.  */
-+
 +#ifdef YYLEX_PARAM
 +# define YYLEX yylex (YYLEX_PARAM)
 +#else
@@ -15407,16 +15225,16 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c pkg/tregrm/tregr
 +int yychar;
 +
 +
-+#ifndef YYLVAL_INITIALIZE
-+# define YYLVAL_INITIALIZE()
-+#endif
 +#ifndef YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
 +# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
 +# define YY_IGNORE_MAYBE_UNINITIALIZED_END
 +#endif
++#ifndef YY_INITIAL_VALUE
++# define YY_INITIAL_VALUE(Value) /* Nothing. */
++#endif
 +
 +/* The semantic value of the lookahead symbol.  */
-+YYSTYPE yylval;
++YYSTYPE yylval YY_INITIAL_VALUE(yyval_default);
 +
 +/* Number of syntax errors so far.  */
 +int yynerrs;
@@ -15492,8 +15310,8 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c pkg/tregrm/tregr
 +     Keep to zero when no symbol should be popped.  */
 +  int yylen = 0;
 +
-+  yyss = yyssa;
-+  yyvs = yyvsa;
++  yyssp = yyss = yyssa;
++  yyvsp = yyvs = yyvsa;
 +  yystacksize = YYINITDEPTH;
 +
 +  YYDPRINTF ((stderr, "Starting parse\n"));
@@ -15502,15 +15320,6 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c pkg/tregrm/tregr
 +  yyerrstatus = 0;
 +  yynerrs = 0;
 +  yychar = YYEMPTY; /* Cause a token to be read.  */
-+
-+  /* Initialize stack pointers.
-+     Waste one element of value and location stack
-+     so that they stay on the same level as the state stack.
-+     The wasted elements are never initialized.  */
-+  yyssp = yyss;
-+  yyvsp = yyvs;
-+
-+  YYLVAL_INITIALIZE ();
 +  goto yysetstate;
 +
 +/*------------------------------------------------------------.
@@ -15690,212 +15499,212 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c pkg/tregrm/tregr
 +  switch (yyn)
 +    {
 +        case 2:
-+/* Line 1813 of yacc.c  */
-+#line 40 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 40 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(1,4);}
 +    break;
 +
 +  case 3:
-+/* Line 1813 of yacc.c  */
-+#line 44 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 44 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(2,1);}
 +    break;
 +
 +  case 5:
-+/* Line 1813 of yacc.c  */
-+#line 52 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 52 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 6:
-+/* Line 1813 of yacc.c  */
-+#line 57 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 57 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 10:
-+/* Line 1813 of yacc.c  */
-+#line 69 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 69 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(3,1);}
 +    break;
 +
 +  case 12:
-+/* Line 1813 of yacc.c  */
-+#line 77 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 77 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 13:
-+/* Line 1813 of yacc.c  */
-+#line 82 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 82 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 15:
-+/* Line 1813 of yacc.c  */
-+#line 90 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 90 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(4,1);}
 +    break;
 +
 +  case 16:
-+/* Line 1813 of yacc.c  */
-+#line 94 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 94 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(5,1);}
 +    break;
 +
 +  case 17:
-+/* Line 1813 of yacc.c  */
-+#line 98 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 98 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(6,2);}
 +    break;
 +
 +  case 18:
-+/* Line 1813 of yacc.c  */
-+#line 104 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 104 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(7,3);}
 +    break;
 +
 +  case 19:
-+/* Line 1813 of yacc.c  */
-+#line 108 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 108 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(8,1);}
 +    break;
 +
 +  case 21:
-+/* Line 1813 of yacc.c  */
-+#line 116 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 116 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 22:
-+/* Line 1813 of yacc.c  */
-+#line 121 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 121 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 24:
-+/* Line 1813 of yacc.c  */
-+#line 127 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 127 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(9,1);}
 +    break;
 +
 +  case 26:
-+/* Line 1813 of yacc.c  */
-+#line 135 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 135 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 27:
-+/* Line 1813 of yacc.c  */
-+#line 140 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 140 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 29:
-+/* Line 1813 of yacc.c  */
-+#line 148 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 148 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(10,2);}
 +    break;
 +
 +  case 30:
-+/* Line 1813 of yacc.c  */
-+#line 152 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 152 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(11,1);}
 +    break;
 +
 +  case 31:
-+/* Line 1813 of yacc.c  */
-+#line 157 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 157 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 33:
-+/* Line 1813 of yacc.c  */
-+#line 165 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 165 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(12,2);}
 +    break;
 +
 +  case 35:
-+/* Line 1813 of yacc.c  */
-+#line 172 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 172 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 36:
-+/* Line 1813 of yacc.c  */
-+#line 176 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 176 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(-13,1);}
 +    break;
 +
 +  case 37:
-+/* Line 1813 of yacc.c  */
-+#line 181 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 181 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 38:
-+/* Line 1813 of yacc.c  */
-+#line 183 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 183 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 39:
-+/* Line 1813 of yacc.c  */
-+#line 189 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 189 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(14,2);}
 +    break;
 +
 +  case 40:
-+/* Line 1813 of yacc.c  */
-+#line 192 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 192 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(15,1);}
 +    break;
 +
 +  case 41:
-+/* Line 1813 of yacc.c  */
-+#line 195 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 195 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(16,1);}
 +    break;
 +
 +  case 42:
-+/* Line 1813 of yacc.c  */
-+#line 198 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 198 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(17,1);}
 +    break;
 +
 +  case 49:
-+/* Line 1813 of yacc.c  */
-+#line 221 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 221 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(18,1);}
 +    break;
 +
 +  case 50:
-+/* Line 1813 of yacc.c  */
-+#line 226 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 226 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(19,1);}
 +    break;
 +
 +  case 52:
-+/* Line 1813 of yacc.c  */
-+#line 232 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 232 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(20,-1);}
 +    break;
 +
 +  case 53:
-+/* Line 1813 of yacc.c  */
-+#line 234 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 234 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(21,-1);}
 +    break;
 +
 +  case 54:
-+/* Line 1813 of yacc.c  */
-+#line 236 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 236 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(22,-1);}
 +    break;
 +
 +
-+/* Line 1813 of yacc.c  */
-+#line 1685 "y.tab.c"
++/* Line 1778 of yacc.c  */
++#line 1647 "y.tab.c"
 +      default: break;
 +    }
 +  /* User semantic actions sometimes alter yychar, and that requires
@@ -16126,14 +15935,14 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c pkg/tregrm/tregr
 +}
 +
 +
-+/* Line 2076 of yacc.c  */
-+#line 238 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 2041 of yacc.c  */
++#line 238 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +
 diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c.dflt pkg/tregrm/tregrm-yacc.c.dflt
 --- pkg/tregrm/tregrm-yacc.c.dflt	1969-12-31 18:00:00.000000000 -0600
-+++ pkg/tregrm/tregrm-yacc.c.dflt	2012-10-28 03:51:03.000000000 -0500
-@@ -0,0 +1,1917 @@
-+/* A Bison parser, made by GNU Bison 2.6.4.  */
++++ pkg/tregrm/tregrm-yacc.c.dflt	2012-11-25 14:56:26.000000000 -0600
+@@ -0,0 +1,1879 @@
++/* A Bison parser, made by GNU Bison 2.6.5.  */
 +
 +/* Bison implementation for Yacc-like parsers in C
 +   
@@ -16179,7 +15988,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c.dflt pkg/tregrm/
 +#define YYBISON 1
 +
 +/* Bison version.  */
-+#define YYBISON_VERSION "2.6.4"
++#define YYBISON_VERSION "2.6.5"
 +
 +/* Skeleton name.  */
 +#define YYSKELETON_NAME "yacc.c"
@@ -16197,8 +16006,8 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c.dflt pkg/tregrm/
 +
 +
 +/* Copy the first part of user declarations.  */
-+/* Line 358 of yacc.c  */
-+#line 1 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 360 of yacc.c  */
++#line 1 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +
 +#include "inc/GMC.h"
 +extern int num_ParseErrors;
@@ -16210,7 +16019,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c.dflt pkg/tregrm/
 +{num_ParseErrors++; ParseError(s);}
 +int yylex() {return YY_Lex();}
 +
-+/* Line 358 of yacc.c  */
++/* Line 360 of yacc.c  */
 +#line 80 "y.tab.c"
 +
 +# ifndef YY_NULL
@@ -16318,7 +16127,7 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c.dflt pkg/tregrm/
 +
 +/* Copy the second part of user declarations.  */
 +
-+/* Line 377 of yacc.c  */
++/* Line 379 of yacc.c  */
 +#line 188 "y.tab.c"
 +
 +#ifdef short
@@ -16822,47 +16631,18 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c.dflt pkg/tregrm/
 +    }								\
 +while (YYID (0))
 +
-+
++/* Error token number */
 +#define YYTERROR	1
 +#define YYERRCODE	256
 +
-+/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
-+   If N is 0, then set CURRENT to the empty location which ends
-+   the previous symbol: RHS[0] (always defined).  */
-+
-+#ifndef YYLLOC_DEFAULT
-+# define YYLLOC_DEFAULT(Current, Rhs, N)                                \
-+    do                                                                  \
-+      if (YYID (N))                                                     \
-+        {                                                               \
-+          (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;        \
-+          (Current).first_column = YYRHSLOC (Rhs, 1).first_column;      \
-+          (Current).last_line    = YYRHSLOC (Rhs, N).last_line;         \
-+          (Current).last_column  = YYRHSLOC (Rhs, N).last_column;       \
-+        }                                                               \
-+      else                                                              \
-+        {                                                               \
-+          (Current).first_line   = (Current).last_line   =              \
-+            YYRHSLOC (Rhs, 0).last_line;                                \
-+          (Current).first_column = (Current).last_column =              \
-+            YYRHSLOC (Rhs, 0).last_column;                              \
-+        }                                                               \
-+    while (YYID (0))
-+#endif
-+
-+#define YYRHSLOC(Rhs, K) ((Rhs)[K])
-+
-+
 +
 +/* This macro is provided for backward compatibility. */
-+
 +#ifndef YY_LOCATION_PRINT
 +# define YY_LOCATION_PRINT(File, Loc) ((void) 0)
 +#endif
 +
 +
 +/* YYLEX -- calling `yylex' with the right arguments.  */
-+
 +#ifdef YYLEX_PARAM
 +# define YYLEX yylex (YYLEX_PARAM)
 +#else
@@ -17328,16 +17108,16 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c.dflt pkg/tregrm/
 +int yychar;
 +
 +
-+#ifndef YYLVAL_INITIALIZE
-+# define YYLVAL_INITIALIZE()
-+#endif
 +#ifndef YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
 +# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
 +# define YY_IGNORE_MAYBE_UNINITIALIZED_END
 +#endif
++#ifndef YY_INITIAL_VALUE
++# define YY_INITIAL_VALUE(Value) /* Nothing. */
++#endif
 +
 +/* The semantic value of the lookahead symbol.  */
-+YYSTYPE yylval;
++YYSTYPE yylval YY_INITIAL_VALUE(yyval_default);
 +
 +/* Number of syntax errors so far.  */
 +int yynerrs;
@@ -17413,8 +17193,8 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c.dflt pkg/tregrm/
 +     Keep to zero when no symbol should be popped.  */
 +  int yylen = 0;
 +
-+  yyss = yyssa;
-+  yyvs = yyvsa;
++  yyssp = yyss = yyssa;
++  yyvsp = yyvs = yyvsa;
 +  yystacksize = YYINITDEPTH;
 +
 +  YYDPRINTF ((stderr, "Starting parse\n"));
@@ -17423,15 +17203,6 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c.dflt pkg/tregrm/
 +  yyerrstatus = 0;
 +  yynerrs = 0;
 +  yychar = YYEMPTY; /* Cause a token to be read.  */
-+
-+  /* Initialize stack pointers.
-+     Waste one element of value and location stack
-+     so that they stay on the same level as the state stack.
-+     The wasted elements are never initialized.  */
-+  yyssp = yyss;
-+  yyvsp = yyvs;
-+
-+  YYLVAL_INITIALIZE ();
 +  goto yysetstate;
 +
 +/*------------------------------------------------------------.
@@ -17611,212 +17382,212 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c.dflt pkg/tregrm/
 +  switch (yyn)
 +    {
 +        case 2:
-+/* Line 1813 of yacc.c  */
-+#line 40 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 40 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(1,4);}
 +    break;
 +
 +  case 3:
-+/* Line 1813 of yacc.c  */
-+#line 44 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 44 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(2,1);}
 +    break;
 +
 +  case 5:
-+/* Line 1813 of yacc.c  */
-+#line 52 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 52 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 6:
-+/* Line 1813 of yacc.c  */
-+#line 57 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 57 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 10:
-+/* Line 1813 of yacc.c  */
-+#line 69 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 69 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(3,1);}
 +    break;
 +
 +  case 12:
-+/* Line 1813 of yacc.c  */
-+#line 77 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 77 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 13:
-+/* Line 1813 of yacc.c  */
-+#line 82 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 82 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 15:
-+/* Line 1813 of yacc.c  */
-+#line 90 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 90 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(4,1);}
 +    break;
 +
 +  case 16:
-+/* Line 1813 of yacc.c  */
-+#line 94 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 94 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(5,1);}
 +    break;
 +
 +  case 17:
-+/* Line 1813 of yacc.c  */
-+#line 98 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 98 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(6,2);}
 +    break;
 +
 +  case 18:
-+/* Line 1813 of yacc.c  */
-+#line 104 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 104 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(7,3);}
 +    break;
 +
 +  case 19:
-+/* Line 1813 of yacc.c  */
-+#line 108 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 108 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(8,1);}
 +    break;
 +
 +  case 21:
-+/* Line 1813 of yacc.c  */
-+#line 116 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 116 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 22:
-+/* Line 1813 of yacc.c  */
-+#line 121 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 121 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 24:
-+/* Line 1813 of yacc.c  */
-+#line 127 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 127 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(9,1);}
 +    break;
 +
 +  case 26:
-+/* Line 1813 of yacc.c  */
-+#line 135 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 135 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 27:
-+/* Line 1813 of yacc.c  */
-+#line 140 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 140 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 29:
-+/* Line 1813 of yacc.c  */
-+#line 148 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 148 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(10,2);}
 +    break;
 +
 +  case 30:
-+/* Line 1813 of yacc.c  */
-+#line 152 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 152 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(11,1);}
 +    break;
 +
 +  case 31:
-+/* Line 1813 of yacc.c  */
-+#line 157 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 157 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 33:
-+/* Line 1813 of yacc.c  */
-+#line 165 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 165 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(12,2);}
 +    break;
 +
 +  case 35:
-+/* Line 1813 of yacc.c  */
-+#line 172 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 172 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 36:
-+/* Line 1813 of yacc.c  */
-+#line 176 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 176 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(-13,1);}
 +    break;
 +
 +  case 37:
-+/* Line 1813 of yacc.c  */
-+#line 181 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 181 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,2);}
 +    break;
 +
 +  case 38:
-+/* Line 1813 of yacc.c  */
-+#line 183 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 183 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(0,0);}
 +    break;
 +
 +  case 39:
-+/* Line 1813 of yacc.c  */
-+#line 189 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 189 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(14,2);}
 +    break;
 +
 +  case 40:
-+/* Line 1813 of yacc.c  */
-+#line 192 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 192 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(15,1);}
 +    break;
 +
 +  case 41:
-+/* Line 1813 of yacc.c  */
-+#line 195 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 195 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(16,1);}
 +    break;
 +
 +  case 42:
-+/* Line 1813 of yacc.c  */
-+#line 198 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 198 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(17,1);}
 +    break;
 +
 +  case 49:
-+/* Line 1813 of yacc.c  */
-+#line 221 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 221 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(18,1);}
 +    break;
 +
 +  case 50:
-+/* Line 1813 of yacc.c  */
-+#line 226 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 226 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(19,1);}
 +    break;
 +
 +  case 52:
-+/* Line 1813 of yacc.c  */
-+#line 232 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 232 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(20,-1);}
 +    break;
 +
 +  case 53:
-+/* Line 1813 of yacc.c  */
-+#line 234 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 234 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(21,-1);}
 +    break;
 +
 +  case 54:
-+/* Line 1813 of yacc.c  */
-+#line 236 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 1778 of yacc.c  */
++#line 236 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +    {Action(22,-1);}
 +    break;
 +
 +
-+/* Line 1813 of yacc.c  */
-+#line 1685 "y.tab.c"
++/* Line 1778 of yacc.c  */
++#line 1647 "y.tab.c"
 +      default: break;
 +    }
 +  /* User semantic actions sometimes alter yychar, and that requires
@@ -18047,6 +17818,6 @@ diff -ruNx autom4te.cache -x 'config*' pkg/tregrm/tregrm-yacc.c.dflt pkg/tregrm/
 +}
 +
 +
-+/* Line 2076 of yacc.c  */
-+#line 238 "/home/darktjm/.ODIN/darktjm/FILES/a/f/tregrm.ygi.1986903.y"
++/* Line 2041 of yacc.c  */
++#line 238 "/home/darktjm/.ODIN/darktjm/FILES/a/p/tregrm.ygi.2625354.y"
 +

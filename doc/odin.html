@@ -10735,9 +10735,8 @@ true, user write permission is added to all destination items.
 </DD>
 <DT><STRONG>ln(src, dest)</STRONG></DT>
 <DD>-- make a link from source to destination.  If
-lua-posix is installed, a soft link is made.  Otherwise, if possible,
-a hard link if made.  If no link can be made, this is the same as
-<TT>cp_RpL</TT>.
+possible, a soft link is made.  Otherwise, if possible, a hard link if made.
+If no link can be made, this is the same as <TT>cp_RpL</TT>.
 </DD>
 <DT><STRONG>cat(f)</STRONG></DT>
 <DD>-- print <I>f</I> on standard output.  <I>f</I> may be
@@ -10950,20 +10949,6 @@ overridden).
 compiler flags and libraries from <TT>pkg-config -libs -cflags</TT> in
 Odin option format.  Two separate runs are made to separate generic
 linker flags (<TT>+ld_flags</TT>) from generic compiler flags (<TT>+cc_flags</TT>) properly.
-</DD>
-<DT><STRONG>aprconfig</STRONG></DT>
-<DD>The expected Apache Portable Runtime configuration
-program (<TT>apr-1-config</TT> unless APRCONFIG is set in the environment)
-</DD>
-<DT><STRONG>get_aprconfig(fl)</STRONG></DT>
-<DD>-- Get APR configuration information using
-configuration command flags <I>fl</I>.
-</DD>
-<DT><STRONG>apr_libs()</STRONG></DT>
-<DD>Return APR linker flags, parsed to Odin format.
-</DD>
-<DT><STRONG>apr_cflags()</STRONG></DT>
-<DD>Return APR C compiler and linker flags, parsed to Odin
 format.
 </DD>
 </DL>
@@ -10991,13 +10976,6 @@ command-line argument, equivalent to concatenating all of <TT>words(f)</TT> into
 </DD>
 <DT><STRONG>unpack(table)</STRONG></DT>
 <DD>-- an alias for <TT>table.unpack()</TT> in Lua 5.2.
-</DD>
-<DT><STRONG>has_posix</STRONG></DT>
-<DD>-- a boolean indicating presence of the lua-posix
-library.
-</DD>
-<DT><STRONG>posix</STRONG></DT>
-<DD>-- the lua-posix library, if present
 </DD>
 </DL>
 
@@ -11045,7 +11023,7 @@ Richard&nbsp;M. Stallman and Roland McGrath.
 <BR><HR>
 <ADDRESS>
 Thomas J. Moore
-2012-10-28
+2012-11-25
 </ADDRESS>
 </BODY>
 </HTML>
