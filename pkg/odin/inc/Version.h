@@ -1,1 +1,0 @@
-#define ODIN_VERSION_STR "1.18.0"

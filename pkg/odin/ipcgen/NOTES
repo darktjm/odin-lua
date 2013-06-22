@@ -1,4 +1,0 @@
-Validity checks:
-- Can only have output parameters in request.
-
-Could return "REPLY" message on broadcasts and notices, if needed.

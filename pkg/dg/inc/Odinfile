@@ -1,7 +1,0 @@
-# ./Odin/pkg/dg/inc/Odinfile
-
-TokTyp_.h == ../drvgrf.ygi :tok.h
-NodTyp_.h == ../drvgrf.ygi :nod.h
-Func.hh == \
-  ((..%dg.c.sm :code.list :ls) +subst='$/:c.h' :regsub :list :cat) \
-  +match='tp_SKind' +hide_match :regsub

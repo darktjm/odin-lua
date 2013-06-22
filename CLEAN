@@ -1,7 +1,0 @@
-#!/bin/sh
-# delete derived files produced during INSTALL of the Odin system
-
-rm -f pkg/odin/*.o pkg/odin/*/*.o pkg/*/*.exe
-rm -rf ODINBOOT bin lib man
-
-exit 0

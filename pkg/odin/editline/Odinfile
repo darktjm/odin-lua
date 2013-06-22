@@ -1,2 +1,0 @@
-%editline.sm == <<
-   editline.c; complete.c; sysunix.c

@@ -1,9 +1,0 @@
-# ./Odin/pkg/ipcgen/inc/Odinfile
-
-TokTyp_.h == ../ipcgen.ygi :tok.h
-
-NodTyp_.h == ../ipcgen.ygi :nod.h
-
-Func.hh == \
-  ((..%ipcgen.c.sm :code.list :ls) +subst='$/:c.h' :regsub :list :cat) \
-  +match='tp_SKind' +hide_match :regsub
