@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
 <!--Converted with LaTeX2HTML 2008 (1.71)
 original version by:  Nikos Drakos, CBLU, University of Leeds
@@ -30,7 +30,7 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 <BR>
 <BR>
         REFERENCE MANUAL
-        </H1><DIV>
+        </H1><DIV CLASS="author_info">
 
 <P ALIGN="CENTER"><STRONG>Geoffrey M. Clemm</STRONG></P>
 <P ALIGN="CENTER"><STRONG>
@@ -53,7 +53,7 @@ Contents</A>
 </H2>
 <!--Table of Contents-->
 
-<UL>
+<UL CLASS="TofC">
 <LI><A NAME="tex2html162"
   HREF="odin.html#SECTION00200000000000000000">1. Introduction</A>
 <UL>
@@ -458,13 +458,13 @@ Contents</A>
 
 <H1><A NAME="SECTION00200000000000000000"></A>
 <A NAME="intro"></A><BR>
-1. Introduction
+<SPAN CLASS="arabic">1</SPAN>. Introduction
 </H1>
 
 <P>
 
 <H1><A NAME="SECTION00210000000000000000">
-1.1 Derived Object Managers</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">1</SPAN> Derived Object Managers</A>
 </H1>
 
 <P>
@@ -503,7 +503,7 @@ in which each tool is described by a single declaration.
 <P>
 
 <H1><A NAME="SECTION00220000000000000000">
-1.2 Odin Objects</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">2</SPAN> Odin Objects</A>
 </H1>
 
 <P>
@@ -519,7 +519,7 @@ or the arguments to a command.
 <P>
 
 <H2><A NAME="SECTION00221000000000000000">
-1.2.1 Source and Derived Objects</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">1</SPAN> Source and Derived Objects</A>
 </H2>
 
 <P>
@@ -550,7 +550,7 @@ referenced by <TT>#include</TT> statements.
 
 <H2><A NAME="SECTION00222000000000000000"></A>
 <A NAME="cache"></A><BR>
-1.2.2 The Derived Object Cache
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">2</SPAN> The Derived Object Cache
 </H2>
 
 <P>
@@ -597,7 +597,7 @@ and Unix domain sockets will be used instead.
 <P>
 
 <H1><A NAME="SECTION00230000000000000000">
-1.3 Why Not Just Use Make?</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN> Why Not Just Use Make?</A>
 </H1>
 
 <P>
@@ -626,7 +626,7 @@ description means is to run Make and see what kind of commands it executes.
 <P>
 
 <H2><A NAME="SECTION00231000000000000000">
-1.3.1 Dependency Information</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">1</SPAN> Dependency Information</A>
 </H2>
 
 <P>
@@ -690,7 +690,7 @@ must be recomputed.
 <P>
 
 <H2><A NAME="SECTION00232000000000000000">
-1.3.2 Specifying Build Variants</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">2</SPAN> Specifying Build Variants</A>
 </H2>
 
 <P>
@@ -732,7 +732,7 @@ explicit build rules are hardly ever needed in an Odinfile.
 <P>
 
 <H2><A NAME="SECTION00233000000000000000">
-1.3.3 Storing Derived File Variants</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">3</SPAN> Storing Derived File Variants</A>
 </H2>
 
 <P>
@@ -798,7 +798,7 @@ or to the correct derived file in the derived file cache.
 <P>
 
 <H2><A NAME="SECTION00234000000000000000">
-1.3.4 Parallel Builds</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">4</SPAN> Parallel Builds</A>
 </H2>
 Odin provides concurrent parallel builds on local and remote hosts.
 You just specify a list of build hosts and the maximum number of parallel
@@ -807,7 +807,7 @@ builds.
 <P>
 
 <H2><A NAME="SECTION00235000000000000000">
-1.3.5 Help</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">5</SPAN> Help</A>
 </H2>
 Odin provides a powerful help system that uses its knowledge of the
 currently installed set of implicit rules (including those added by
@@ -821,7 +821,7 @@ given derived file.
 <P>
 
 <H2><A NAME="SECTION00236000000000000000">
-1.3.6 Errors</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">6</SPAN> Errors</A>
 </H2>
 Odin maintains a persistent database of all error and warning messages
 associated with each build step.
@@ -834,7 +834,7 @@ database rather than recomputed.
 <P>
 
 <H2><A NAME="SECTION00237000000000000000">
-1.3.7 Operations on Lists</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">7</SPAN> Operations on Lists</A>
 </H2>
 Enhanced versions of Make each provide their own idiosyncratic
 set of operations for manipulating filenames and lists of filenames.
@@ -845,7 +845,7 @@ the dependency database.
 <P>
 
 <H2><A NAME="SECTION00238000000000000000">
-1.3.8 Editing while Building</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">8</SPAN> Editing while Building</A>
 </H2>
 You can edit files that are currently being used for one or more builds,
 and Odin will automatically recognize the changes and redo the parts of
@@ -855,7 +855,7 @@ before letting the builds complete.
 <P>
 
 <H2><A NAME="SECTION00239000000000000000">
-1.3.9 Recursive Implicit Rules</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">9</SPAN> Recursive Implicit Rules</A>
 </H2>
 Odin allows you to recursively chain implicit rules,
 so for example, you can specify that the files included by
@@ -867,7 +867,7 @@ of implicit rules do not allow recursive chaining.
 <P>
 
 <H2><A NAME="SECTION002310000000000000000">
-1.3.10 Circular Dependencies</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">10</SPAN> Circular Dependencies</A>
 </H2>
 Odin allows a file to depend on itself.
 This may seem unreasonable until you start writing tools that generate code,
@@ -881,7 +881,7 @@ is identical to the one used as input to the computation
 <P>
 
 <H2><A NAME="SECTION002311000000000000000">
-1.3.11 Efficient Dependency Computation</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">11</SPAN> Efficient Dependency Computation</A>
 </H2>
 In very large systems, even when a desired derived file is up-to-date,
 simply <TT>fstat()</TT>'ing all the source files upon which it depends
@@ -895,7 +895,7 @@ of file dependencies.
 <P>
 
 <H2><A NAME="SECTION002312000000000000000">
-1.3.12 Tool Dependencies</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">12</SPAN> Tool Dependencies</A>
 </H2>
 Build steps automatically depend on the tools and scripts that produce them,
 so if you change a tool, Odin will recompute anything produced by that
@@ -908,7 +908,7 @@ that depend on that output of the tool are marked as still being valid.
 <P>
 
 <H2><A NAME="SECTION002313000000000000000">
-1.3.13 Availability</A>
+<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">13</SPAN> Availability</A>
 </H2>
 Finally, Odin is portable, free, and available in source form.
 It can be retrieved via anonymous ftp
@@ -919,14 +919,14 @@ at <TT>ftp.cs.colorado.edu (128.138.243.151)</TT>.
 
 <H1><A NAME="SECTION00300000000000000000"></A>
 <A NAME="odinfile"></A><BR>
-2. The Odinfile
+<SPAN CLASS="arabic">2</SPAN>. The Odinfile
 </H1>
 
 <P>
 
 <H1><A NAME="SECTION00310000000000000000"></A>
 <A NAME="target"></A><BR>
-2.1 Targets
+<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">1</SPAN> Targets
 </H1>
 
 <P>
@@ -963,7 +963,7 @@ of the file specified by the odin-expression <TT>prog.c+debug:exe</TT>.
 
 <H1><A NAME="SECTION00320000000000000000"></A>
 <A NAME="odinexpr"></A><BR>
-2.2 Odin-Expressions
+<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">2</SPAN> Odin-Expressions
 </H1>
 
 <P>
@@ -986,7 +986,7 @@ is selected from <TT>src/prog.c+debug</TT>.
 <P>
 
 <H2><A NAME="SECTION00321000000000000000">
-2.2.1 Lexical Conventions</A>
+<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">1</SPAN> Lexical Conventions</A>
 </H2>
 
 <P>
@@ -1004,7 +1004,7 @@ by separating them with semi-colon operators.
 An identifier token is just a sequence of characters.
 The following characters:
 <PRE>
-   : + = ( ) / % ; ? $ &lt; &gt; ! &lt;space&gt; &lt;tab&gt; &lt;new-line&gt; # \ ' 
+   : + = ( ) / % ; ? $ &lt; &gt; ! &lt;space&gt; &lt;tab&gt; &lt;new-line&gt; # \ '
 </PRE>
 must be escaped to be included in an identifier.
 A single character can be escaped by preceding it with a backslash
@@ -1033,7 +1033,7 @@ Parentheses are required for nested odin-expressions
 
 <H2><A NAME="SECTION00322000000000000000"></A>
 <A NAME="selection"></A><BR>
-2.2.2 Selection Expressions
+<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">2</SPAN> Selection Expressions
 </H2>
 
 <P>
@@ -1079,7 +1079,7 @@ objects derived from the file (see Section&nbsp;<A HREF="#builtin">B.4.1</A>).
 <P>
 
 <H2><A NAME="SECTION00323000000000000000">
-2.2.3 Derivation Expressions</A>
+<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">3</SPAN> Derivation Expressions</A>
 </H2>
 
 <P>
@@ -1120,7 +1120,7 @@ although it can be a symbolic link to another directory.
 <P>
 
 <H2><A NAME="SECTION00324000000000000000">
-2.2.4 Parameterization Expressions</A>
+<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">4</SPAN> Parameterization Expressions</A>
 </H2>
 
 <P>
@@ -1244,7 +1244,7 @@ would be equivalent.
 <P>
 
 <H2><A NAME="SECTION00325000000000000000">
-2.2.5 String Expressions</A>
+<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">5</SPAN> String Expressions</A>
 </H2>
 
 <P>
@@ -1261,7 +1261,7 @@ names the string <TT>cxv</TT>.
 
 <H1><A NAME="SECTION00330000000000000000"></A>
 <A NAME="virtualtarget"></A><BR>
-2.3 Virtual Targets
+<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">3</SPAN> Virtual Targets
 </H1>
 
 <P>
@@ -1324,7 +1324,7 @@ obtains the virtual target for <TT>%fastprog</TT> from <TT>src/models</TT>.
 
 <H1><A NAME="SECTION00340000000000000000"></A>
 <A NAME="texttarget"></A><BR>
-2.4 Text Targets
+<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">4</SPAN> Text Targets
 </H1>
 
 <P>
@@ -1376,7 +1376,7 @@ five characters: "<TT>aeiou</TT>".
 
 <H2><A NAME="SECTION00341000000000000000"></A>
 <A NAME="executabletarget"></A><BR>
-2.4.1 Executable Text Targets
+<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">1</SPAN> Executable Text Targets
 </H2>
 
 <P>
@@ -1390,14 +1390,13 @@ For example, the <TT>Odinfile</TT> entry:
       backup_name=$1.back
       mv $1 $backup_name
       cp $backup_name $1
-</PRE>
-specifies <TT>%backup</TT> to be an executable text target.
+</PRE>specifies <TT>%backup</TT> to be an executable text target.
 
 <P>
 
 <H1><A NAME="SECTION00350000000000000000"></A>
 <A NAME="commandtarget"></A><BR>
-2.5 Command Targets
+<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">5</SPAN> Command Targets
 </H1>
 
 <P>
@@ -1427,7 +1426,7 @@ makes sure <TT>prog</TT> is up-to-date with respect to
 
 <H1><A NAME="SECTION00360000000000000000"></A>
 <A NAME="nestedtarget"></A><BR>
-2.6 Nested Target Definitions
+<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">6</SPAN> Nested Target Definitions
 </H1>
 
 <P>
@@ -1455,7 +1454,7 @@ on the <TT>linux</TT> platform.
 <P>
 
 <H1><A NAME="SECTION00400000000000000000">
-3. Getting Started</A>
+<SPAN CLASS="arabic">3</SPAN>. Getting Started</A>
 </H1>
 
 <P>
@@ -1501,7 +1500,7 @@ You have now built your first executable with Odin.  Now to test it:
 <P>
 
 <H1><A NAME="SECTION00410000000000000000">
-3.1 Systems with Several Files</A>
+<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">1</SPAN> Systems with Several Files</A>
 </H1>
 
 <P>
@@ -1582,7 +1581,7 @@ phase since the old executable is still valid.
 <P>
 
 <H1><A NAME="SECTION00420000000000000000">
-3.2 Files in Other Directories</A>
+<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">2</SPAN> Files in Other Directories</A>
 </H1>
 
 <P>
@@ -1610,7 +1609,7 @@ you switch from one to the other in your system model.
 <P>
 
 <H1><A NAME="SECTION00430000000000000000">
-3.3 Recursive Odin Calls</A>
+<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">3</SPAN> Recursive Odin Calls</A>
 </H1>
 
 <P>
@@ -1641,7 +1640,7 @@ are computed for you, so a simple <TT>odin hello</TT> is sufficient.
 <P>
 
 <H1><A NAME="SECTION00440000000000000000">
-3.4 Debugging Your Program</A>
+<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">4</SPAN> Debugging Your Program</A>
 </H1>
 
 <P>
@@ -1693,7 +1692,7 @@ and then because <TT>%dbx</TT> is an executable target, execute the script.
 
 <H1><A NAME="SECTION00500000000000000000"></A>
 <A NAME="command"></A><BR>
-4. Odin-Commands
+<SPAN CLASS="arabic">4</SPAN>. Odin-Commands
 </H1>
 
 <P>
@@ -1736,7 +1735,7 @@ typed at the location of the question-mark.
 
 <H1><A NAME="SECTION00510000000000000000"></A>
 <A NAME="query"></A><BR>
-4.1 Query Odin-Commands
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">1</SPAN> Query Odin-Commands
 </H1>
 
 <P>
@@ -1760,7 +1759,7 @@ The level of detail of this information is controlled by the value of the
 <P>
 
 <H2><A NAME="SECTION00511000000000000000">
-4.1.1 Status of Odin Objects</A>
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">1</SPAN> Status of Odin Objects</A>
 </H2>
 
 <P>
@@ -1794,7 +1793,7 @@ if it is a target, and otherwise <TT>OK</TT>.
 <P>
 
 <H2><A NAME="SECTION00512000000000000000">
-4.1.2 Error and Warning Messages</A>
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">2</SPAN> Error and Warning Messages</A>
 </H2>
 
 <P>
@@ -1829,7 +1828,7 @@ warning and error messages for an object.
 
 <H1><A NAME="SECTION00520000000000000000"></A>
 <A NAME="copy"></A><BR>
-4.2 Copy Odin-Commands
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">2</SPAN> Copy Odin-Commands
 </H1>
 
 <P>
@@ -1870,7 +1869,7 @@ each element of the list is copied individually into the directory.
 <P>
 
 <H2><A NAME="SECTION00521000000000000000">
-4.2.1 Copying to Standard Output</A>
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">1</SPAN> Copying to Standard Output</A>
 </H2>
 
 <P>
@@ -1885,7 +1884,7 @@ displays the file named <TT>prog.c</TT>.
 <P>
 
 <H2><A NAME="SECTION00522000000000000000">
-4.2.2 Editing with the Copy Odin-Command</A>
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">2</SPAN> Editing with the Copy Odin-Command</A>
 </H2>
 
 <P>
@@ -1904,7 +1903,7 @@ invokes the <TT>emacs</TT> editor on the file <TT>prog.c</TT>.
 
 <H1><A NAME="SECTION00530000000000000000"></A>
 <A NAME="execute"></A><BR>
-4.3 Execute Odin-Commands
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">3</SPAN> Execute Odin-Commands
 </H1>
 
 <P>
@@ -1955,7 +1954,7 @@ to be executed by the Odin interpreter.
 
 <H1><A NAME="SECTION00540000000000000000"></A>
 <A NAME="variable"></A><BR>
-4.4 Variable Assignment Odin-Commands
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">4</SPAN> Variable Assignment Odin-Commands
 </H1>
 
 <P>
@@ -2016,7 +2015,7 @@ is specified in the <TT>ODINMAXBUILDS</TT> environment variable.
 <P>
 
 <H2><A NAME="SECTION00541000000000000000">
-4.4.1 Dir</A>
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">1</SPAN> Dir</A>
 </H2>
 
 <P>
@@ -2030,7 +2029,7 @@ for all relative names given to the Odin interpreter.
 <P>
 
 <H2><A NAME="SECTION00542000000000000000">
-4.4.2 BuildHosts, MaxBuilds</A>
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">2</SPAN> BuildHosts, MaxBuilds</A>
 </H2>
 
 <P>
@@ -2053,7 +2052,7 @@ this can be achieved by extending the tool packages
 
 <H2><A NAME="SECTION00543000000000000000"></A>
 <A NAME="keepgoing"></A><BR>
-4.4.3 KeepGoing
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">3</SPAN> KeepGoing
 </H2>
 
 <P>
@@ -2067,7 +2066,7 @@ reports an error (similar to the default behavior of Make).
 
 <H2><A NAME="SECTION00544000000000000000"></A>
 <A NAME="history"></A><BR>
-4.4.4 History
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">4</SPAN> History
 </H2>
 
 <P>
@@ -2079,7 +2078,7 @@ when it is used as an interactive command interpreter.
 
 <H2><A NAME="SECTION00545000000000000000"></A>
 <A NAME="errlevel"></A><BR>
-4.4.5 ErrLevel, WarnLevel, LogLevel
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">5</SPAN> ErrLevel, WarnLevel, LogLevel
 </H2>
 
 <P>
@@ -2103,7 +2102,7 @@ The <TT>LogLevel</TT> variable specifies how detailed these messages are.
 
 <H2><A NAME="SECTION00546000000000000000"></A>
 <A NAME="helplevel"></A><BR>
-4.4.6 HelpLevel
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">6</SPAN> HelpLevel
 </H2>
 
 <P>
@@ -2117,7 +2116,7 @@ can be increased to have all possible types described.
 
 <H2><A NAME="SECTION00547000000000000000"></A>
 <A NAME="verifylevel"></A><BR>
-4.4.7 VerifyLevel
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">7</SPAN> VerifyLevel
 </H2>
 
 <P>
@@ -2137,7 +2136,7 @@ is avoided as well.
 <P>
 
 <H2><A NAME="SECTION00548000000000000000">
-4.4.8 Size</A>
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">8</SPAN> Size</A>
 </H2>
 
 <P>
@@ -2148,7 +2147,7 @@ The value of the <TT>Size</TT> variable indicates how much disk space
 
 <H2><A NAME="SECTION00549000000000000000"></A>
 <A NAME="envvar"></A><BR>
-4.4.9 Environment Variables
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">9</SPAN> Environment Variables
 </H2>
 
 <P>
@@ -2158,8 +2157,7 @@ For example, if the environment variable <TT>$HOME</TT> has the value
 <PRE>
    -&gt; $HOME/prog.c :exe
    -&gt; /u/geoff/prog.c :exe
-</PRE>
-are equivalent.
+</PRE>are equivalent.
 The value of an environment variable can be quoted by immediately 
 preceding it with a quoted identifier.
 For example, if the value of <TT>$PATH</TT> is <TT>/bin:/usr/bin</TT>,
@@ -2167,8 +2165,7 @@ then the two odin-commands:
 <PRE>
    -&gt; prog.c +path='/etc:'$PATH
    -&gt; prog.c +path='/etc:/bin:/usr/bin'
-</PRE>
-are equivalent.
+</PRE>are equivalent.
 
 <P>
 The environment variable <TT>$ODINCACHE</TT> is set by Odin to be the location
@@ -2206,7 +2203,7 @@ user and the login directory of the user with login <TT>name</TT>.
 
 <H1><A NAME="SECTION00550000000000000000"></A>
 <A NAME="help"></A><BR>
-4.5 Help
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">5</SPAN> Help
 </H1>
 
 <P>
@@ -2245,7 +2242,7 @@ For example, the following odin-command provides a syntax summary:
 <P>
 
 <H2><A NAME="SECTION00551000000000000000">
-4.5.1 Source Type Help</A>
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">5</SPAN>.<SPAN CLASS="arabic">1</SPAN> Source Type Help</A>
 </H2>
 
 <P>
@@ -2267,7 +2264,7 @@ where the message contents is derived from the installed tool packages
 <P>
 
 <H2><A NAME="SECTION00552000000000000000">
-4.5.2 Derivation Help</A>
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">5</SPAN>.<SPAN CLASS="arabic">2</SPAN> Derivation Help</A>
 </H2>
 
 <P>
@@ -2295,7 +2292,7 @@ states that all of the following are acceptable odin-expressions:
 <P>
 
 <H2><A NAME="SECTION00553000000000000000">
-4.5.3 Parameterization Help</A>
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">5</SPAN>.<SPAN CLASS="arabic">3</SPAN> Parameterization Help</A>
 </H2>
 
 <P>
@@ -2336,7 +2333,7 @@ from <TT>:fmt</TT> to <TT>:o</TT>, it is not listed.
 <P>
 
 <H2><A NAME="SECTION00554000000000000000">
-4.5.4 Variable Help</A>
+<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">5</SPAN>.<SPAN CLASS="arabic">4</SPAN> Variable Help</A>
 </H2>
 
 <P>
@@ -2403,7 +2400,7 @@ For example:
 <P>
 
 <H1><A NAME="SECTION00610000000000000000">
-A.1 Testing Host Files for Changes</A>
+A.<SPAN CLASS="arabic">1</SPAN> Testing Host Files for Changes</A>
 </H1>
 
 <P>
@@ -2445,7 +2442,7 @@ that extends the gnu-emacs editor to issue the appropriate
 <P>
 
 <H1><A NAME="SECTION00620000000000000000">
-A.2 Redoing a Particular Derivation Step</A>
+A.<SPAN CLASS="arabic">2</SPAN> Redoing a Particular Derivation Step</A>
 </H1>
 
 <P>
@@ -2467,7 +2464,7 @@ a transient error.
 <P>
 
 <H1><A NAME="SECTION00630000000000000000">
-A.3 Browsing the Dependency Database</A>
+A.<SPAN CLASS="arabic">3</SPAN> Browsing the Dependency Database</A>
 </H1>
 
 <P>
@@ -2555,7 +2552,7 @@ installed into the cache.
 
 <H1><A NAME="SECTION00710000000000000000"></A>
 <A NAME="package"></A><BR>
-B.1 Tool Packages
+B.<SPAN CLASS="arabic">1</SPAN> Tool Packages
 </H1>
 
 <P>
@@ -2574,7 +2571,7 @@ It is described in detail in Section&nbsp;<A HREF="#derivationgraph">B.2</A>.
 <P>
 
 <H2><A NAME="SECTION00711000000000000000">
-B.1.1 Versioned Tool Packages</A>
+B.<SPAN CLASS="arabic">1</SPAN>.<SPAN CLASS="arabic">1</SPAN> Versioned Tool Packages</A>
 </H2>
 
 <P>
@@ -2624,7 +2621,7 @@ by editing the <TT>LIBVER</TT> file.
 
 <H1><A NAME="SECTION00720000000000000000"></A>
 <A NAME="derivationgraph"></A><BR>
-B.2 Derivation Graphs
+B.<SPAN CLASS="arabic">2</SPAN> Derivation Graphs
 </H1>
 
 <P>
@@ -2654,7 +2651,7 @@ as those for odin-expressions (see Section&nbsp;<A HREF="#odinexpr">2.2</A>).
 
 <H1><A NAME="SECTION00730000000000000000"></A>
 <A NAME="sourcedecl"></A><BR>
-B.3 Source Declarations
+B.<SPAN CLASS="arabic">3</SPAN> Source Declarations
 </H1>
 
 <P>
@@ -2703,7 +2700,7 @@ the following object types would be assigned:
 
 <H1><A NAME="SECTION00740000000000000000"></A>
 <A NAME="objecttype"></A><BR>
-B.4 Object Type Declarations
+B.<SPAN CLASS="arabic">4</SPAN> Object Type Declarations
 </H1>
 
 <P>
@@ -2786,7 +2783,7 @@ for a derivation that must produce an object of type <TT>:c</TT>.
 
 <H2><A NAME="SECTION00741000000000000000"></A>
 <A NAME="builtin"></A><BR>
-B.4.1 Built-In Supertypes
+B.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">1</SPAN> Built-In Supertypes
 </H2>
 
 <P>
@@ -2862,7 +2859,7 @@ then the object must be a directory produced by a tool.
 
 <H2><A NAME="SECTION00742000000000000000"></A>
 <A NAME="builtindrv"></A><BR>
-B.4.2 Built-In Derived Object Types
+B.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">2</SPAN> Built-In Derived Object Types
 </H2>
 
 <P>
@@ -3049,7 +3046,7 @@ A hook is text of the form:
 where <TT>odin-expression</TT> is the name of the object referenced by the hook,
 <TT>hooktype</TT> is the type of the hook, and <TT>hookdata</TT> is the actual
 reference.
-In order to escape the delimiter `<TT>(|</TT>', `<TT>|</TT>', or `<TT>|)</TT>',
+In order to escape the delimiter `<TT>(<SPAN CLASS="MATH">|</SPAN></TT>', `<TT><SPAN CLASS="MATH">|</SPAN></TT>', or `<TT><SPAN CLASS="MATH">|</SPAN>)</TT>',
 precede it with a backslash.
 
 <P>
@@ -3104,7 +3101,7 @@ to provide a different response to this help command.
 
 <H1><A NAME="SECTION00750000000000000000"></A>
 <A NAME="parametertype"></A><BR>
-B.5 Parameter Type Declarations
+B.<SPAN CLASS="arabic">5</SPAN> Parameter Type Declarations
 </H1>
 
 <P>
@@ -3128,7 +3125,7 @@ and a <TT>+debug</TT> parameter type which is a flag.
 
 <H1><A NAME="SECTION00760000000000000000"></A>
 <A NAME="envvardecl"></A><BR>
-B.6 Environment Variable Declarations
+B.<SPAN CLASS="arabic">6</SPAN> Environment Variable Declarations
 </H1>
 
 <P>
@@ -3167,7 +3164,7 @@ in <TT>$ODINCACHE/ENV</TT>.
 
 <H1><A NAME="SECTION00770000000000000000"></A>
 <A NAME="execdecl"></A><BR>
-B.7 Tool Declarations
+B.<SPAN CLASS="arabic">7</SPAN> Tool Declarations
 </H1>
 
 <P>
@@ -3193,7 +3190,7 @@ and that has outputs:
 
 <H2><A NAME="SECTION00771000000000000000"></A>
 <A NAME="input"></A><BR>
-B.7.1 Input-Expressions
+B.<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">1</SPAN> Input-Expressions
 </H2>
 
 <P>
@@ -3254,7 +3251,7 @@ or list.
 <P>
 
 <H2><A NAME="SECTION00772000000000000000">
-B.7.2 Ignoring the Status of a Tool Input</A>
+B.<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">2</SPAN> Ignoring the Status of a Tool Input</A>
 </H2>
 
 <P>
@@ -3272,7 +3269,7 @@ what the status of the <TT>:FILE</TT> input object is.
 <P>
 
 <H2><A NAME="SECTION00773000000000000000">
-B.7.3 Ignoring Changes to the Value of a Tool Input</A>
+B.<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">3</SPAN> Ignoring Changes to the Value of a Tool Input</A>
 </H2>
 
 <P>
@@ -3297,7 +3294,7 @@ but not if the contents of the directories in the search path change.
 
 <H2><A NAME="SECTION00774000000000000000"></A>
 <A NAME="exec"></A><BR>
-B.7.4 EXEC Tool
+B.<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">4</SPAN> EXEC Tool
 </H2>
 
 <P>
@@ -3428,7 +3425,7 @@ and indirectly uses as input an object of type <TT>:all_c_incs</TT>.
 <P>
 
 <H2><A NAME="SECTION00775000000000000000">
-B.7.5 COLLECT Tool</A>
+B.<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">5</SPAN> COLLECT Tool</A>
 </H2>
 
 <P>
@@ -3456,7 +3453,7 @@ results from applying <TT>+debug:o</TT> to a <TT>:c</TT> file.
 <P>
 
 <H2><A NAME="SECTION00776000000000000000">
-B.7.6 READ-LIST Tool</A>
+B.<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">6</SPAN> READ-LIST Tool</A>
 </H2>
 
 <P>
@@ -3475,7 +3472,7 @@ a file of type <TT>:c.sm</TT>.
 <P>
 
 <H2><A NAME="SECTION00777000000000000000">
-B.7.7 READ-REFERENCE Tool</A>
+B.<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">7</SPAN> READ-REFERENCE Tool</A>
 </H2>
 
 <P>
@@ -3564,7 +3561,6 @@ Word            -&gt; "Identifier"
 
 Variable        -&gt; '$' "Identifier";
 </PRE>
-
 <P>
 
 <H1><A NAME="SECTION00900000000000000000">
@@ -3667,7 +3663,7 @@ the Odin distribution.  Each section documents a single package.
 <P>
 
 <H1><A NAME="SECTION001010000000000000000"></A><A NAME="sec:config"></A><BR>
-E.1 config
+E.<SPAN CLASS="arabic">1</SPAN> config
 </H1>
 
 <P>
@@ -3701,7 +3697,7 @@ values for environment variables:
 <P>
 
 <H1><A NAME="SECTION001020000000000000000"></A><A NAME="sec:odin"></A><BR>
-E.2 odin
+E.<SPAN CLASS="arabic">2</SPAN> odin
 </H1>
 
 <P>
@@ -3760,7 +3756,7 @@ programs:
 <P>
 
 <H2><A NAME="SECTION001021000000000000000">
-E.2.1 Other transformations</A>
+E.<SPAN CLASS="arabic">2</SPAN>.<SPAN CLASS="arabic">1</SPAN> Other transformations</A>
 </H2>
 
 <P>
@@ -3843,15 +3839,17 @@ Given a file with hooks, expand all hooks into an output file.  A
 hook could be more commonly called a cross-reference, or a mark.
 A hook may be surrounded by other text.  Its syntax is:
 <BLOCKQUOTE>
-<I>hookdata</I> 
+<code>(|</code> <SPAN  CLASS="textit">odin-expression</SPAN> <code>|</code> <SPAN  CLASS="textit">hooktype</SPAN> <code>|</code>
+          <SPAN  CLASS="textit">hookdata</SPAN> <code>|)</code>
+
 </BLOCKQUOTE>
 Backslashes can be used to escape the delimiters.
 
 <P>
-The <I>odin-expression</I> is what derives the object being
-referenced by the hook.  The <I>hooktype</I> derivation is applied
+The <SPAN  CLASS="textit">odin-expression</SPAN> is what derives the object being
+referenced by the hook.  The <SPAN  CLASS="textit">hooktype</SPAN> derivation is applied
 to the expression with the parameter <TT>+hookvalue</TT> set to the
-<I>hookdata</I>, and the entire hook is replaced by the results.
+<SPAN  CLASS="textit">hookdata</SPAN>, and the entire hook is replaced by the results.
 Hooks are applied recursively; that is, if the replacement text
 contains hooks, they are evaluated and replaced as well.
 
@@ -4011,7 +4009,7 @@ request, it is passed in using the <TT>+prm_help</TT> parameter.
 </DD>
 </DL>
 <H1><A NAME="SECTION001030000000000000000"></A><A NAME="sec:vc"></A><BR>
-E.3 vc
+E.<SPAN CLASS="arabic">3</SPAN> vc
 </H1>
 
 <P>
@@ -4025,7 +4023,7 @@ derivation needs to be overridden as well.
 <P>
 
 <H2><A NAME="SECTION001031000000000000000">
-E.3.1 SCCS version control file</A>
+E.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">1</SPAN> SCCS version control file</A>
 </H2>
 
 <P>
@@ -4198,7 +4196,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION001032000000000000000">
-E.3.2 A view-path system model</A>
+E.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">2</SPAN> A view-path system model</A>
 </H2>
 
 <P>
@@ -4371,7 +4369,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION001033000000000000000">
-E.3.3 RCS version control file</A>
+E.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">3</SPAN> RCS version control file</A>
 </H2>
 
 <P>
@@ -4560,7 +4558,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION001034000000000000000">
-E.3.4 Other transformations</A>
+E.<SPAN CLASS="arabic">3</SPAN>.<SPAN CLASS="arabic">4</SPAN> Other transformations</A>
 </H2>
 
 <P>
@@ -4576,7 +4574,7 @@ accounted for into a virtual directory.
 </DD>
 </DL>
 <H1><A NAME="SECTION001040000000000000000"></A><A NAME="sec:code"></A><BR>
-E.4 code
+E.<SPAN CLASS="arabic">4</SPAN> code
 </H1>
 
 <P>
@@ -4586,7 +4584,7 @@ This package supports object file management.
 <P>
 
 <H2><A NAME="SECTION001041000000000000000">
-E.4.1 System model of source code files</A>
+E.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">1</SPAN> System model of source code files</A>
 </H2>
 
 <P>
@@ -4718,7 +4716,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION001042000000000000000">
-E.4.2 Object library archive</A>
+E.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">2</SPAN> Object library archive</A>
 </H2>
 
 <P>
@@ -4850,7 +4848,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION001043000000000000000">
-E.4.3 Object module</A>
+E.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">3</SPAN> Object module</A>
 </H2>
 
 <P>
@@ -4985,7 +4983,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION001044000000000000000">
-E.4.4 Other transformations</A>
+E.<SPAN CLASS="arabic">4</SPAN>.<SPAN CLASS="arabic">4</SPAN> Other transformations</A>
 </H2>
 
 <P>
@@ -5045,8 +5043,8 @@ Generate dependency information and library flags from +lib and
 added to the dependencies), and library base names (for use with the
 -l option).  The latter are converted to dependencies based on the
  library path and added as options with -l.  The file associated
- with their dependency is assumed to be lib&lt;name&gt;.&lt;ext&gt;, where
- &lt;ext&gt; is one of a, so, or sl, or one of those with two or more
+ with their dependency is assumed to be lib<SPAN CLASS="MATH">&lt;</SPAN>name<SPAN CLASS="MATH">&gt;</SPAN>.<SPAN CLASS="MATH">&lt;</SPAN>ext<SPAN CLASS="MATH">&gt;</SPAN>, where
+ <SPAN CLASS="MATH">&lt;</SPAN>ext<SPAN CLASS="MATH">&gt;</SPAN> is one of a, so, or sl, or one of those with two or more
  numeric extensions.
 </DD>
 <DT><STRONG><TT>:libraries</TT></STRONG></DT>
@@ -5055,7 +5053,7 @@ Converts view descriptor's valid entries into the list of libraries.
 </DD>
 </DL>
 <H1><A NAME="SECTION001050000000000000000"></A><A NAME="sec:cc"></A><BR>
-E.5 cc
+E.<SPAN CLASS="arabic">5</SPAN> cc
 </H1>
 
 <P>
@@ -5066,7 +5064,7 @@ scanner and pretty printer, as well.
 <P>
 
 <H2><A NAME="SECTION001051000000000000000">
-E.5.1 System model for a C program</A>
+E.<SPAN CLASS="arabic">5</SPAN>.<SPAN CLASS="arabic">1</SPAN> System model for a C program</A>
 </H2>
 
 <P>
@@ -5144,7 +5142,7 @@ more paths in the order given.  Spaces are not supported in search
 paths.  The $ODIN_CC_I variable is intended to be cpp's built-in
 search path, which is appended to the search list.  +home is
 simply an alternate, single-entry option to prepend to the path.
-For local includes (using "" instead of &lt;&gt;), the file's source
+For local includes (using "" instead of <SPAN CLASS="MATH">&lt;&gt;</SPAN>), the file's source
 directory is prepended to the path as well.
 </DD>
 <DT><STRONG><TT>:targets_inc</TT></STRONG></DT>
@@ -5246,7 +5244,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION001052000000000000000">
-E.5.2 Executable binary</A>
+E.<SPAN CLASS="arabic">5</SPAN>.<SPAN CLASS="arabic">2</SPAN> Executable binary</A>
 </H2>
 
 <P>
@@ -5337,7 +5335,7 @@ more paths in the order given.  Spaces are not supported in search
 paths.  The $ODIN_CC_I variable is intended to be cpp's built-in
 search path, which is appended to the search list.  +home is
 simply an alternate, single-entry option to prepend to the path.
-For local includes (using "" instead of &lt;&gt;), the file's source
+For local includes (using "" instead of <SPAN CLASS="MATH">&lt;&gt;</SPAN>), the file's source
 directory is prepended to the path as well.
 </DD>
 <DT><STRONG><TT>:targets_inc</TT></STRONG></DT>
@@ -5439,7 +5437,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION001053000000000000000">
-E.5.3 C source code</A>
+E.<SPAN CLASS="arabic">5</SPAN>.<SPAN CLASS="arabic">3</SPAN> C source code</A>
 </H2>
 
 <P>
@@ -5555,15 +5553,15 @@ the C compiler as follows:
 </LI>
 <LI>Specifying +prof adds the profiling option -pg.
 </LI>
-<LI>Specifying +optimize=&lt;type&gt; adds the optimization option
-      -O&lt;type&gt;.
+<LI>Specifying +optimize=<SPAN CLASS="MATH">&lt;</SPAN>type<SPAN CLASS="MATH">&gt;</SPAN> adds the optimization option
+      -O<SPAN CLASS="MATH">&lt;</SPAN>type<SPAN CLASS="MATH">&gt;</SPAN>.
 </LI>
-<LI>For each +define parameter, a -D&lt;parm&gt; option is added.  Note
+<LI>For each +define parameter, a -D<SPAN CLASS="MATH">&lt;</SPAN>parm<SPAN CLASS="MATH">&gt;</SPAN> option is added.  Note
       that spaces are not supported: they separated multiple
       parameters.  This is not a problem when only defining the
       symbol, but may require work for defining its value.
 </LI>
-<LI>For each +inc_sp parameter, a -I&lt;parm&gt; option is added.  Once
+<LI>For each +inc_sp parameter, a -I<SPAN CLASS="MATH">&lt;</SPAN>parm<SPAN CLASS="MATH">&gt;</SPAN> option is added.  Once
       again, spaces are not supported.
 </LI>
 <LI>Finally, the parameter +cc_flags and the variable
@@ -5573,7 +5571,7 @@ the C compiler as follows:
       instead for compatibility.
 </LI>
 <LI>Actually, there is one more set of parameters:  -c to specify
-      only an object file, and -o &lt;output&gt; to create the appropriate
+      only an object file, and -o <SPAN CLASS="MATH">&lt;</SPAN>output<SPAN CLASS="MATH">&gt;</SPAN> to create the appropriate
       output file.
 </LI>
 </UL>
@@ -5669,7 +5667,7 @@ more paths in the order given.  Spaces are not supported in search
 paths.  The $ODIN_CC_I variable is intended to be cpp's built-in
 search path, which is appended to the search list.  +home is
 simply an alternate, single-entry option to prepend to the path.
-For local includes (using "" instead of &lt;&gt;), the file's source
+For local includes (using "" instead of <SPAN CLASS="MATH">&lt;&gt;</SPAN>), the file's source
 directory is prepended to the path as well.
 </DD>
 <DT><STRONG><TT>:targets_inc</TT></STRONG></DT>
@@ -5771,7 +5769,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION001054000000000000000">
-E.5.4 Other transformations</A>
+E.<SPAN CLASS="arabic">5</SPAN>.<SPAN CLASS="arabic">4</SPAN> Other transformations</A>
 </H2>
 
 <P>
@@ -5884,7 +5882,7 @@ the C compiler as follows:
 </DD>
 </DL>
 <H1><A NAME="SECTION001060000000000000000"></A><A NAME="sec:cpp"></A><BR>
-E.6 cpp
+E.<SPAN CLASS="arabic">6</SPAN> cpp
 </H1>
 
 <P>
@@ -5895,7 +5893,7 @@ preprocessor.
 <P>
 
 <H2><A NAME="SECTION001061000000000000000">
-E.6.1 Cpp input</A>
+E.<SPAN CLASS="arabic">6</SPAN>.<SPAN CLASS="arabic">1</SPAN> Cpp input</A>
 </H2>
 
 <P>
@@ -5957,12 +5955,12 @@ preprocessor is defined by the $ODIN_CPP environment variable.
 Options are passed as follows: 
 
 <UL>
-<LI>For each +define parameter, a -D&lt;parm&gt; option is added.  Note
+<LI>For each +define parameter, a -D<SPAN CLASS="MATH">&lt;</SPAN>parm<SPAN CLASS="MATH">&gt;</SPAN> option is added.  Note
       that spaces are not supported: they separated multiple
       parameters.  This is not a problem when only defining the
       symbol, but may require work for defining its value.
 </LI>
-<LI>For each +inc_sp parameter, a -I&lt;parm&gt; option is added.  Once
+<LI>For each +inc_sp parameter, a -I<SPAN CLASS="MATH">&lt;</SPAN>parm<SPAN CLASS="MATH">&gt;</SPAN> option is added.  Once
       again, spaces are not supported.
 </LI>
 <LI>The environment variable $ODIN_CPP_FLAGS is then appended.
@@ -6007,12 +6005,12 @@ preprocessor is defined by the $ODIN_CPP environment variable.
 Options are passed as follows:
 
 <UL>
-<LI>For each +define parameter, a -D&lt;parm&gt; option is added.  Note
+<LI>For each +define parameter, a -D<SPAN CLASS="MATH">&lt;</SPAN>parm<SPAN CLASS="MATH">&gt;</SPAN> option is added.  Note
       that spaces are not supported: they separated multiple
       parameters.  This is not a problem when only defining the
       symbol, but may require work for defining its value.
 </LI>
-<LI>For each +inc_sp parameter, a -I&lt;parm&gt; option is added.  Once
+<LI>For each +inc_sp parameter, a -I<SPAN CLASS="MATH">&lt;</SPAN>parm<SPAN CLASS="MATH">&gt;</SPAN> option is added.  Once
       again, spaces are not supported.
 </LI>
 <LI>The environment variable $ODIN_CPP_FLAGS is then appended.
@@ -6118,7 +6116,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H1><A NAME="SECTION001070000000000000000"></A><A NAME="sec:cxx"></A><BR>
-E.7 cxx
+E.<SPAN CLASS="arabic">7</SPAN> cxx
 </H1>
 
 <P>
@@ -6129,7 +6127,7 @@ depency scanner as well.
 <P>
 
 <H2><A NAME="SECTION001071000000000000000">
-E.7.1 System model for a C++ program</A>
+E.<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">1</SPAN> System model for a C++ program</A>
 </H2>
 
 <P>
@@ -6207,7 +6205,7 @@ more paths in the order given.  Spaces are not supported in search
 paths.  The $ODIN_CXX_I variable is intended to be cpp's built-in
 search path, which is appended to the search list.  +home is
 simply an alternate, single-entry option to prepend to the path.
-For local includes (using "" instead of &lt;&gt;), the file's source
+For local includes (using "" instead of <SPAN CLASS="MATH">&lt;&gt;</SPAN>), the file's source
 directory is prepended to the path as well.
 </DD>
 <DT><STRONG><TT>:targets_inc</TT></STRONG></DT>
@@ -6309,7 +6307,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION001072000000000000000">
-E.7.2 C++ source code</A>
+E.<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">2</SPAN> C++ source code</A>
 </H2>
 
 <P>
@@ -6431,15 +6429,15 @@ the C++ compiler as follows:
 </LI>
 <LI>Specifying +prof adds the profiling option -pg.
 </LI>
-<LI>Specifying +optimize=&lt;type&gt; adds the optimization option
-      -O&lt;type&gt;.
+<LI>Specifying +optimize=<SPAN CLASS="MATH">&lt;</SPAN>type<SPAN CLASS="MATH">&gt;</SPAN> adds the optimization option
+      -O<SPAN CLASS="MATH">&lt;</SPAN>type<SPAN CLASS="MATH">&gt;</SPAN>.
 </LI>
-<LI>For each +define parameter, a -D&lt;parm&gt; option is added.  Note
+<LI>For each +define parameter, a -D<SPAN CLASS="MATH">&lt;</SPAN>parm<SPAN CLASS="MATH">&gt;</SPAN> option is added.  Note
       that spaces are not supported: they separated multiple
       parameters.  This is not a problem when only defining the
       symbol, but may require work for defining its value.
 </LI>
-<LI>For each +inc_sp parameter, a -I&lt;parm&gt; option is added.  Once
+<LI>For each +inc_sp parameter, a -I<SPAN CLASS="MATH">&lt;</SPAN>parm<SPAN CLASS="MATH">&gt;</SPAN> option is added.  Once
       again, spaces are not supported.
 </LI>
 <LI>Finally, the parameter +cc_flags and the variable
@@ -6449,7 +6447,7 @@ the C++ compiler as follows:
       instead for compatibility.
 </LI>
 <LI>Actually, there is one more set of parameters:  -c to specify
-      only an object file, and -o &lt;output&gt; to create the appropriate
+      only an object file, and -o <SPAN CLASS="MATH">&lt;</SPAN>output<SPAN CLASS="MATH">&gt;</SPAN> to create the appropriate
       output file.
 </LI>
 </UL>
@@ -6466,7 +6464,7 @@ considered warnings, and will not set the warning status.
 </DD>
 </DL>
 <H2><A NAME="SECTION001073000000000000000">
-E.7.3 Other transformations</A>
+E.<SPAN CLASS="arabic">7</SPAN>.<SPAN CLASS="arabic">3</SPAN> Other transformations</A>
 </H2>
 
 <P>
@@ -6606,7 +6604,7 @@ the C++ compiler as follows:
 </DD>
 </DL>
 <H1><A NAME="SECTION001080000000000000000"></A><A NAME="sec:odi"></A><BR>
-E.8 odi
+E.<SPAN CLASS="arabic">8</SPAN> odi
 </H1>
 
 <P>
@@ -6616,7 +6614,7 @@ FIXME: document
 <P>
 
 <H2><A NAME="SECTION001081000000000000000">
-E.8.1 System model for an ODI C++ program</A>
+E.<SPAN CLASS="arabic">8</SPAN>.<SPAN CLASS="arabic">1</SPAN> System model for an ODI C++ program</A>
 </H2>
 
 <P>
@@ -6748,7 +6746,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION001082000000000000000">
-E.8.2 Other transformations</A>
+E.<SPAN CLASS="arabic">8</SPAN>.<SPAN CLASS="arabic">2</SPAN> Other transformations</A>
 </H2>
 
 <P>
@@ -6807,7 +6805,7 @@ FIXME: document
 </DD>
 </DL>
 <H1><A NAME="SECTION001090000000000000000"></A><A NAME="sec:f77"></A><BR>
-E.9 f77
+E.<SPAN CLASS="arabic">9</SPAN> f77
 </H1>
 
 <P>
@@ -6817,7 +6815,7 @@ This package enables compilation of Fortran programs.
 <P>
 
 <H2><A NAME="SECTION001091000000000000000">
-E.9.1 Fortran77 source code</A>
+E.<SPAN CLASS="arabic">9</SPAN>.<SPAN CLASS="arabic">1</SPAN> Fortran77 source code</A>
 </H2>
 
 <P>
@@ -6897,7 +6895,7 @@ return code:  success produces warnings, and failure produces errors.
 </DD>
 </DL>
 <H1><A NAME="SECTION0010100000000000000000"></A><A NAME="sec:lex"></A><BR>
-E.10 lex
+E.<SPAN CLASS="arabic">10</SPAN> lex
 </H1>
 
 <P>
@@ -6907,7 +6905,7 @@ This package supports automatically generated lexical analyzers.
 <P>
 
 <H2><A NAME="SECTION0010101000000000000000">
-E.10.1 Scanner grammar</A>
+E.<SPAN CLASS="arabic">10</SPAN>.<SPAN CLASS="arabic">1</SPAN> Scanner grammar</A>
 </H2>
 
 <P>
@@ -7062,7 +7060,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H1><A NAME="SECTION0010110000000000000000"></A><A NAME="sec:yacc"></A><BR>
-E.11 yacc
+E.<SPAN CLASS="arabic">11</SPAN> yacc
 </H1>
 
 <P>
@@ -7072,7 +7070,7 @@ This package supports automatically generated LALR(1) parsers.
 <P>
 
 <H2><A NAME="SECTION0010111000000000000000">
-E.11.1 Yacc input</A>
+E.<SPAN CLASS="arabic">11</SPAN>.<SPAN CLASS="arabic">1</SPAN> Yacc input</A>
 </H2>
 
 <P>
@@ -7285,7 +7283,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H1><A NAME="SECTION0010120000000000000000"></A><A NAME="sec:tregrm"></A><BR>
-E.12 tregrm
+E.<SPAN CLASS="arabic">12</SPAN> tregrm
 </H1>
 
 <P>
@@ -7306,8 +7304,8 @@ dashes, underscores, dots, slashes, and commas.
 
 <P>
 The first section of the input describes C include files.  For each
-file to include, <TT>INCLUDE</TT> <I>name</I> will generate a
-<code>#include</code> directive.  The <I>name</I> should be enclosed in
+file to include, <TT>INCLUDE</TT> <SPAN  CLASS="textit">name</SPAN> will generate a
+<code>#include</code> directive.  The <SPAN  CLASS="textit">name</SPAN> should be enclosed in
 double-quotes for local includes and single-quotes for system
 includes.
 
@@ -7396,7 +7394,7 @@ be created if the number of children is non-zero.
 <P>
 
 <H2><A NAME="SECTION0010121000000000000000">
-E.12.1 Input grammar for the Tregrm tree-building parser generator</A>
+E.<SPAN CLASS="arabic">12</SPAN>.<SPAN CLASS="arabic">1</SPAN> Input grammar for the Tregrm tree-building parser generator</A>
 </H2>
 
 <P>
@@ -7550,7 +7548,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H1><A NAME="SECTION0010130000000000000000"></A><A NAME="sec:dg"></A><BR>
-E.13 dg
+E.<SPAN CLASS="arabic">13</SPAN> dg
 </H1>
 
 <P>
@@ -7560,7 +7558,7 @@ This package contains the derivation graph parser.
 <P>
 
 <H2><A NAME="SECTION0010131000000000000000">
-E.13.1 Odin Derivation Graph</A>
+E.<SPAN CLASS="arabic">13</SPAN>.<SPAN CLASS="arabic">1</SPAN> Odin Derivation Graph</A>
 </H2>
 
 <P>
@@ -7699,7 +7697,7 @@ one for each table:
 
 <P>
 Next is the contents of each table, one line per entry.  The
-structure of each table entry is defined in inc/&lt;tabletype&gt;.h;
+structure of each table entry is defined in inc/<SPAN CLASS="MATH">&lt;</SPAN>tabletype<SPAN CLASS="MATH">&gt;</SPAN>.h;
 for each element, the structure element name in the C code is
 provided.  Pointers to other table elements are stored as table index
 numbers in the text file, with -1 indicating NULL.
@@ -8124,7 +8122,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H1><A NAME="SECTION0010140000000000000000"></A><A NAME="sec:idl"></A><BR>
-E.14 idl
+E.<SPAN CLASS="arabic">14</SPAN> idl
 </H1>
 
 <P>
@@ -8134,7 +8132,7 @@ FIXME: document
 <P>
 
 <H2><A NAME="SECTION0010141000000000000000">
-E.14.1 C++ Interface Definition Language file</A>
+E.<SPAN CLASS="arabic">14</SPAN>.<SPAN CLASS="arabic">1</SPAN> C++ Interface Definition Language file</A>
 </H2>
 
 <P>
@@ -8339,7 +8337,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION0010142000000000000000">
-E.14.2 Other transformations</A>
+E.<SPAN CLASS="arabic">14</SPAN>.<SPAN CLASS="arabic">2</SPAN> Other transformations</A>
 </H2>
 
 <P>
@@ -8366,7 +8364,7 @@ FIXME: document
 </DD>
 </DL>
 <H1><A NAME="SECTION0010150000000000000000"></A><A NAME="sec:prof"></A><BR>
-E.15 prof
+E.<SPAN CLASS="arabic">15</SPAN> prof
 </H1>
 
 <P>
@@ -8376,7 +8374,7 @@ This package supports running the standard profiler, gprof.
 <P>
 
 <H2><A NAME="SECTION0010151000000000000000">
-E.15.1 Other transformations</A>
+E.<SPAN CLASS="arabic">15</SPAN>.<SPAN CLASS="arabic">1</SPAN> Other transformations</A>
 </H2>
 
 <P>
@@ -8407,7 +8405,7 @@ given in +gprof_flags.
 </DD>
 </DL>
 <H1><A NAME="SECTION0010160000000000000000"></A><A NAME="sec:lint"></A><BR>
-E.16 lint
+E.<SPAN CLASS="arabic">16</SPAN> lint
 </H1>
 
 <P>
@@ -8417,7 +8415,7 @@ FIXME: document
 <P>
 
 <H2><A NAME="SECTION0010161000000000000000">
-E.16.1 Other transformations</A>
+E.<SPAN CLASS="arabic">16</SPAN>.<SPAN CLASS="arabic">1</SPAN> Other transformations</A>
 </H2>
 
 <P>
@@ -8504,7 +8502,7 @@ FIXME: document
 </DD>
 </DL>
 <H1><A NAME="SECTION0010170000000000000000"></A><A NAME="sec:misc"></A><BR>
-E.17 misc
+E.<SPAN CLASS="arabic">17</SPAN> misc
 </H1>
 
 <P>
@@ -8514,7 +8512,7 @@ This package contains miscellaneous support utilities.
 <P>
 
 <H2><A NAME="SECTION0010171000000000000000">
-E.17.1 Other transformations</A>
+E.<SPAN CLASS="arabic">17</SPAN>.<SPAN CLASS="arabic">1</SPAN> Other transformations</A>
 </H2>
 
 <P>
@@ -8581,7 +8579,7 @@ target, assuming it is a file.
 </DD>
 </DL>
 <H1><A NAME="SECTION0010180000000000000000"></A><A NAME="sec:roff"></A><BR>
-E.18 roff
+E.<SPAN CLASS="arabic">18</SPAN> roff
 </H1>
 
 <P>
@@ -8591,7 +8589,7 @@ This package supports documentation written for UNIX roff.
 <P>
 
 <H2><A NAME="SECTION0010181000000000000000">
-E.18.1 Nroff/troff input</A>
+E.<SPAN CLASS="arabic">18</SPAN>.<SPAN CLASS="arabic">1</SPAN> Nroff/troff input</A>
 </H2>
 
 <P>
@@ -8755,7 +8753,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION0010182000000000000000">
-E.18.2 Eqn input</A>
+E.<SPAN CLASS="arabic">18</SPAN>.<SPAN CLASS="arabic">2</SPAN> Eqn input</A>
 </H2>
 
 <P>
@@ -8910,7 +8908,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION0010183000000000000000">
-E.18.3 Tbl input</A>
+E.<SPAN CLASS="arabic">18</SPAN>.<SPAN CLASS="arabic">3</SPAN> Tbl input</A>
 </H2>
 
 <P>
@@ -9064,7 +9062,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION0010184000000000000000">
-E.18.4 Other transformations</A>
+E.<SPAN CLASS="arabic">18</SPAN>.<SPAN CLASS="arabic">4</SPAN> Other transformations</A>
 </H2>
 
 <P>
@@ -9080,17 +9078,17 @@ This is used for automatic dependency calculation.
 </DD>
 </DL>
 <H1><A NAME="SECTION0010190000000000000000"></A><A NAME="sec:tex"></A><BR>
-E.19 tex
+E.<SPAN CLASS="arabic">19</SPAN> tex
 </H1>
 
 <P>
 The <TT>tex</TT> package is at version 3.1.0.
-This package supports T<SMALL>E</SMALL>X and L<SUP><SMALL>A</SMALL></SUP>T<SMALL>E</SMALL>X documentation.
+This package supports <SPAN CLASS="logo-TeX">T<SMALL>E</SMALL>X</SPAN> and <SPAN CLASS="logo,LaTeX">L<SUP><SMALL>A</SMALL></SUP>T<SMALL>E</SMALL>X</SPAN> documentation.
 
 <P>
 
 <H2><A NAME="SECTION0010191000000000000000">
-E.19.1 Basis of a TeX formatted document</A>
+E.<SPAN CLASS="arabic">19</SPAN>.<SPAN CLASS="arabic">1</SPAN> Basis of a TeX formatted document</A>
 </H2>
 
 <P>
@@ -9139,21 +9137,21 @@ should be specified using <TT>+texroot</TT>.
 (may be given more than once)
 </DD>
 </DL>
-Return a file containing directories, one per line, to search for T<SMALL>E</SMALL>X
+Return a file containing directories, one per line, to search for <SPAN CLASS="logo-TeX">T<SMALL>E</SMALL>X</SPAN>
 inputs.  This includes the directory containing the virtual inputs,
 as well as any path specified by <TT>+texsearch</TT>.  If
 unspecified, the original source directory for the input file is used.
 </DD>
 <DT><STRONG><TT>:dvi</TT>, <TT>:texpdf</TT>, <TT>:tex.log</TT>, <TT>:citations</TT>, <TT>:indexntry</TT>, <TT>:texauxout</TT></STRONG></DT>
 <DD>(Device independent format file, PDF created from TeX or LaTeX, TeX log file, Citation and bibliographic data commands, Indexentry commands with page numbers, Auxiliary files potentially modified by TeX) with additional source of type <TT>:fmtcmd</TT> (Formatting command) and additional source of type <TT>:rootName</TT> (Base name (no .tex suffix) of the root file) and additional source of type <TT>:texsp</TT> (Search path for the document basis).
-Run T<SMALL>E</SMALL>X on inputs until auxiliary files settle.  The actual command
+Run <SPAN CLASS="logo-TeX">T<SMALL>E</SMALL>X</SPAN> on inputs until auxiliary files settle.  The actual command
 to run is obtained by the <TT>:fmtcmd</TT> derivation.  The
 <TT>:dvi</TT> and <TT>:texpdf</TT> outputs are optional, and depend on
 the formatter type (<TT>+usepf</TT>).
 </DD>
 </DL>
 <H2><A NAME="SECTION0010192000000000000000">
-E.19.2 Bibliographic data file</A>
+E.<SPAN CLASS="arabic">19</SPAN>.<SPAN CLASS="arabic">2</SPAN> Bibliographic data file</A>
 </H2>
 
 <P>
@@ -9285,7 +9283,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION0010193000000000000000">
-E.19.3 Bibliographic style file</A>
+E.<SPAN CLASS="arabic">19</SPAN>.<SPAN CLASS="arabic">3</SPAN> Bibliographic style file</A>
 </H2>
 
 <P>
@@ -9417,7 +9415,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION0010194000000000000000">
-E.19.4 Formatting style file</A>
+E.<SPAN CLASS="arabic">19</SPAN>.<SPAN CLASS="arabic">4</SPAN> Formatting style file</A>
 </H2>
 
 <P>
@@ -9549,7 +9547,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION0010195000000000000000">
-E.19.5 Portable Document Format file</A>
+E.<SPAN CLASS="arabic">19</SPAN>.<SPAN CLASS="arabic">5</SPAN> Portable Document Format file</A>
 </H2>
 
 <P>
@@ -9681,7 +9679,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION0010196000000000000000">
-E.19.6 Formatting style file</A>
+E.<SPAN CLASS="arabic">19</SPAN>.<SPAN CLASS="arabic">6</SPAN> Formatting style file</A>
 </H2>
 
 <P>
@@ -9813,7 +9811,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION0010197000000000000000">
-E.19.7 TeX formatter input</A>
+E.<SPAN CLASS="arabic">19</SPAN>.<SPAN CLASS="arabic">7</SPAN> TeX formatter input</A>
 </H2>
 
 <P>
@@ -9845,11 +9843,11 @@ They may be transformed to any of the following:
 <DL>
 <DT><STRONG><TT>:one_tex_vtd</TT></STRONG></DT>
 <DD>(Singleton set of TeX formatter inputs) with additional source of type <TT>:label</TT> (Label of a file).
-Return a file listing the input T<SMALL>E</SMALL>X file.
+Return a file listing the input <SPAN CLASS="logo-TeX">T<SMALL>E</SMALL>X</SPAN> file.
 </DD>
 <DT><STRONG><TT>:texnames</TT></STRONG></DT>
 <DD>(Text file containing local file names).
-Given a T<SMALL>E</SMALL>X input file, return a list of files needed during a run.
+Given a <SPAN CLASS="logo-TeX">T<SMALL>E</SMALL>X</SPAN> input file, return a list of files needed during a run.
 </DD>
 </DL>
 
@@ -9960,7 +9958,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION0010198000000000000000">
-E.19.8 Postscript file</A>
+E.<SPAN CLASS="arabic">19</SPAN>.<SPAN CLASS="arabic">8</SPAN> Postscript file</A>
 </H2>
 
 <P>
@@ -10092,7 +10090,7 @@ As the type <TT>:OBJECT</TT> (Any object), they may be transformed to any of the
 </DD>
 </DL>
 <H2><A NAME="SECTION0010199000000000000000">
-E.19.9 Other transformations</A>
+E.<SPAN CLASS="arabic">19</SPAN>.<SPAN CLASS="arabic">9</SPAN> Other transformations</A>
 </H2>
 
 <P>
@@ -10103,12 +10101,12 @@ package.  They are used in the other packages as indicated.
 <DL>
 <DT><STRONG><TT>:texclose</TT></STRONG></DT>
 <DD>(Names of all files transitively referenced) from source of type <TT>:texfiles</TT> (Accessible files referenced).
-Given a list of T<SMALL>E</SMALL>X files, list all files needed during a run.  This
+Given a list of <SPAN CLASS="logo-TeX">T<SMALL>E</SMALL>X</SPAN> files, list all files needed during a run.  This
 is for automatic dependency scanning.
 </DD>
 <DT><STRONG><TT>:texbasis</TT></STRONG></DT>
 <DD>(Document basis) from source of type <TT>:rootFileName</TT> (Simple name of the TeX file to be used as the root).
-Given a T<SMALL>E</SMALL>X root file name, list all files needed during a run.  This
+Given a <SPAN CLASS="logo-TeX">T<SMALL>E</SMALL>X</SPAN> root file name, list all files needed during a run.  This
 is for automatic dependency scanning.
 </DD>
 <DT><STRONG><TT>:tex.view_desc</TT></STRONG></DT>
@@ -10121,7 +10119,7 @@ is for automatic dependency scanning.
 <BR>Parameter type for search path information
 </DD>
 </DL>
-Given a list of T<SMALL>E</SMALL>X input files, produce a view descriptor.  This is
+Given a list of <SPAN CLASS="logo-TeX">T<SMALL>E</SMALL>X</SPAN> input files, produce a view descriptor.  This is
 for automatic dependency scanning.
 </DD>
 <DT><STRONG><TT>:texfiles</TT></STRONG></DT>
@@ -10146,16 +10144,16 @@ Collapse view descriptor to actual present files.
 <BR>Produce PDF code
 </DD>
 </DL>
-Given a T<SMALL>E</SMALL>X input file, determine which command to run for output.  If
+Given a <SPAN CLASS="logo-TeX">T<SMALL>E</SMALL>X</SPAN> input file, determine which command to run for output.  If
 <TT>+usepdf</TT> is set, PDF is produced directly from input using
-pdf(la)tex.  If <TT>+tex</TT> is set, the input is plain T<SMALL>E</SMALL>X.  If
-<TT>+latex</TT> is set, the input is L<SUP><SMALL>A</SMALL></SUP>T<SMALL>E</SMALL>X.  Otherwise, selection
-is based on presence of the L<SUP><SMALL>A</SMALL></SUP>T<SMALL>E</SMALL>X command
+pdf(la)tex.  If <TT>+tex</TT> is set, the input is plain <SPAN CLASS="logo-TeX">T<SMALL>E</SMALL>X</SPAN>.  If
+<TT>+latex</TT> is set, the input is <SPAN CLASS="logo,LaTeX">L<SUP><SMALL>A</SMALL></SUP>T<SMALL>E</SMALL>X</SPAN>.  Otherwise, selection
+is based on presence of the <SPAN CLASS="logo,LaTeX">L<SUP><SMALL>A</SMALL></SUP>T<SMALL>E</SMALL>X</SPAN> command
 &#92;documentstyle or &#92;documentclass. 
 </DD>
 <DT><STRONG><TT>:tex.bbl</TT></STRONG></DT>
 <DD>(TeX bibliographic reference file) from source of type <TT>:citations</TT> (Citation and bibliographic data commands) with additional source of type <TT>:texsp</TT> (Search path for the document basis).
-Given T<SMALL>E</SMALL>X input, create a bibliography file if needed, using
+Given <SPAN CLASS="logo-TeX">T<SMALL>E</SMALL>X</SPAN> input, create a bibliography file if needed, using
 <TT>bibtex</TT>.
 </DD>
 <DT><STRONG><TT>:tex.ind</TT>, <TT>:tex.ilg</TT></STRONG></DT>
@@ -10169,12 +10167,12 @@ Given T<SMALL>E</SMALL>X input, create a bibliography file if needed, using
 (may be given more than once)
 </DD>
 </DL>
-Given T<SMALL>E</SMALL>X input, create indices using <TT>makeindex</TT>, if
+Given <SPAN CLASS="logo-TeX">T<SMALL>E</SMALL>X</SPAN> input, create indices using <TT>makeindex</TT>, if
 needed.
 </DD>
 <DT><STRONG><TT>:texauxin.vtd</TT></STRONG></DT>
 <DD>(Auxiliary files input to the formatting step) from source of type <TT>:rootName</TT> (Base name (no .tex suffix) of the root file) with additional source of type <TT>:texauxout</TT> (Auxiliary files potentially modified by TeX) and additional source of type <TT>:tex.bbl</TT> (TeX bibliographic reference file) and additional source of type <TT>:tex.ind</TT> (TeX index file).
-Return file listing all auxiliary inputs associated with a T<SMALL>E</SMALL>X run.
+Return file listing all auxiliary inputs associated with a <SPAN CLASS="logo-TeX">T<SMALL>E</SMALL>X</SPAN> run.
 </DD>
 <DT><STRONG><TT>:texps</TT></STRONG></DT>
 <DD>(PostScript created from TeX or LaTeX) from source of type <TT>:dvi</TT> (Device independent format file) with additional source of type <TT>:texsp</TT> (Search path for the document basis) using the following parameters:
@@ -10187,7 +10185,7 @@ Return file listing all auxiliary inputs associated with a T<SMALL>E</SMALL>X ru
 (may be given more than once)
 </DD>
 </DL>
-After running T<SMALL>E</SMALL>X, run <TT>dvips</TT> to convert the DVI output
+After running <SPAN CLASS="logo-TeX">T<SMALL>E</SMALL>X</SPAN>, run <TT>dvips</TT> to convert the DVI output
 to PostScript.
 </DD>
 <DT><STRONG><TT>:refpdf</TT></STRONG></DT>
@@ -10196,7 +10194,7 @@ A back path to creating PDF using pdf(la)tex directly.
 </DD>
 </DL>
 <H1><A NAME="SECTION0010200000000000000000"></A><A NAME="sec:dbx"></A><BR>
-E.20 dbx
+E.<SPAN CLASS="arabic">20</SPAN> dbx
 </H1>
 
 <P>
@@ -10206,7 +10204,7 @@ This package supports running a debugger on executables.
 <P>
 
 <H2><A NAME="SECTION0010201000000000000000">
-E.20.1 Other transformations</A>
+E.<SPAN CLASS="arabic">20</SPAN>.<SPAN CLASS="arabic">1</SPAN> Other transformations</A>
 </H2>
 
 <P>
@@ -10235,7 +10233,7 @@ used interactively with the ! suffix to execute the script.
 </DD>
 </DL>
 <H1><A NAME="SECTION0010210000000000000000"></A><A NAME="sec:run"></A><BR>
-E.21 run
+E.<SPAN CLASS="arabic">21</SPAN> run
 </H1>
 
 <P>
@@ -10245,7 +10243,7 @@ This package supports execution of simple command lines.
 <P>
 
 <H2><A NAME="SECTION0010211000000000000000">
-E.21.1 Other transformations</A>
+E.<SPAN CLASS="arabic">21</SPAN>.<SPAN CLASS="arabic">1</SPAN> Other transformations</A>
 </H2>
 
 <P>
@@ -10328,7 +10326,7 @@ input file.
 <P>
 Within the Lua code, only io.write() will write to the results.  If
 other commands are used, they should write to a separate file, and
-the result :output/&lt;other_file&gt; should be used instead of
+the result :output/<SPAN CLASS="MATH">&lt;</SPAN>other_file<SPAN CLASS="MATH">&gt;</SPAN> should be used instead of
 :lua_stdout.  Otherwise, :lua_stdout will probably be overwritten on
 exit.
 
@@ -10336,7 +10334,7 @@ exit.
 </DD>
 </DL>
 <H1><A NAME="SECTION0010220000000000000000"></A><A NAME="sec:regsub"></A><BR>
-E.22 regsub
+E.<SPAN CLASS="arabic">22</SPAN> regsub
 </H1>
 
 <P>
@@ -10346,7 +10344,7 @@ This package provides a simple egrep and sed replacement.
 <P>
 
 <H2><A NAME="SECTION0010221000000000000000">
-E.22.1 Regsub substitution input</A>
+E.<SPAN CLASS="arabic">22</SPAN>.<SPAN CLASS="arabic">1</SPAN> Regsub substitution input</A>
 </H2>
 
 <P>
@@ -10433,7 +10431,7 @@ filtering using +match takes place before +subst substitution.
 <P>
 The +prefix parameter text is prepended to each line, and the +suffix
 parameter is appended to each line.  They are shortcuts to +subst
-/&lt;text&gt; and +subst $/&lt;text&gt;, respectively, except that
+/<SPAN CLASS="MATH">&lt;</SPAN>text<SPAN CLASS="MATH">&gt;</SPAN> and +subst $/<SPAN CLASS="MATH">&lt;</SPAN>text<SPAN CLASS="MATH">&gt;</SPAN>, respectively, except that
 they do not count towards +subst_only, and only one of each may be
 given.
 </DD>
@@ -10502,7 +10500,7 @@ filtering using +match takes place before +subst substitution.
 <P>
 The +prefix parameter text is prepended to each line, and the +suffix
 parameter is appended to each line.  They are shortcuts to +subst
-/&lt;text&gt; and +subst $/&lt;text&gt;, respectively, except that
+/<SPAN CLASS="MATH">&lt;</SPAN>text<SPAN CLASS="MATH">&gt;</SPAN> and +subst $/<SPAN CLASS="MATH">&lt;</SPAN>text<SPAN CLASS="MATH">&gt;</SPAN>, respectively, except that
 they do not count towards +subst_only, and only one of each may be
 given.
 </DD>
@@ -10618,7 +10616,7 @@ utility functions for convenience and portability.
 <P>
 
 <H1><A NAME="SECTION001110000000000000000">
-F.1 GLib</A>
+F.<SPAN CLASS="arabic">1</SPAN> GLib</A>
 </H1>
 
 <P>
@@ -10648,25 +10646,25 @@ directory and any missing intervening directories
 <DD><TT>glib.rename</TT> -- file rename
 </DD>
 <DT><STRONG>exists(name)</STRONG></DT>
-<DD><TT>glib.exists</TT> -- return true if <I>name</I> exists
+<DD><TT>glib.exists</TT> -- return true if <SPAN  CLASS="textit">name</SPAN> exists
 in the file system.
 </DD>
 <DT><STRONG>is_dir(name)</STRONG></DT>
-<DD><TT>glib.is_dir</TT> -- return true if <I>name</I> is a
+<DD><TT>glib.is_dir</TT> -- return true if <SPAN  CLASS="textit">name</SPAN> is a
 directory or a soft link to a directory.
 </DD>
 <DT><STRONG>is_file(name)</STRONG></DT>
-<DD><TT>glib.is_file</TT> -- return true if <I>name</I> is a
+<DD><TT>glib.is_file</TT> -- return true if <SPAN  CLASS="textit">name</SPAN> is a
 file or a soft link to a file.
 </DD>
 <DT><STRONG>is_exec(name)</STRONG></DT>
-<DD><TT>glib.is_exec</TT> -- return true if <I>name</I> is a
+<DD><TT>glib.is_exec</TT> -- return true if <SPAN  CLASS="textit">name</SPAN> is a
 file and executable permission is set for that file.  Note that on Windows,
-a heuristic is applied to <I>name</I> determine if a file is executable,
+a heuristic is applied to <SPAN  CLASS="textit">name</SPAN> determine if a file is executable,
 since otherwise all files would be executable by that logic.
 </DD>
 <DT><STRONG>is_link(name)</STRONG></DT>
-<DD><TT>glib.is_symlink</TT> -- return true if <I>name</I> is
+<DD><TT>glib.is_symlink</TT> -- return true if <SPAN  CLASS="textit">name</SPAN> is
 a soft link.  Note that pseudo-soft link files (<TT> *.lnk) on Windows are
 not covered by this, so it always returns false on Windows.
 </DD>
@@ -10682,8 +10680,8 @@ In addition, light wrappers are available for a few functions:
 blank if unset (in comparison to <TT>nil</TT> as returned by <TT>apr.env_get</TT>)
 </DD>
 <DT><STRONG>setenv(name, val)</STRONG></DT>
-<DD>-- overwrite env var <I>name</I> with
-<I>val</I>
+<DD>-- overwrite env var <SPAN  CLASS="textit">name</SPAN> with
+<SPAN  CLASS="textit">val</SPAN>
 </DD>
 <DT><STRONG>basename(name[, split])</STRONG></DT>
 <DD><TT>glib.path_get_basename</TT> -- get last
@@ -10691,11 +10689,11 @@ path element, and split off last dot-separated extension and return
 separately
 </DD>
 <DT><STRONG>is_empty(name)</STRONG></DT>
-<DD>-- return true if <I>name</I> either does not
+<DD>-- return true if <SPAN  CLASS="textit">name</SPAN> either does not
 exist or is an empty file.
 </DD>
 <DT><STRONG>touch(name[, date])</STRONG></DT>
-<DD>-- if <I>name</I> does not exist, it is
+<DD>-- if <SPAN  CLASS="textit">name</SPAN> does not exist, it is
 created as an empty file.  Otherwise, it sets the modification time to
 the given parameter (seconds past epoch).
 </DD>
@@ -10704,7 +10702,7 @@ the given parameter (seconds past epoch).
 <P>
 
 <H1><A NAME="SECTION001120000000000000000">
-F.2 File Commands</A>
+F.<SPAN CLASS="arabic">2</SPAN> File Commands</A>
 </H1>
 
 <P>
@@ -10713,11 +10711,11 @@ Some additional file commands not provided by GLib are provided here:
 <P>
 <DL>
 <DT><STRONG>cp(src, dest[, mode])</STRONG></DT>
-<DD>-- copy file <I>src</I> to <I>dest</I>.
-<I>src</I> and <I>dest</I> may be a file descriptor or a file name.  If
-<I>dest</I> is a file name, protection attributes are set to <I>mode</I>,
-if provided.  If <I>src</I> and <I>dest</I> are both file names, and
-<I>mode</I> is not provided, permissios are copied from <I>src</I>.
+<DD>-- copy file <SPAN  CLASS="textit">src</SPAN> to <SPAN  CLASS="textit">dest</SPAN>.
+<SPAN  CLASS="textit">src</SPAN> and <SPAN  CLASS="textit">dest</SPAN> may be a file descriptor or a file name.  If
+<SPAN  CLASS="textit">dest</SPAN> is a file name, protection attributes are set to <SPAN  CLASS="textit">mode</SPAN>,
+if provided.  If <SPAN  CLASS="textit">src</SPAN> and <SPAN  CLASS="textit">dest</SPAN> are both file names, and
+<SPAN  CLASS="textit">mode</SPAN> is not provided, permissios are copied from <SPAN  CLASS="textit">src</SPAN>.
 </DD>
 <DT><STRONG>rm(name)</STRONG></DT>
 <DD>-- recursive delete
@@ -10730,7 +10728,7 @@ resolved before comparison.
 </DD>
 <DT><STRONG>cp_RpL(src, dest[, plus_w])</STRONG></DT>
 <DD>-- copy source to destination
-recursively, copying permissions if possible.  If <I>plus_w</I> is
+recursively, copying permissions if possible.  If <SPAN  CLASS="textit">plus_w</SPAN> is
 true, user write permission is added to all destination items.
 </DD>
 <DT><STRONG>ln(src, dest)</STRONG></DT>
@@ -10739,14 +10737,14 @@ possible, a soft link is made.  Otherwise, if possible, a hard link if made.
 If no link can be made, this is the same as <TT>cp_RpL</TT>.
 </DD>
 <DT><STRONG>cat(f)</STRONG></DT>
-<DD>-- print <I>f</I> on standard output.  <I>f</I> may be
+<DD>-- print <SPAN  CLASS="textit">f</SPAN> on standard output.  <SPAN  CLASS="textit">f</SPAN> may be
 either the name of a file or a Lua file descriptor.  The entire file
 is not read into memory at once, so this can be safely used with large
 files.
 </DD>
 <DT><STRONG>append_line(f, msg)</STRONG></DT>
-<DD>-- append <I>msg</I> and a newline to the
-file <I>f</I>.  <I>f</I> may be either the name of a file or a Lua
+<DD>-- append <SPAN  CLASS="textit">msg</SPAN> and a newline to the
+file <SPAN  CLASS="textit">f</SPAN>.  <SPAN  CLASS="textit">f</SPAN> may be either the name of a file or a Lua
 file descriptor.
 </DD>
 <DT><STRONG>split_filename(f)</STRONG></DT>
@@ -10783,28 +10781,28 @@ For example, <TT>'{a,b,c*}'</TT> would return <TT>{'a', 'b', 'c*'}</TT>.
 </DD>
 <DT><STRONG>dir_regex([dir,] regex)</STRONG></DT>
 <DD>-- Return an iterator which
-produces names of directory entries in <I>dir</I> matching <I>regex</I>.
-If <I>dir</I> is not specified, search the current directory.  The
-<I>regex</I> parameter may either by a regular expression string or a
+produces names of directory entries in <SPAN  CLASS="textit">dir</SPAN> matching <SPAN  CLASS="textit">regex</SPAN>.
+If <SPAN  CLASS="textit">dir</SPAN> is not specified, search the current directory.  The
+<SPAN  CLASS="textit">regex</SPAN> parameter may either by a regular expression string or a
 compiled regular expression (from <TT>glib.regex_new</TT>).  The special
 directory elements <TT>'.'</TT> and <TT>'..'</TT> cannot be matched.
 </DD>
 <DT><STRONG>dir_glob([dir,] glob)</STRONG></DT>
 <DD>-- Return an iterator which produces
-names of directory entries in <I>dir</I> matching glob-style pattern
-<I>glob</I>.  If <I>dir</I> is not specified, search the current directory.
+names of directory entries in <SPAN  CLASS="textit">dir</SPAN> matching glob-style pattern
+<SPAN  CLASS="textit">glob</SPAN>.  If <SPAN  CLASS="textit">dir</SPAN> is not specified, search the current directory.
 The special directory elements <TT>'.'</TT> and <TT>'..'</TT> cannot be matched.
 </DD>
 <DT><STRONG>relative_glob([dir,] glob)</STRONG></DT>
 <DD>-- Return an iterator which produces
 relative paths of directory entries which match the glob-style pattern
-<I>glob</I>.  Directory separators in <I>glob</I> are followed.  No
+<SPAN  CLASS="textit">glob</SPAN>.  Directory separators in <SPAN  CLASS="textit">glob</SPAN> are followed.  No
 part of the pattern may match the special directory entires <TT>'.'</TT> and
 <TT>'..'</TT>.
 </DD>
 <DT><STRONG>glob(pat)</STRONG></DT>
 <DD>-- Return an iterator which produces directory entries
-which match the glob-style pattern <I>pat</I>.  Absolute paths are
+which match the glob-style pattern <SPAN  CLASS="textit">pat</SPAN>.  Absolute paths are
 permitted, so long as the absolute prefix contains no pattern elements
 other than curly braces/commas.  Relative patterns are always matched
 relative to the current working directory.  The special path elements
@@ -10817,7 +10815,7 @@ example, <TT>'../*.[ch]'</TT> works, but <TT>'*/..'</TT> does not.
 <P>
 
 <H1><A NAME="SECTION001130000000000000000">
-F.3 Odin Support Utilities</A>
+F.<SPAN CLASS="arabic">3</SPAN> Odin Support Utilities</A>
 </H1>
 
 <P>
@@ -10826,8 +10824,8 @@ The following functions are for common things done in Odin scripts:
 <P>
 <DL>
 <DT><STRONG>odin_error(msg[, ret])</STRONG></DT>
-<DD>-- append <I>msg</I> to <TT>ERRORS</TT>
-and, if <I>ret</I> is provided, exit the script with <I>ret</I> as the
+<DD>-- append <SPAN  CLASS="textit">msg</SPAN> to <TT>ERRORS</TT>
+and, if <SPAN  CLASS="textit">ret</SPAN> is provided, exit the script with <SPAN  CLASS="textit">ret</SPAN> as the
 result.
 </DD>
 <DT><STRONG>ODINVERBOSE</STRONG></DT>
@@ -10837,31 +10835,31 @@ result.
 <DD>- shortcut for <TT>getenv('ODINRBSHOST')</TT>
 </DD>
 <DT><STRONG>odin_log(msg)</STRONG></DT>
-<DD>-- print <I>msg</I> if ODINVERBOSE is set in
+<DD>-- print <SPAN  CLASS="textit">msg</SPAN> if ODINVERBOSE is set in
 the environment, and prepend ODINRBSHOST if it is set in the
 environment.  This is intended for printing the command to execute
 before exeuting it.
 </DD>
 <DT><STRONG>trim(s)</STRONG></DT>
-<DD>-- trim leading and trailing whitespace from <I>s</I>.
+<DD>-- trim leading and trailing whitespace from <SPAN  CLASS="textit">s</SPAN>.
 This is intended for use with command strings with embedded
 odin-expressions, since they are technically separate words, and
 therefore separated by whitespace (usually newlines):
 <BR><TT>() +cmd='...files = trim[['(%files)']]...' :lua_stdout</TT>
 </DD>
 <DT><STRONG>odin_quote(s)</STRONG></DT>
-<DD>-- quote <I>s</I> as a single Odin token
+<DD>-- quote <SPAN  CLASS="textit">s</SPAN> as a single Odin token
 </DD>
 <DT><STRONG>odin_quote_file(s[, virt])</STRONG></DT>
-<DD>-- quote <I>s</I> as an Odin
-path; that is, slashes remain unquoted.  If <I>virt</I> is true,
+<DD>-- quote <SPAN  CLASS="textit">s</SPAN> as an Odin
+path; that is, slashes remain unquoted.  If <SPAN  CLASS="textit">virt</SPAN> is true,
 percent signs remain unquoted as well.
 </DD>
 <DT><STRONG>runcmd(cmd[, args])</STRONG></DT>
 <DD>-- execute a system command.
-<I>cmd</I> is parsed like a shell command.  Array elements of
-<I>args</I> are appended to arguments split out from <I>cmd</I> as if
-they were fully quoted arguments.  <I>args</I> may also have named
+<SPAN  CLASS="textit">cmd</SPAN> is parsed like a shell command.  Array elements of
+<SPAN  CLASS="textit">args</SPAN> are appended to arguments split out from <SPAN  CLASS="textit">cmd</SPAN> as if
+they were fully quoted arguments.  <SPAN  CLASS="textit">args</SPAN> may also have named
 options:
 <DL>
 <DT><STRONG>stdin</STRONG></DT>
@@ -10896,7 +10894,7 @@ removed as well.
 <P>
 
 <H1><A NAME="SECTION001140000000000000000">
-F.4 Configuration Support</A>
+F.<SPAN CLASS="arabic">4</SPAN> Configuration Support</A>
 </H1>
 
 <P>
@@ -10906,12 +10904,12 @@ script:
 <P>
 <DL>
 <DT><STRONG>parse_ldflags(fl)</STRONG></DT>
-<DD>-- Parse <I>fl</I> as standard UNIX C
+<DD>-- Parse <SPAN  CLASS="textit">fl</SPAN> as standard UNIX C
 linker flags, and return as Odin <TT>+lib_sp</TT>, <TT>+lib</TT>, and
 +ld_flags options.
 </DD>
 <DT><STRONG>parse_cflags(fl)</STRONG></DT>
-<DD>-- Parse <I>fl</I> as standard UNIX C
+<DD>-- Parse <SPAN  CLASS="textit">fl</SPAN> as standard UNIX C
 compiler flags, and return as Odin <TT>+inc_sp</TT>, <TT>+define</TT>, and
 +cc_flags options.
 </DD>
@@ -10956,7 +10954,7 @@ format.
 <P>
 
 <H1><A NAME="SECTION001150000000000000000">
-F.5 Miscellaneous</A>
+F.<SPAN CLASS="arabic">5</SPAN> Miscellaneous</A>
 </H1>
 
 <P>
@@ -10966,7 +10964,7 @@ The following defy categorization:
 <DL>
 <DT><STRONG>words(f)</STRONG></DT>
 <DD>-- replacement for shell's <TT>for x in `cat f`</TT>, in
-that the file <I>f</I> (either a file name or a Lua file descriptor)
+that the file <SPAN  CLASS="textit">f</SPAN> (either a file name or a Lua file descriptor)
 is read, and an iterator is returned which iterates over
 whitespace-separated words.
 </DD>
@@ -11023,7 +11021,7 @@ Richard&nbsp;M. Stallman and Roland McGrath.
 <BR><HR>
 <ADDRESS>
 Thomas J. Moore
-2012-11-25
+2016-09-08
 </ADDRESS>
 </BODY>
 </HTML>

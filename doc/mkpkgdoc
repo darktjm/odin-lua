@@ -9,8 +9,6 @@
 --    OK to leave this package's rules in misc sec?
 --  check out EnvVarLst and PrmTypLst; maybe easier way to get at those
 
-apr = require 'apr'
-
 docdir = arg[1] .. '/'
 
 -- first read PKGS/PKGLST

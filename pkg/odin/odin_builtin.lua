@@ -18,7 +18,7 @@ is_link = glib.is_symlink
 if unpack == nil then unpack = table.unpack end
 
 --- inverse of pathcat
-dir_separator_charclass = '[' .. glib.regex_escape_string(glib.dir_separator) .. ']')
+dir_separator_charclass = '[' .. glib.regex_escape_string(glib.dir_separator) .. ']'
 dir_separator_regex = glib.regex_new(dir_separator_charclass)
 dir_separator_all_regex = glib.regex_new('^' .. dir_separator_charclass .. '+$')
 --dir_separator_end_regex = glib.regex_new('^((?!' ..  dir_separator_charclass .. ').*?)' ..

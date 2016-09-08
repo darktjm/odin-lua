@@ -31,12 +31,13 @@ odin_log("lua!" .. cmd)
 io.input(ODIN_FILE)
 io.output('lua_stdout')
 mkdir('lua_output')
+odir = glib.get_current_dir()
 chdir('lua_output')
 
 if ODIN_cmd ~= "" then
    st, msg = pcall(dofile, ODIN_cmd)
    if not st then
-      chdir('..')
+      chdir(odir)
       odin_error(msg, 0)
    end
 end
@@ -44,7 +45,7 @@ if ODIN_cmdfile ~= "" then
    for f in io.lines(ODIN_cmdfile) do
       st, msg = pcall(dofile, f)
       if not st then
-         chdir('..')
+         chdir(odir)
 	 odin_error(msg, 0)
       end
    end
@@ -52,7 +53,7 @@ end
 if ODIN_cmd == "" and ODIN_cmdfile == "" then
    st, msg = pcall(cat, io.input())
    if not st then
-      chdir('..')
+      chdir(odir)
       odin_error(msg, 0)
    end
 end
